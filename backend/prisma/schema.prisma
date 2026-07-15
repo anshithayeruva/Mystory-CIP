@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id             String          @id @default(uuid())
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
   email          String          @unique
   passwordHash   String
   role           Role            @default(STUDENT)
@@ -23,12 +23,11 @@ model User {
   hodProfile     HodProfile?
   studentProfile StudentProfile?
 
-  @@index([email])
   @@index([role])
 }
 
 model Department {
-  id        String           @id @default(uuid())
+  id        String           @id @default(auto()) @map("_id") @db.ObjectId
   name      String           @unique
   code      String           @unique
   createdAt DateTime         @default(now())
@@ -41,17 +40,17 @@ model Department {
 }
 
 model AdminProfile {
-  id        String   @id @default(uuid())
-  userId    String   @unique
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @unique @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model HodProfile {
-  id           String     @id @default(uuid())
-  userId       String     @unique
-  departmentId String     @unique
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String     @unique @db.ObjectId
+  departmentId String     @unique @db.ObjectId
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   status       HodStatus  @default(ACTIVE)
@@ -60,11 +59,11 @@ model HodProfile {
 }
 
 model FacultyProfile {
-  id           String          @id @default(uuid())
-  userId       String          @unique
+  id           String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String          @unique @db.ObjectId
   employeeId   String          @unique
   designation  String
-  departmentId String
+  departmentId String          @db.ObjectId
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
   status       FacultyStatus   @default(ACTIVE)
@@ -76,18 +75,18 @@ model FacultyProfile {
 }
 
 model StudentProfile {
-  id                 String        @id @default(uuid())
-  userId             String        @unique
+  id                 String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId             String        @unique @db.ObjectId
   rollNumber         String        @unique
-  departmentId       String
+  departmentId       String        @db.ObjectId
   currentSemester    Int
   batch              String
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
-  programId          String?
+  programId          String?       @db.ObjectId
   registrationNumber String?       @unique
-  sectionId          String?
-  semesterId         String?
+  sectionId          String?       @db.ObjectId
+  semesterId         String?       @db.ObjectId
   status             StudentStatus @default(ACTIVE)
   attendance         Attendance[]
   enrollments        Enrollment[]
@@ -105,11 +104,11 @@ model StudentProfile {
 }
 
 model Course {
-  id             String          @id @default(uuid())
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
   name           String
   code           String          @unique
   credits        Int
-  departmentId   String
+  departmentId   String          @db.ObjectId
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   attendance     Attendance[]
@@ -121,9 +120,9 @@ model Course {
 }
 
 model Enrollment {
-  id           String         @id @default(uuid())
-  studentId    String
-  courseId     String
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
+  studentId    String         @db.ObjectId
+  courseId     String         @db.ObjectId
   semester     Int
   academicYear String
   grade        String?
@@ -140,9 +139,9 @@ model Enrollment {
 }
 
 model Attendance {
-  id        String           @id @default(uuid())
-  studentId String
-  courseId  String
+  id        String           @id @default(auto()) @map("_id") @db.ObjectId
+  studentId String           @db.ObjectId
+  courseId  String           @db.ObjectId
   date      DateTime
   status    AttendanceStatus @default(PRESENT)
   remarks   String?
@@ -158,9 +157,9 @@ model Attendance {
 }
 
 model FacultyCourse {
-  id           String         @id @default(uuid())
-  facultyId    String
-  courseId     String
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
+  facultyId    String         @db.ObjectId
+  courseId     String         @db.ObjectId
   section      String
   semester     Int
   academicYear String
@@ -175,10 +174,10 @@ model FacultyCourse {
 }
 
 model Program {
-  id           String           @id @default(uuid())
+  id           String           @id @default(auto()) @map("_id") @db.ObjectId
   name         String           @unique
   code         String           @unique
-  departmentId String
+  departmentId String           @db.ObjectId
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
   department   Department       @relation(fields: [departmentId], references: [id], onDelete: Cascade)
@@ -189,9 +188,9 @@ model Program {
 }
 
 model Semester {
-  id             String           @id @default(uuid())
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
   semesterNumber Int
-  programId      String
+  programId      String           @db.ObjectId
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   sections       Section[]
@@ -203,9 +202,9 @@ model Semester {
 }
 
 model Section {
-  id         String           @id @default(uuid())
+  id         String           @id @default(auto()) @map("_id") @db.ObjectId
   name       String
-  semesterId String
+  semesterId String           @db.ObjectId
   createdAt  DateTime         @default(now())
   updatedAt  DateTime         @updatedAt
   semester   Semester         @relation(fields: [semesterId], references: [id], onDelete: Cascade)

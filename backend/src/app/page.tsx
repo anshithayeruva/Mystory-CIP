@@ -67,14 +67,14 @@ export default function Home() {
             </div>
             
             <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div style={{ color: 'var(--success)', fontSize: '1.5rem', fontWeight: 'bold' }}>PostgreSQL</div>
-              <p className="text-sm">Relational storage optimized with multi-table indexes, cascades, and constraints.</p>
+              <div style={{ color: 'var(--success)', fontSize: '1.5rem', fontWeight: 'bold' }}>MongoDB</div>
+              <p className="text-sm">Document database storage optimized with collections, composite indexes, and replica set transaction support.</p>
               <span className="badge badge-success" style={{ width: 'fit-content', marginTop: 'auto' }}>Ready</span>
             </div>
 
             <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div style={{ color: '#8b5cf6', fontSize: '1.5rem', fontWeight: 'bold' }}>Prisma ORM</div>
-              <p className="text-sm">Fully-typed schema definitions for relational data mappings and automated migrations.</p>
+              <p className="text-sm">Fully-typed schema definitions for MongoDB document models and database index synchronization.</p>
               <span className="badge" style={{ backgroundColor: '#f5f3ff', color: '#8b5cf6', width: 'fit-content', marginTop: 'auto' }}>Generated</span>
             </div>
 

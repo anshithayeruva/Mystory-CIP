@@ -1,6 +1,6 @@
 # Academix: College Academic Analytics Portal
 
-This is a production-ready **Next.js 15** academic analytics system built with **TypeScript**, **PostgreSQL**, **Prisma ORM**, **Redis**, and edge-compatible **JWT Authentication**.
+This is a production-ready **Next.js 15** academic analytics system built with **TypeScript**, **MongoDB**, **Prisma ORM**, **Redis**, and edge-compatible **JWT Authentication**.
 
 ---
 
@@ -26,20 +26,20 @@ Copy the environment variables template to create your local configurations file
   ```
 
 Open the newly created `.env` file and configure it to match your local setup:
-- **`DATABASE_URL`**: Update this connection string with your local PostgreSQL credentials (username, password, port, and database name).
+- **`DATABASE_URL`**: Update this connection string with your MongoDB credentials. A Replica Set is required for Prisma transaction support (`$transaction`), so run with replica set configuration (e.g., `mongodb://localhost:27018/academix?replicaSet=rs0`) or use MongoDB Atlas.
 - **`REDIS_URL`**: Ensure this points to your local running Redis server (default is `redis://localhost:6379`).
 - **`JWT_SECRET`**: You can leave this as default for local testing, or change it to any custom string.
 
 ### 3. Initialize the Database
-Ensure your local PostgreSQL server is running, then run the database migrations. This creates all the necessary tables (Users, Profiles, Courses, Enrollments, etc.):
+Ensure your MongoDB replica set is running, then run:
 ```bash
-npx prisma migrate dev --name init
+npx prisma db push
 ```
 
-*Note: This command will automatically run `npx prisma generate` at the end to create local TypeScript types. If you ever modify the schema, run `npx prisma generate` manually.*
+*Note: This command will automatically run `npx prisma generate` at the end to create local TypeScript types and synchronize MongoDB collections and indexes.*
 
 ### 4. Start the Development Server
-Ensure both **PostgreSQL** and **Redis** servers are running on your machine, then spin up the Next.js dev server:
+Ensure both **MongoDB** and **Redis** servers are running on your machine, then spin up the Next.js dev server:
 ```bash
 npm run dev
 ```
