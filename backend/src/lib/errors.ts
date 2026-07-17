@@ -6,7 +6,7 @@ export class AppError extends Error {
   constructor(
     public message: string,
     public statusCode: number = 500,
-    public errors?: any
+    public errors?: unknown
   ) {
     super(message);
     this.name = this.constructor.name;
@@ -15,7 +15,7 @@ export class AppError extends Error {
 }
 
 export class BadRequestError extends AppError {
-  constructor(message: string = 'Bad Request', errors?: any) {
+  constructor(message: string = 'Bad Request', errors?: unknown) {
     super(message, 400, errors);
   }
 }
@@ -79,7 +79,7 @@ export function handleError(error: unknown) {
 
   // Handle Prisma Database Errors
   if (typeof error === 'object' && error !== null && 'code' in error) {
-    const prismaErr = error as { code: string; meta?: any; message?: string };
+    const prismaErr = error as { code: string; meta?: Record<string, unknown>; message?: string };
     switch (prismaErr.code) {
       case 'P2002': // Unique constraint violation
         return NextResponse.json(

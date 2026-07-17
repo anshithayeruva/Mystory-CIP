@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { Role } from '@prisma/client';
-import { ROLE_WEIGHTS } from '@/config/roles';
+import { Role, ROLE_WEIGHTS } from '@/config/roles';
 
 // Secret key must match process.env.JWT_SECRET
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production-at-least-32-chars';
@@ -23,10 +22,17 @@ function base64urlDecode(str: string): Uint8Array {
   return bytes;
 }
 
+interface EdgeTokenPayload {
+  userId: string;
+  email: string;
+  role: string;
+  exp?: number;
+}
+
 /**
  * Web Crypto API-based JWT verification that runs safely on Next.js Edge Runtime.
  */
-async function verifyJwtEdge(token: string): Promise<any | null> {
+async function verifyJwtEdge(token: string): Promise<EdgeTokenPayload | null> {
   try {
     const parts = token.split('.');
     if (parts.length !== 3) return null;
@@ -45,7 +51,7 @@ async function verifyJwtEdge(token: string): Promise<any | null> {
 
     const data = encoder.encode(`${header}.${payload}`);
     const sigBuf = base64urlDecode(signature);
-    const isValid = await crypto.subtle.verify('HMAC', key, sigBuf as any, data as any);
+    const isValid = await crypto.subtle.verify('HMAC', key, sigBuf as unknown as ArrayBuffer, data as unknown as ArrayBuffer);
 
     if (!isValid) return null;
 

@@ -1,5 +1,3 @@
-import Image from 'next/image';
-
 export default function Home() {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>

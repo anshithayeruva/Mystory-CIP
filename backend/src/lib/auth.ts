@@ -29,7 +29,7 @@ export async function comparePassword(password: string, hash: string): Promise<b
  */
 export function generateToken(payload: TokenPayload): string {
   return jwt.sign(payload, env.jwtSecret, {
-    expiresIn: env.jwtExpiresIn as any,
+    expiresIn: env.jwtExpiresIn as jwt.SignOptions['expiresIn'],
   });
 }
 

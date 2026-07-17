@@ -22,7 +22,7 @@ import {
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Authenticate user
@@ -34,7 +34,7 @@ export async function GET(
     }
 
     // Get program ID from URL
-    const { id } = params;
+    const { id } = await params;
 
     // Fetch program
     const program =
@@ -58,7 +58,7 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Authenticate user
@@ -70,7 +70,7 @@ export async function PATCH(
     }
 
     // Get program ID from URL
-    const { id } = params;
+    const { id } = await params;
 
     // Parse request body
     const body = await request.json();
@@ -104,7 +104,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Authenticate user
@@ -116,7 +116,7 @@ export async function DELETE(
     }
 
     // Get program ID from URL
-    const { id } = params;
+    const { id } = await params;
 
     // Delete program
     await ProgramService.deleteProgram(id);

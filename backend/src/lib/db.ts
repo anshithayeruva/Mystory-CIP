@@ -3,7 +3,6 @@ import { env } from '@/config/env';
 
 declare global {
   // Allow global var declarations in TypeScript for globalThis
-  // eslint-disable-next-line no-var
   var prismaGlobal: PrismaClient | undefined;
 }
 

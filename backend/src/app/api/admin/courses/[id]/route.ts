@@ -22,7 +22,7 @@ import {
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authenticatedUser = getAuthenticatedUser(request);
@@ -31,7 +31,7 @@ export async function GET(
       throw new ForbiddenError('Admin access required');
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     const course =
       await CourseService.getCourseById(id);
@@ -53,7 +53,7 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authenticatedUser = getAuthenticatedUser(request);
@@ -62,7 +62,7 @@ export async function PATCH(
       throw new ForbiddenError('Admin access required');
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     const body = await request.json();
 
@@ -92,7 +92,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authenticatedUser = getAuthenticatedUser(request);
@@ -101,7 +101,7 @@ export async function DELETE(
       throw new ForbiddenError('Admin access required');
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     await CourseService.deleteCourse(id);
 

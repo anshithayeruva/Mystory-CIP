@@ -1,4 +1,9 @@
-import { Role } from '@prisma/client';
+export enum Role {
+  ADMIN = 'ADMIN',
+  HOD = 'HOD',
+  FACULTY = 'FACULTY',
+  STUDENT = 'STUDENT',
+}
 
 /**
  * Defines the numerical weight/clearance of each role.
