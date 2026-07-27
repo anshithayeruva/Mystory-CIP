@@ -92,6 +92,7 @@ model StudentProfile {
   status             StudentStatus @default(ACTIVE)
   attendance         Attendance[]
   enrollments        Enrollment[]
+  pulseParticipations PulseParticipation[]
   department         Department    @relation(fields: [departmentId], references: [id])
   program            Program?      @relation(fields: [programId], references: [id])
   section            Section?      @relation(fields: [sectionId], references: [id])
@@ -404,6 +405,8 @@ model PulseSession {
   department Department     @relation(fields: [departmentId], references: [id])
   program    Program?       @relation(fields: [programId], references: [id])
   faculty    FacultyProfile @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  questions      PulseQuestion[]
+  participations PulseParticipation[]
 
   @@index([courseId])
   @@index([topicId])
@@ -412,5 +415,65 @@ model PulseSession {
   @@index([facultyId])
   @@index([date])
   @@index([status])
+}
+
+model PulseQuestion {
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  sessionId      String          @db.ObjectId
+  questionNumber Int
+  questionText   String
+  options        String[]
+  correctAnswer  String
+  marks          Float           @default(1.0)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  session        PulseSession    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  answers        PulseAnswer[]
+
+  @@unique([sessionId, questionNumber])
+  @@index([sessionId])
+}
+
+model PulseParticipation {
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  sessionId        String          @db.ObjectId
+  studentId        String          @db.ObjectId
+  isPresent        Boolean         @default(true)
+  hasAttempted     Boolean         @default(false)
+  score            Float?
+  maxScore         Float?
+  percentage       Float?
+  timeTakenSeconds Int?
+  attemptedAt      DateTime?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  session          PulseSession    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  student          StudentProfile  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  answers          PulseAnswer[]
+
+  @@unique([sessionId, studentId])
+  @@index([sessionId])
+  @@index([studentId])
+}
+
+model PulseAnswer {
+  id               String             @id @default(auto()) @map("_id") @db.ObjectId
+  participationId  String             @db.ObjectId
+  questionId       String             @db.ObjectId
+  studentAnswer    String
+  isCorrect        Boolean
+  marksAwarded     Float              @default(0.0)
+  timeTakenSeconds Int?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  participation    PulseParticipation @relation(fields: [participationId], references: [id], onDelete: Cascade)
+  question         PulseQuestion      @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([participationId, questionId])
+  @@index([participationId])
+  @@index([questionId])
 }
 
