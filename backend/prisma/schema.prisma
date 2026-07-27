@@ -348,6 +348,23 @@ enum PulseResultVisibility {
   IMMEDIATE
 }
 
+enum PulseSessionStatus {
+  DRAFT
+  PUBLISHED
+  LIVE
+  PAUSED
+  COMPLETED
+  CLOSED
+  ARCHIVED
+}
+
+enum PulseTimerStatus {
+  IDLE
+  RUNNING
+  PAUSED
+  COMPLETED
+}
+
 model PulseSession {
   id               String                @id @default(auto()) @map("_id") @db.ObjectId
   courseId         String                @db.ObjectId
@@ -368,6 +385,17 @@ model PulseSession {
   difficultyLevel  PulseDifficultyLevel
   attendanceRule   PulseAttendanceRule
   resultVisibility PulseResultVisibility
+  status                PulseSessionStatus    @default(DRAFT)
+  sessionCode           String?               @unique
+  codeCreatedAt         DateTime?
+  codeExpiresAt         DateTime?
+  isCodeActive          Boolean               @default(false)
+  qrCodeUrl             String?
+  timerStatus           PulseTimerStatus      @default(IDLE)
+  timerDurationMinutes  Int?
+  timerActualStartTime  DateTime?
+  timerActualEndTime    DateTime?
+  timerRemainingSeconds Int?
   createdAt        DateTime              @default(now())
   updatedAt        DateTime              @updatedAt
 
@@ -383,5 +411,6 @@ model PulseSession {
   @@index([programId])
   @@index([facultyId])
   @@index([date])
+  @@index([status])
 }
 
