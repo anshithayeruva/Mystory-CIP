@@ -32,11 +32,12 @@ model Department {
   code      String           @unique
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
-  courses   Course[]
-  faculty   FacultyProfile[]
-  hod       HodProfile?
-  programs  Program[]
-  students  StudentProfile[]
+  courses       Course[]
+  faculty       FacultyProfile[]
+  hod           HodProfile?
+  programs      Program[]
+  students      StudentProfile[]
+  pulseSessions PulseSession[]
 }
 
 model AdminProfile {
@@ -66,9 +67,10 @@ model FacultyProfile {
   departmentId String          @db.ObjectId
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
-  status       FacultyStatus   @default(ACTIVE)
-  courses      FacultyCourse[]
-  department   Department      @relation(fields: [departmentId], references: [id])
+  status        FacultyStatus   @default(ACTIVE)
+  courses       FacultyCourse[]
+  pulseSessions PulseSession[]
+  department    Department      @relation(fields: [departmentId], references: [id])
   user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([departmentId])
@@ -121,6 +123,7 @@ model Course {
   syllabus       Syllabus?
   courseOutcomes CourseOutcome[]
   units          Unit[]
+  pulseSessions  PulseSession[]
 
   @@index([departmentId])
   @@index([programId])
@@ -188,9 +191,10 @@ model Program {
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
   department   Department       @relation(fields: [departmentId], references: [id], onDelete: Cascade)
-  semesters    Semester[]
-  students     StudentProfile[]
-  courses      Course[]
+  semesters     Semester[]
+  students      StudentProfile[]
+  courses       Course[]
+  pulseSessions PulseSession[]
 
   @@index([departmentId])
 }
@@ -301,7 +305,83 @@ model Topic {
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  unit        Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  unit          Unit           @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  pulseSessions PulseSession[]
 
   @@index([unitId])
 }
+
+enum PulseSessionType {
+  MID_CLASS_CHECK
+  END_OF_CLASS_CHECK
+  END_OF_DAY_REVIEW
+  WEEKLY_REVISION
+  LAB_UNDERSTANDING_CHECK
+  TUTORIAL_SESSION
+  REMEDIAL_SESSION
+  PLACEMENT_TRAINING_SESSION
+  CONTEST_PREPARATION_SESSION
+}
+
+enum PulseQuestionType {
+  MCQ
+  TRUE_FALSE
+  SHORT_ANSWER
+}
+
+enum PulseDifficultyLevel {
+  EASY
+  MEDIUM
+  HARD
+  MIXED
+}
+
+enum PulseAttendanceRule {
+  ATTEMPT_REQUIRED
+  QR_ATTENDANCE_ONLY
+  BOTH
+}
+
+enum PulseResultVisibility {
+  FACULTY_ONLY
+  STUDENTS_AFTER_SESSION
+  IMMEDIATE
+}
+
+model PulseSession {
+  id               String                @id @default(auto()) @map("_id") @db.ObjectId
+  courseId         String                @db.ObjectId
+  topicId          String                @db.ObjectId
+  departmentId     String                @db.ObjectId
+  programId        String?               @db.ObjectId
+  semester         Int
+  section          String
+  facultyId        String                @db.ObjectId
+  sessionType      PulseSessionType
+  title            String
+  description      String?
+  date             DateTime
+  startTime        String
+  durationMinutes  Int
+  questionCount    Int
+  questionType     PulseQuestionType
+  difficultyLevel  PulseDifficultyLevel
+  attendanceRule   PulseAttendanceRule
+  resultVisibility PulseResultVisibility
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  course     Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  topic      Topic          @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  department Department     @relation(fields: [departmentId], references: [id])
+  program    Program?       @relation(fields: [programId], references: [id])
+  faculty    FacultyProfile @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+
+  @@index([courseId])
+  @@index([topicId])
+  @@index([departmentId])
+  @@index([programId])
+  @@index([facultyId])
+  @@index([date])
+}
+

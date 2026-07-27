@@ -14,7 +14,6 @@ import {
   TopicInput,
   UpdateTopicInput,
   SyllabusInput,
-  SubjectQueryInput,
 } from './subject.validation';
 import {
   SubjectResponse,
@@ -23,7 +22,9 @@ import {
   UnitResponse,
   TopicResponse,
   SyllabusResponse,
+  SubjectQueryDTO,
 } from './subject.types';
+import { Prisma } from '@prisma/client';
 
 export class SubjectService {
   /**
@@ -276,15 +277,14 @@ export class SubjectService {
   /**
    * Lists subjects assigned to the requesting faculty member with search, filter, and pagination.
    */
-  static async listSubjects(userId: string, query: SubjectQueryInput): Promise<SubjectListResponse> {
+  static async listSubjects(userId: string, query: SubjectQueryDTO): Promise<SubjectListResponse> {
     const faculty = await this.getFacultyProfile(userId);
 
-    const { page, limit, search, programId, semester, departmentId } = query;
+    const { page = 1, limit = 10, search, programId, semester, departmentId } = query;
     const skip = (page - 1) * limit;
 
     // Build filter query scoped strictly to assigned subjects
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const where: any = {
+    const where: Prisma.CourseWhereInput = {
       facultyCourses: {
         some: {
           facultyId: faculty.id,
