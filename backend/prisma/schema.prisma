@@ -15,6 +15,7 @@ model User {
   firstName      String
   lastName       String
   phoneNumber    String?
+  lastLoginAt    DateTime?
   isActive       Boolean         @default(true)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
@@ -68,6 +69,8 @@ model FacultyProfile {
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
   status        FacultyStatus   @default(ACTIVE)
+  profilePicture String?
+  officeLocation String?
   courses       FacultyCourse[]
   pulseSessions PulseSession[]
   department    Department      @relation(fields: [departmentId], references: [id])
