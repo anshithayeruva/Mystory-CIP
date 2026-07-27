@@ -109,14 +109,21 @@ model Course {
   code           String          @unique
   credits        Int
   departmentId   String          @db.ObjectId
+  programId      String?         @db.ObjectId
+  semester       Int?
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   attendance     Attendance[]
   department     Department      @relation(fields: [departmentId], references: [id])
+  program        Program?        @relation(fields: [programId], references: [id])
   enrollments    Enrollment[]
   facultyCourses FacultyCourse[]
+  syllabus       Syllabus?
+  courseOutcomes CourseOutcome[]
+  units          Unit[]
 
   @@index([departmentId])
+  @@index([programId])
 }
 
 model Enrollment {
@@ -183,6 +190,7 @@ model Program {
   department   Department       @relation(fields: [departmentId], references: [id], onDelete: Cascade)
   semesters    Semester[]
   students     StudentProfile[]
+  courses      Course[]
 
   @@index([departmentId])
 }
@@ -244,4 +252,56 @@ enum HodStatus {
   ACTIVE
   INACTIVE
   BLOCKED
+}
+
+model Syllabus {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  courseId         String   @unique @db.ObjectId
+  fileUrl          String
+  originalFileName String
+  uploadDate       DateTime @default(now())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  course           Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+}
+
+model CourseOutcome {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  courseId    String   @db.ObjectId
+  coNumber    String   // e.g., "CO1", "CO2" or "1"
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, coNumber])
+  @@index([courseId])
+}
+
+model Unit {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  courseId    String   @db.ObjectId
+  unitNumber  Int      // e.g., 1, 2, 3
+  unitName    String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  topics      Topic[]
+
+  @@unique([courseId, unitNumber])
+  @@index([courseId])
+}
+
+model Topic {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  unitId      String   @db.ObjectId
+  topicName   String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  unit        Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
+
+  @@index([unitId])
 }

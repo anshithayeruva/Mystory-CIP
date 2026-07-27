@@ -7,9 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio"
+    "prisma:generate": "prisma generate --schema=../backend/prisma/schema.prisma && cp -r ../backend/node_modules/.prisma ./node_modules/ && cp -r ../backend/node_modules/@prisma/client ./node_modules/@prisma/",
+    "prisma:migrate": "prisma migrate dev --schema=../backend/prisma/schema.prisma",
+    "prisma:studio": "prisma studio --schema=../backend/prisma/schema.prisma"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
