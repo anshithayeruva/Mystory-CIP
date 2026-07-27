@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, GraduationCap, Users, BarChart3, Settings, Building2, ChevronUp, ChevronDown, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { LayoutDashboard, GraduationCap, Users, BarChart3, Settings, Building2, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import styles from "../admin-layout.module.css";
 
 const navItems = [
@@ -30,7 +30,7 @@ export default function Sidebar() {
             <span className={styles.logoSubtitle}>INSTITUTION ADMIN</span>
           </div>
         )}
-        <button 
+        <button suppressHydrationWarning 
           onClick={() => setIsCollapsed(!isCollapsed)} 
           className={styles.collapseBtn}
           title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
@@ -57,30 +57,6 @@ export default function Sidebar() {
           );
         })}
       </nav>
-
-      <div className={styles.userProfile}>
-        <div className={styles.userInfo}>
-          <div className={styles.avatar}>
-            <img 
-              src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" 
-              alt="Admin User" 
-              className={styles.avatar}
-            />
-          </div>
-          {!isCollapsed && (
-            <div>
-              <div className={styles.userName}>Admin User</div>
-              <div className={styles.userRole}>Super Admin</div>
-            </div>
-          )}
-        </div>
-        {!isCollapsed && (
-          <div style={{ display: "flex", flexDirection: "column", color: "var(--text-muted)" }}>
-            <ChevronUp size={14} style={{ marginBottom: "-4px" }} />
-            <ChevronDown size={14} />
-          </div>
-        )}
-      </div>
     </aside>
   );
 }
