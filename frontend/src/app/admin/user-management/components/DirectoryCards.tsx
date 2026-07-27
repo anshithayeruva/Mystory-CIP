@@ -1,38 +1,43 @@
 "use client";
 
-import { GraduationCap, Users, UserCheck } from "lucide-react";
+import { TrendingUp, Hourglass, Database } from "lucide-react";
 import styles from "../directory.module.css";
 
 export default function DirectoryCards() {
   return (
     <div className={styles.summaryCardsRow}>
       <div className={styles.summaryCard}>
-        <div className={styles.summaryCardIcon} style={{ backgroundColor: "#eff6ff", color: "#3b82f6" }}>
-          <GraduationCap size={20} />
+        <div className={styles.cardTopRow}>
+          <div className={styles.summaryCardLabel}>Total Active Users</div>
+          <TrendingUp size={18} className={styles.cardTopIconGreen} />
         </div>
         <div>
-          <div className={styles.summaryCardLabel}>FACULTY</div>
-          <div className={styles.summaryCardValue}>312</div>
+          <div className={styles.summaryCardValue}>1,084</div>
+          <div className={styles.summaryCardSubtext}>+12% this month</div>
         </div>
       </div>
 
       <div className={styles.summaryCard}>
-        <div className={styles.summaryCardIcon} style={{ backgroundColor: "#faf5ff", color: "#a855f7" }}>
-          <Users size={20} />
+        <div className={styles.cardTopRow}>
+          <div className={styles.summaryCardLabel}>Pending Invites</div>
+          <Hourglass size={18} className={styles.cardTopIconGray} />
         </div>
         <div>
-          <div className={styles.summaryCardLabel}>STUDENTS</div>
-          <div className={styles.summaryCardValue}>1,240</div>
+          <div className={styles.summaryCardValue}>42</div>
+          <div className={styles.summaryCardSubtext}>Awaiting verification</div>
         </div>
       </div>
 
       <div className={styles.summaryCard}>
-        <div className={styles.summaryCardIcon} style={{ backgroundColor: "#ecfdf5", color: "#10b981" }}>
-          <UserCheck size={20} />
+        <div className={styles.cardTopRow}>
+          <div className={styles.summaryCardLabel}>Storage Used</div>
+          <Database size={18} className={styles.cardTopIconRed} />
         </div>
         <div>
-          <div className={styles.summaryCardLabel}>HODS</div>
-          <div className={styles.summaryCardValue}>24</div>
+          <div className={styles.summaryCardValue}>78.4 GB</div>
+          <div className={styles.progressBarContainer}>
+            <div className={styles.progressBarFill} style={{ width: "65%" }}></div>
+          </div>
         </div>
       </div>
     </div>

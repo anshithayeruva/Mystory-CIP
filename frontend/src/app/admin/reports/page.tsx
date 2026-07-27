@@ -3,9 +3,10 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { 
-  TrendingUp, GraduationCap, FileText, Calendar, Activity, 
+  TrendingUp, TrendingDown, GraduationCap, FileText, Calendar, Activity, 
   Building2, Users, BookOpen, CheckCircle, BarChart, 
-  List, Download, Info, X, FileSpreadsheet, FileJson
+  List, Download, Info, X, FileSpreadsheet, FileJson,
+  ChevronDown, Award, UserCheck, MoreVertical, Minus, ArrowRight, ChevronLeft, ChevronRight
 } from "lucide-react";
 import styles from "./reports.module.css";
 
@@ -16,10 +17,6 @@ const reportsData = [
   { id: 4, name: "Department Report", desc: "Department-wise academic performance.", date: "Oct 09, 2023", icon: Building2 },
   { id: 5, name: "Faculty Report", desc: "Faculty assessment and teaching performance.", date: "Oct 08, 2023", icon: Users },
   { id: 6, name: "Student Report", desc: "Individual student academic performance.", date: "Oct 07, 2023", icon: GraduationCap },
-  { id: 7, name: "Subject Report", desc: "Subject-wise understanding and assessment results.", date: "Oct 06, 2023", icon: BookOpen },
-  { id: 8, name: "Topic Mastery Report", desc: "Topic-wise mastery and learning progress.", date: "Oct 05, 2023", icon: CheckCircle },
-  { id: 9, name: "Academic Score Report", desc: "Overall assessment scores and academic metrics.", date: "Oct 04, 2023", icon: BarChart },
-  { id: 10, name: "CO/PO Report", desc: "Course Outcome and Program Outcome attainment.", date: "Oct 03, 2023", icon: List },
 ];
 
 export default function ReportsAnalyticsPage() {
@@ -47,13 +44,15 @@ export default function ReportsAnalyticsPage() {
         <div className={styles.breadcrumbs}>
           Dashboard &gt; <span>Reports & Analytics</span>
         </div>
-        <div className={styles.titleArea}>
-          <h1 className={styles.title}>Reports & Analytics</h1>
-          <p className={styles.subtitle}>
-            {activeTab === "overview" 
-              ? "View institution-wide academic performance and assessment reports."
-              : "Download institution reports for academic review, compliance, and record keeping."}
-          </p>
+        <div className={styles.titleRow}>
+          <div className={styles.titleArea}>
+            <h1 className={styles.title}>Reports & Analytics</h1>
+            <p className={styles.subtitle}>
+              {activeTab === "overview" 
+                ? "Gain institution-wide insights into academic performance, student understanding, attendance, and departmental health."
+                : "Download institution reports for academic review, compliance, and record keeping."}
+            </p>
+          </div>
         </div>
         <div className={styles.tabs}>
           <div 
@@ -72,254 +71,283 @@ export default function ReportsAnalyticsPage() {
       </div>
 
       {activeTab === "overview" ? (
-        <>
-          <div className={styles.topRow}>
-            <div className={styles.card}>
-              <div className={styles.cardTitle}>Institutional Understanding Breakdown</div>
-              <div className={styles.breakdownSection}>
-                <div className={styles.breakdownBarContainer}>
-                  <div className={styles.marker}>84%</div>
-                  <div className={styles.markerPoint}></div>
-                  <div className={styles.breakdownBar}>
-                    <div className={styles.barRed}></div>
-                    <div className={styles.barGrey}></div>
-                    <div className={styles.barGreen}></div>
-                    <div className={styles.barDarkGreen}></div>
+        <div className={styles.overviewContainer}>
+          
+          <div className={styles.topMetricsGrid}>
+            <div className={styles.metricCardNew}>
+              <div className={styles.metricHeaderNew}>
+                <span className={styles.metricTitleNew}>Overall Understanding</span>
+                <Award size={18} className={styles.metricIconNew} />
+              </div>
+              <div className={styles.metricValueRow}>
+                <span className={styles.metricValueNew}>84%</span>
+                <span className={styles.trendUp}><TrendingUp size={12}/> +2.4%</span>
+              </div>
+            </div>
+
+            <div className={styles.metricCardNew}>
+              <div className={styles.metricHeaderNew}>
+                <span className={styles.metricTitleNew}>Students Assessed</span>
+                <UserCheck size={18} className={styles.metricIconNew} />
+              </div>
+              <div className={styles.metricValueRow}>
+                <span className={styles.metricValueNew}>12,480</span>
+                <span className={styles.metricSubtext}>Total Population</span>
+              </div>
+            </div>
+
+            <div className={styles.metricCardNew}>
+              <div className={styles.metricHeaderNew}>
+                <span className={styles.metricTitleNew}>Overall Attendance</span>
+                <Calendar size={18} className={styles.metricIconNew} />
+              </div>
+              <div className={styles.metricValueRow}>
+                <span className={styles.metricValueNew}>89%</span>
+                <span className={styles.trendDown}><TrendingDown size={12}/> -0.8%</span>
+              </div>
+            </div>
+
+            <div className={styles.metricCardNew}>
+              <div className={styles.metricHeaderNew}>
+                <span className={styles.metricTitleNew}>Departments</span>
+                <Building2 size={18} className={styles.metricIconNew} />
+              </div>
+              <div className={styles.metricValueRow}>
+                <span className={styles.metricValueNew}>18</span>
+                <span className={styles.metricSubtext}>Active Faculties</span>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.chartsRow}>
+            <div className={styles.chartPanel}>
+              <div className={styles.chartPanelHeader}>
+                <div className={styles.chartPanelTitle}>Learning Mastery Distribution</div>
+                <div className={styles.chartPanelSub}>Breakdown of student proficiency levels across all assessments.</div>
+              </div>
+              
+              <div className={styles.masteryList}>
+                <div className={styles.masteryItem}>
+                  <div className={styles.masteryTop}>
+                    <span className={styles.masteryLabel} style={{color: "#005233"}}>Mastered</span>
+                    <span className={styles.masteryStats}><strong>32%</strong> (3,994 Students)</span>
+                  </div>
+                  <div className={styles.masteryBarBg}>
+                    <div className={styles.masteryBarFill} style={{width: "32%", backgroundColor: "#005233"}}></div>
                   </div>
                 </div>
-                <div className={styles.breakdownLabels}>
-                  <span>Poor</span>
-                  <span>Fair</span>
-                  <span>Good</span>
-                  <span>Excellent</span>
+
+                <div className={styles.masteryItem}>
+                  <div className={styles.masteryTop}>
+                    <span className={styles.masteryLabel} style={{color: "#143155"}}>Proficient</span>
+                    <span className={styles.masteryStats}><strong>42%</strong> (5,242 Students)</span>
+                  </div>
+                  <div className={styles.masteryBarBg}>
+                    <div className={styles.masteryBarFill} style={{width: "42%", backgroundColor: "#143155"}}></div>
+                  </div>
                 </div>
-                <div className={styles.performanceLevel}>
-                  Performance Level: <span>Excellent</span>
+
+                <div className={styles.masteryItem}>
+                  <div className={styles.masteryTop}>
+                    <span className={styles.masteryLabel} style={{color: "#2D476D"}}>Developing</span>
+                    <span className={styles.masteryStats}><strong>18%</strong> (2,246 Students)</span>
+                  </div>
+                  <div className={styles.masteryBarBg}>
+                    <div className={styles.masteryBarFill} style={{width: "18%", backgroundColor: "#2D476D"}}></div>
+                  </div>
+                </div>
+
+                <div className={styles.masteryItem}>
+                  <div className={styles.masteryTop}>
+                    <span className={styles.masteryLabel} style={{color: "#C4C8C2"}}>Needs Support</span>
+                    <span className={styles.masteryStats}><strong style={{color: "#C4C8C2"}}>8%</strong> (998 Students)</span>
+                  </div>
+                  <div className={styles.masteryBarBg}>
+                    <div className={styles.masteryBarFill} style={{width: "8%", backgroundColor: "#C4C8C2"}}></div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className={styles.metricsCol}>
-              <div className={styles.metricCard}>
-                <div className={styles.metricIcon}>
-                  <TrendingUp size={20} />
+            <div className={styles.chartPanel}>
+              <div className={styles.chartPanelHeaderRow}>
+                <div>
+                  <div className={styles.chartPanelTitle}>Understanding Trend</div>
+                  <div className={styles.chartPanelSub}>Institutional performance tracking from August to Current.</div>
                 </div>
-                <div className={styles.metricInfo}>
-                  <span className={styles.metricLabel}>Overall Score</span>
-                  <span className={styles.metricValue}>84%</span>
-                </div>
-              </div>
-              <div className={styles.metricCard}>
-                <div className={styles.metricIcon}>
-                  <GraduationCap size={20} />
-                </div>
-                <div className={styles.metricInfo}>
-                  <span className={styles.metricLabel}>Students Assessed</span>
-                  <span className={styles.metricValue}>12.4k</span>
+                <div className={styles.trendScore}>
+                  <div className={styles.trendScoreVal}>84%</div>
+                  <div className={styles.trendScoreSub}>Current Avg</div>
                 </div>
               </div>
-              <div className={styles.metricCard}>
-                <div className={styles.metricIcon}>
-                  <FileText size={20} />
-                </div>
-                <div className={styles.metricInfo}>
-                  <span className={styles.metricLabel}>Assessments Conducted</span>
-                  <span className={styles.metricValue}>1,240</span>
+              
+              <div className={styles.trendChartArea}>
+                <svg className={styles.trendSvg} viewBox="0 0 800 200" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#00522E" stopOpacity="0.15" />
+                      <stop offset="100%" stopColor="#00522E" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d="M 10 160 C 150 160, 200 165, 300 150 C 400 120, 500 110, 600 105 C 700 100, 750 60, 790 20 L 790 200 L 10 200 Z"
+                    fill="url(#trendGradient)"
+                  />
+                  <path
+                    d="M 10 160 C 150 160, 200 165, 300 150 C 400 120, 500 110, 600 105 C 700 100, 750 60, 790 20"
+                    fill="none"
+                    stroke="#00522E"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className={styles.trendXAxis}>
+                  <span>Aug</span>
+                  <span>Sep</span>
+                  <span>Oct</span>
+                  <span>Nov</span>
+                  <span>Dec</span>
+                  <span>Current</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className={styles.card}>
-            <div className={styles.cardTitle}>
-              Learning Understanding Trend
-              <div className={styles.legend}>
-                <div className={styles.legendLine}></div> Understanding Score %
-              </div>
+          <div className={styles.tablePanel}>
+            <div className={styles.tablePanelHeader}>
+              <div className={styles.chartPanelTitle}>Department Academic Performance</div>
+              <div className={styles.chartPanelSub}>Comparative analysis of departmental outcomes and engagement metrics.</div>
             </div>
-            <div className={styles.chartContainer}>
-              <svg className={styles.chartSvg} viewBox="0 0 800 150" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#115e59" stopOpacity="0.2" />
-                    <stop offset="100%" stopColor="#115e59" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                <path
-                  d="M 10 110 L 160 90 L 310 105 L 460 70 L 610 50 L 790 30 L 790 150 L 10 150 Z"
-                  fill="url(#chartGradient)"
-                />
-                <path
-                  d="M 10 110 L 160 90 L 310 105 L 460 70 L 610 50 L 790 30"
-                  fill="none"
-                  stroke="#115e59"
-                  strokeWidth="2"
-                />
-                <circle cx="10" cy="110" r="4" fill="white" stroke="#115e59" strokeWidth="2" />
-                <circle cx="160" cy="90" r="4" fill="white" stroke="#115e59" strokeWidth="2" />
-                <circle cx="310" cy="105" r="4" fill="white" stroke="#115e59" strokeWidth="2" />
-                <circle cx="460" cy="70" r="4" fill="white" stroke="#115e59" strokeWidth="2" />
-                <circle cx="610" cy="50" r="4" fill="white" stroke="#115e59" strokeWidth="2" />
-                <circle cx="790" cy="30" r="4" fill="white" stroke="#115e59" strokeWidth="2" />
-              </svg>
-            </div>
-            <div className={styles.chartXAxis}>
-              <span>AUG</span>
-              <span>SEP</span>
-              <span>OCT</span>
-              <span>NOV</span>
-              <span>DEC</span>
-              <span>CURRENT</span>
-            </div>
-          </div>
-
-          <div className={styles.card}>
-            <div className={styles.cardTitle}>Department Performance Ranking</div>
-            <div className={styles.rankingList}>
-              <div className={styles.rankingItem}>
-                <div className={styles.rankingHeader}>
-                  <span>Computer Science</span>
-                  <span>88%</span>
-                </div>
-                <div className={styles.rankingTrack}>
-                  <div className={styles.rankingFill} style={{ width: "88%" }}></div>
-                </div>
-              </div>
-              <div className={styles.rankingItem}>
-                <div className={styles.rankingHeader}>
-                  <span>Mathematics</span>
-                  <span>82%</span>
-                </div>
-                <div className={styles.rankingTrack}>
-                  <div className={styles.rankingFill} style={{ width: "82%" }}></div>
-                </div>
-              </div>
-              <div className={styles.rankingItem}>
-                <div className={styles.rankingHeader}>
-                  <span>Engineering</span>
-                  <span>74%</span>
-                </div>
-                <div className={styles.rankingTrack}>
-                  <div className={styles.rankingFill} style={{ width: "74%" }}></div>
-                </div>
-              </div>
-              <div className={styles.rankingItem}>
-                <div className={styles.rankingHeader}>
-                  <span>Management</span>
-                  <span>68%</span>
-                </div>
-                <div className={styles.rankingTrack}>
-                  <div className={`${styles.rankingFill} ${styles.grey}`} style={{ width: "68%" }}></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.card} style={{ padding: 0, overflow: 'hidden' }}>
-            <div className={styles.cardTitle} style={{ padding: "16px 16px 0", marginBottom: "12px" }}>
-              Subject Performance Matrix
-            </div>
+            
             <div className={styles.tableWrapper}>
-              <table className={styles.table}>
+              <table className={styles.perfTable}>
                 <thead>
                   <tr>
-                    <th>Subject</th>
-                    <th>Avg Understanding</th>
-                    <th>Assessments Conducted</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Algorithms</td>
-                    <td className={styles.muted}>89%</td>
-                    <td className={styles.muted}>45</td>
-                    <td>
-                      <span className={`${styles.badge} ${styles.badgeOptimal}`}>
-                        <span className={styles.badgeDot}></span> Optimal
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Database Systems</td>
-                    <td className={styles.muted}>81%</td>
-                    <td className={styles.muted}>32</td>
-                    <td>
-                      <span className={`${styles.badge} ${styles.badgeStable}`}>
-                        <span className={styles.badgeDot}></span> Stable
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Neural Networks</td>
-                    <td className={styles.muted}>76%</td>
-                    <td className={styles.muted}>28</td>
-                    <td>
-                      <span className={`${styles.badge} ${styles.badgeNeedsReview}`}>
-                        <span className={styles.badgeDot}></span> Needs Review
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div className={styles.card} style={{ padding: 0, overflow: 'hidden' }}>
-            <div className={styles.cardTitle} style={{ padding: "16px 16px 0", marginBottom: "12px" }}>
-              Recent Assessments Log
-              <Link href="#" className={styles.viewAll}>View All Assessments</Link>
-            </div>
-            <div className={styles.tableWrapper}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>Assessment Name</th>
                     <th>Department</th>
-                    <th>Avg Score</th>
                     <th>Understanding</th>
-                    <th>Date</th>
+                    <th>Attendance</th>
+                    <th>Students</th>
+                    <th>Overall Status</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td>Data Structures Midterm</td>
-                    <td className={styles.muted}>CS</td>
-                    <td className={styles.muted}>78/100</td>
+                    <td className={styles.tdDept}>Computer Science</td>
                     <td>
-                      <span className={`${styles.badge} ${styles.badgeExcellent}`} style={{ padding: "4px 8px", fontSize: "0.7rem", borderRadius: "4px" }}>
-                        Excellent
-                      </span>
+                      <div className={styles.barCell}>
+                        <div className={styles.miniBarBg}><div className={styles.miniBarFill} style={{width: "91%"}}></div></div>
+                        <span className={styles.miniBarVal}>91%</span>
+                        <TrendingUp size={14} className={styles.iconGreen} />
+                      </div>
                     </td>
-                    <td className={styles.muted}>Oct 24, 2024</td>
+                    <td>
+                      <div className={styles.barCell}>
+                        <div className={styles.miniBarBg}><div className={styles.miniBarFill} style={{width: "93%"}}></div></div>
+                        <span className={styles.miniBarVal}>93%</span>
+                        <ArrowRight size={14} className={styles.iconGrey} />
+                      </div>
+                    </td>
+                    <td>820</td>
+                    <td><span className={styles.badgeExcellent}>Excellent</span></td>
+                    <td className={styles.tdAction}><MoreVertical size={16}/></td>
                   </tr>
+                  
                   <tr>
-                    <td>SQL Query Lab</td>
-                    <td className={styles.muted}>CS</td>
-                    <td className={styles.muted}>82/100</td>
+                    <td className={styles.tdDept}>Business Administration</td>
                     <td>
-                      <span className={`${styles.badge} ${styles.badgeGood}`} style={{ padding: "4px 8px", fontSize: "0.7rem", borderRadius: "4px" }}>
-                        Good
-                      </span>
+                      <div className={styles.barCell}>
+                        <div className={styles.miniBarBg}><div className={styles.miniBarFillLight} style={{width: "88%"}}></div></div>
+                        <span className={styles.miniBarVal}>88%</span>
+                        <ArrowRight size={14} className={styles.iconGrey} />
+                      </div>
                     </td>
-                    <td className={styles.muted}>Oct 22, 2024</td>
+                    <td>
+                      <div className={styles.barCell}>
+                        <div className={styles.miniBarBg}><div className={styles.miniBarFillLight} style={{width: "90%"}}></div></div>
+                        <span className={styles.miniBarVal}>90%</span>
+                        <TrendingUp size={14} className={styles.iconGreen} />
+                      </div>
+                    </td>
+                    <td>540</td>
+                    <td><span className={styles.badgeGood}>Good</span></td>
+                    <td className={styles.tdAction}><MoreVertical size={16}/></td>
                   </tr>
+                  
                   <tr>
-                    <td>AI Ethics Quiz</td>
-                    <td className={styles.muted}>AI Lab</td>
-                    <td className={styles.muted}>85/100</td>
+                    <td className={styles.tdDept}>Mechanical Engineering</td>
                     <td>
-                      <span className={`${styles.badge} ${styles.badgeGood}`} style={{ padding: "4px 8px", fontSize: "0.7rem", borderRadius: "4px" }}>
-                        Good
-                      </span>
+                      <div className={styles.barCell}>
+                        <div className={styles.miniBarBg}><div className={styles.miniBarFillLight} style={{width: "82%"}}></div></div>
+                        <span className={styles.miniBarVal}>82%</span>
+                        <TrendingDown size={14} className={styles.iconRed} />
+                      </div>
                     </td>
-                    <td className={styles.muted}>Oct 20, 2024</td>
+                    <td>
+                      <div className={styles.barCell}>
+                        <div className={styles.miniBarBg}><div className={styles.miniBarFillLight} style={{width: "86%"}}></div></div>
+                        <span className={styles.miniBarVal}>86%</span>
+                        <ArrowRight size={14} className={styles.iconGrey} />
+                      </div>
+                    </td>
+                    <td>610</td>
+                    <td><span className={styles.badgeGood}>Good</span></td>
+                    <td className={styles.tdAction}><MoreVertical size={16}/></td>
+                  </tr>
+
+                  <tr>
+                    <td className={styles.tdDept}>Civil Engineering</td>
+                    <td>
+                      <div className={styles.barCell}>
+                        <div className={styles.miniBarBg}><div className={styles.miniBarFillRed} style={{width: "74%"}}></div></div>
+                        <span className={styles.miniBarVal}>74%</span>
+                        <TrendingDown size={14} className={styles.iconRed} />
+                      </div>
+                    </td>
+                    <td>
+                      <div className={styles.barCell}>
+                        <div className={styles.miniBarBg}><div className={styles.miniBarFillLight} style={{width: "78%"}}></div></div>
+                        <span className={styles.miniBarVal}>78%</span>
+                        <ArrowRight size={14} className={styles.iconGrey} />
+                      </div>
+                    </td>
+                    <td>430</td>
+                    <td><span className={styles.badgeNeedsAttention}>Needs Attention</span></td>
+                    <td className={styles.tdAction}><MoreVertical size={16}/></td>
+                  </tr>
+
+                  <tr>
+                    <td className={styles.tdDept}>Electronics</td>
+                    <td>
+                      <div className={styles.barCell}>
+                        <div className={styles.miniBarBg}><div className={styles.miniBarFill} style={{width: "89%"}}></div></div>
+                        <span className={styles.miniBarVal}>89%</span>
+                        <TrendingUp size={14} className={styles.iconGreen} />
+                      </div>
+                    </td>
+                    <td>
+                      <div className={styles.barCell}>
+                        <div className={styles.miniBarBg}><div className={styles.miniBarFill} style={{width: "91%"}}></div></div>
+                        <span className={styles.miniBarVal}>91%</span>
+                        <TrendingUp size={14} className={styles.iconGreen} />
+                      </div>
+                    </td>
+                    <td>590</td>
+                    <td><span className={styles.badgeExcellent}>Excellent</span></td>
+                    <td className={styles.tdAction}><MoreVertical size={16}/></td>
                   </tr>
                 </tbody>
               </table>
+              <div className={styles.tableFooter}>
+                <span className={styles.footerText}>Showing 1 to 5 of 18 departments</span>
+                <div className={styles.footerNav}>
+                  <button className={styles.navBtn}><ChevronLeft size={16}/></button>
+                  <button className={styles.navBtn}><ChevronRight size={16}/></button>
+                </div>
+              </div>
             </div>
           </div>
-        </>
+        </div>
       ) : (
         <>
           <div className={styles.reportsCard}>

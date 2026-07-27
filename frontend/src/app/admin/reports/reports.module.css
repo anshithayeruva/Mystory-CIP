@@ -145,7 +145,7 @@
   overflow: hidden;
 }
 
-.barRed { background-color: #ef4444; width: 25%; }
+.barRed { background-color: #94a3b8; width: 25%; }
 .barGrey { background-color: #64748b; width: 25%; }
 .barGreen { background-color: #22c55e; width: 25%; }
 .barDarkGreen { background-color: #115e59; width: 25%; }
@@ -347,8 +347,8 @@
 }
 
 .badgeOptimal {
-  background-color: #dcfce7;
-  color: #166534;
+  background-color: #e0e7ff;
+  color: #1F3A5F;
 }
 .badgeOptimal .badgeDot { background-color: #166534; }
 
@@ -365,12 +365,12 @@
 .badgeNeedsReview .badgeDot { background-color: #991b1b; }
 
 .badgeGood {
-  background-color: #e0e7ff;
-  color: #3730a3;
+  background-color: #f0f4f8;
+  color: #2D476D;
 }
 .badgeExcellent {
-  background-color: #dcfce7;
-  color: #166534;
+  background-color: #e6f0e9;
+  color: #005233;
 }
 
 .viewAll {
@@ -442,7 +442,7 @@
   width: 32px;
   height: 32px;
   border-radius: 6px;
-  background-color: #115e59;
+  background-color: #00522E;
   color: white;
   border: none;
   display: flex;
@@ -690,7 +690,7 @@
 }
 
 .downloadConfirmBtn {
-  background-color: #115e59;
+  background-color: #00522E;
   color: white;
   border: none;
   padding: 10px 16px;
@@ -706,4 +706,371 @@
 
 .downloadConfirmBtn:hover {
   background-color: #0f4c47;
+}
+
+/* --- NEW OVERVIEW STYLES --- */
+.titleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.exportBtn {
+  background-color: #00522E;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.overviewContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.topMetricsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.metricCardNew {
+  background: white;
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.metricHeaderNew {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metricTitleNew {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.metricIconNew {
+  color: var(--text-main);
+}
+
+.metricValueRow {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.metricValueNew {
+  font-size: 32px;
+  font-weight: 700;
+  color: #00522E;
+}
+
+.metricSubtext {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.trendUp {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #2D476D;
+  background: #f0f4f8;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.trendDown {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  background: #C4C8C2;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.chartsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.chartPanel {
+  background: white;
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chartPanelHeader {
+  margin-bottom: 24px;
+}
+
+.chartPanelTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+
+.chartPanelSub {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.masteryList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.masteryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.masteryTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.masteryLabel {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.masteryStats {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.masteryStats strong {
+  color: var(--text-main);
+}
+
+.masteryBarBg {
+  width: 100%;
+  height: 8px;
+  background-color: var(--surface-container-low, #f2f4f2);
+}
+
+.masteryBarFill {
+  height: 100%;
+}
+
+.chartPanelHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.trendScore {
+  text-align: right;
+}
+
+.trendScoreVal {
+  font-size: 24px;
+  font-weight: 700;
+  color: #00522E;
+}
+
+.trendScoreSub {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.trendChartArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.trendSvg {
+  width: 100%;
+  height: 150px;
+}
+
+.trendXAxis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.tablePanel {
+  background: white;
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+}
+
+.tablePanelHeader {
+  padding: 24px;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.perfTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.perfTable th {
+  text-align: left;
+  padding: 16px 24px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.perfTable td {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--surface-border);
+  vertical-align: middle;
+}
+
+.tdDept {
+  font-size: 14px;
+  color: var(--text-main);
+}
+
+.barCell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.miniBarBg {
+  width: 100px;
+  height: 6px;
+  background-color: var(--surface-container-low, #f2f4f2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.miniBarFill {
+  height: 100%;
+  background-color: #143155;
+}
+
+.miniBarFillLight {
+  height: 100%;
+  background-color: #2D476D;
+}
+
+.miniBarFillRed {
+  height: 100%;
+  background-color: #C4C8C2;
+}
+
+.miniBarVal {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+  width: 30px;
+}
+
+.iconGreen {
+  color: #143155;
+}
+
+.iconGrey {
+  color: #C4C8C2;
+}
+
+.iconRed {
+  color: #C4C8C2;
+}
+
+.badgeExcellent {
+  background-color: #e6f0e9;
+  color: #005233;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badgeGood {
+  background-color: #f0f4f8;
+  color: #2D476D;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badgeNeedsAttention {
+  background-color: #C4C8C2;
+  color: #143155;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tdAction {
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: right;
+}
+
+.tableFooter {
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footerText {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.footerNav {
+  display: flex;
+  gap: 8px;
+}
+
+.navBtn {
+  background: white;
+  border: 1px solid var(--surface-border);
+  border-radius: 6px;
+  padding: 4px;
+  color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navBtn:hover {
+  background: #f8fafc;
 }

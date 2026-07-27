@@ -45,8 +45,8 @@
 .successIcon {
   width: 48px;
   height: 48px;
-  background-color: #a7f3d0;
-  color: #065f46;
+  background-color: #e9f2ee;
+  color: #00522E;
   border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
@@ -57,7 +57,7 @@
 .heroTitle {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #064e3b;
+  color: #00522E;
   margin-bottom: 8px;
 }
 
@@ -92,8 +92,8 @@
 }
 
 .badgeSuccess {
-  background-color: #ecfdf5;
-  color: #059669;
+  background-color: #e9f2ee;
+  color: #00522E;
   padding: 6px 12px;
   border-radius: 9999px;
   font-size: 0.75rem;
@@ -133,8 +133,8 @@
 }
 
 .statusActive {
-  background-color: #ecfdf5;
-  color: #059669;
+  background-color: #e9f2ee;
+  color: #00522E;
   padding: 4px 10px;
   border-radius: var(--radius-sm);
   font-size: 0.7rem;
@@ -147,7 +147,7 @@
 .statusDot {
   width: 6px;
   height: 6px;
-  background-color: #10b981;
+  background-color: #00522E;
   border-radius: 50%;
 }
 
@@ -286,7 +286,7 @@
 }
 
 .primaryBtn {
-  background: #115e59;
+  background: #00522E;
   color: white;
   border: none;
   border-radius: var(--radius-sm);
@@ -302,8 +302,8 @@
 
 .secondaryBtn {
   background: white;
-  color: #115e59;
-  border: 1px solid #115e59;
+  color: #00522E;
+  border: 1px solid #00522E;
   border-radius: var(--radius-sm);
   padding: 12px 24px;
   font-size: 0.875rem;

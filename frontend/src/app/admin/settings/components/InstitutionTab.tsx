@@ -1,9 +1,19 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Upload, Info, RotateCcw, Database, ArrowRight } from "lucide-react";
 import styles from "../settings.module.css";
 import Link from "next/link";
 
 export default function InstitutionTab() {
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null; // Bypass SSR to avoid extension-induced hydration mismatches
+  }
+
   return (
     <div className={styles.tabContent}>
       <div className={styles.sectionGroup}>

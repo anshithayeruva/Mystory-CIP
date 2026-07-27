@@ -1,0 +1,248 @@
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.breadcrumb {
+  font-size: 14px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  margin-bottom: -8px;
+}
+
+.breadcrumb span.active {
+  color: #00522E;
+  font-weight: 600;
+}
+
+.headerRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.metaItem strong {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.printBtn {
+  background: white;
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.printBtn:hover {
+  background: var(--surface-border);
+}
+
+.downloadBtn {
+  background: #00522E;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1.2;
+  text-align: center;
+  height: 100%;
+}
+
+.downloadBtn:hover {
+  background: #003a21;
+}
+
+/* Timeline */
+.timelineYear {
+  margin-top: 32px;
+}
+
+.yearHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.yearBadge {
+  width: 40px;
+  height: 40px;
+  background-color: #00522E;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.yearTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.yearLine {
+  flex: 1;
+  height: 1px;
+  background-color: var(--surface-border);
+  margin-left: 16px;
+}
+
+.semesterGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.semesterCard {
+  background: white;
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.semesterHeader {
+  background-color: #f2f4f2;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--surface-border);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.courseList {
+  display: flex;
+  flex-direction: column;
+}
+
+.courseItem {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--surface-border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.courseItem:last-child {
+  border-bottom: none;
+}
+
+.courseTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.courseTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.courseCategory {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.creditsBadge {
+  background-color: #e9f2ee;
+  color: #00522E;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lockedCard {
+  background: transparent;
+  border: 1px dashed var(--surface-border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px;
+  color: var(--text-muted);
+  height: 100%;
+}
+
+.lockedCardIcon {
+  color: var(--text-light);
+}
+
+/* Footer */
+.footer {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--surface-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 48px;
+}
+
+.shieldText {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.versionText {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+}

@@ -5,39 +5,48 @@ import styles from "../directory.module.css";
 const MOCK_DATA = [
   {
     id: 1,
-    name: "Dr. Robert Chen",
-    email: "robert.chen@institution.edu",
-    institutionId: "FAC-2024-8842",
-    role: "FACULTY",
-    department: "Computer Science",
-    status: "ACTIVE"
+    name: "Dr. Elena Rodriguez",
+    joined: "Joined Oct 2023",
+    email: "e.rodriguez@mystory.edu",
+    institutionId: "FAC-2023-8842",
+    role: "Faculty",
+    department: "Biomedical Engineering"
   },
   {
     id: 2,
-    name: "Prof. Angela Voight",
-    email: "angela.voight@institution.edu",
-    institutionId: "HOD-2024-0012",
-    role: "HOD",
-    department: "Business Administration",
-    status: "ACTIVE"
+    name: "Marcus Chen",
+    joined: "Joined Sep 2024",
+    email: "m.chen99@mystory.edu",
+    institutionId: "STU-2024-1102",
+    role: "Student",
+    department: "Computer Science"
   },
   {
     id: 3,
-    name: "Jordan Peterson",
-    email: "jordan.peterson@institution.edu",
-    institutionId: "STU-2024-9910",
-    role: "STUDENT",
-    department: "Life Sciences",
-    status: "INACTIVE"
+    name: "Prof. Sarah Jenkins",
+    joined: "Joined Jan 2018",
+    email: "s.jenkins@mystory.edu",
+    institutionId: "HOD-2018-0021",
+    role: "HoD",
+    department: "Philosophy & Ethics"
   },
   {
     id: 4,
-    name: "Dr. Maria Garcia",
-    email: "maria.garcia@institution.edu",
-    institutionId: "FAC-2024-1150",
-    role: "FACULTY",
-    department: "Computer Science",
-    status: "ACTIVE"
+    name: "Amir Al-Farsi",
+    joined: "Joined Mar 2024",
+    email: "amir.farsi@mystory.edu",
+    institutionId: "STU-2024-5590",
+    role: "Student",
+    department: "Artificial Intelligence"
+  },
+  {
+    id: 5,
+    name: "Dr. Thomas Wright",
+    joined: "Joined Nov 2015",
+    email: "t.wright@mystory.edu",
+    institutionId: "FAC-2015-0911",
+    role: "Faculty",
+    department: "History of Art"
   }
 ];
 
@@ -48,43 +57,35 @@ export default function DirectoryTable() {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th style={{ width: "40px", paddingLeft: "24px" }}>
-                <input type="checkbox" style={{ cursor: "pointer" }} />
-              </th>
-              <th>PROFILE</th>
-              <th>INSTITUTION ID</th>
-              <th>ROLE</th>
-              <th>DEPARTMENT</th>
-              <th>EMAIL</th>
-              <th>ACCOUNT STATUS</th>
+              <th>Profile</th>
+              <th>Institution ID</th>
+              <th>Role</th>
+              <th>Department</th>
+              <th>Email</th>
             </tr>
           </thead>
           <tbody>
             {MOCK_DATA.map((row) => (
               <tr key={row.id}>
-                <td style={{ paddingLeft: "24px" }}>
-                  <input type="checkbox" style={{ cursor: "pointer" }} />
-                </td>
                 <td>
                   <div className={styles.profileCell}>
                     <div className={styles.avatar}></div>
-                    <div className={styles.profileName}>{row.name}</div>
+                    <div className={styles.profileText}>
+                      <div className={styles.profileName}>{row.name}</div>
+                      <div className={styles.profileJoined}>{row.joined}</div>
+                    </div>
                   </div>
                 </td>
-                <td style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontWeight: 500 }}>
+                <td style={{ fontSize: "14px", color: "var(--text-main)", fontWeight: 400 }}>
                   {row.institutionId}
                 </td>
                 <td>
-                  {row.role === "FACULTY" && <span className={styles.roleBadgeFaculty}>FACULTY</span>}
-                  {row.role === "HOD" && <span className={styles.roleBadgeHod}>HOD</span>}
-                  {row.role === "STUDENT" && <span className={styles.roleBadgeStudent}>STUDENT</span>}
+                  {row.role === "Faculty" && <span className={styles.roleBadgeFaculty}>Faculty</span>}
+                  {row.role === "HoD" && <span className={styles.roleBadgeHod}>HoD</span>}
+                  {row.role === "Student" && <span className={styles.roleBadgeStudent}>Student</span>}
                 </td>
-                <td>{row.department}</td>
-                <td style={{ color: "#115e59" }}>{row.email}</td>
-                <td>
-                  {row.status === "ACTIVE" && <span className={styles.statusActive}>Active</span>}
-                  {row.status === "INACTIVE" && <span className={styles.statusInactive}>Inactive</span>}
-                </td>
+                <td style={{ fontSize: "14px", color: "var(--text-muted)" }}>{row.department}</td>
+                <td style={{ fontSize: "14px", color: "var(--text-muted)" }}>{row.email}</td>
               </tr>
             ))}
           </tbody>
@@ -93,16 +94,11 @@ export default function DirectoryTable() {
 
       <div className={styles.pagination}>
         <div className={styles.paginationText}>
-          Showing <strong>1-10</strong> of 1,598 users
+          Showing 1-5 of 1,240 users
         </div>
         <div className={styles.paginationControls}>
-          <button className={styles.pageBtn} style={{ color: "var(--text-muted)", borderColor: "transparent" }}>&lt;</button>
-          <button className={`${styles.pageBtn} ${styles.active}`}>1</button>
-          <button className={styles.pageBtn} style={{ border: "none" }}>2</button>
-          <button className={styles.pageBtn} style={{ border: "none" }}>3</button>
-          <span style={{ color: "var(--text-muted)", fontSize: "0.75rem", margin: "0 4px" }}>...</span>
-          <button className={styles.pageBtn} style={{ border: "none" }}>125</button>
-          <button className={styles.pageBtn} style={{ color: "var(--text-main)" }}>&gt;</button>
+          <button className={styles.pageBtnOutlined}>Previous</button>
+          <button className={styles.pageBtnOutlined}>Next</button>
         </div>
       </div>
     </div>

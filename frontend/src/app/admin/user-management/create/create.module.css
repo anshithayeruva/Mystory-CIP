@@ -21,7 +21,7 @@
 .title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #064e3b;
+  color: #00522E;
   margin-bottom: 4px;
 }
 
@@ -109,7 +109,7 @@
 }
 
 .typeCardActive {
-  border-color: #115e59;
+  border-color: #00522E;
   background: #f0fdf4;
 }
 
@@ -119,7 +119,7 @@
 }
 
 .typeCardActive .typeCardIcon {
-  color: #115e59;
+  color: #00522E;
 }
 
 .typeCardTitle {
@@ -130,7 +130,7 @@
 }
 
 .typeCardActive .typeCardTitle {
-  color: #115e59;
+  color: #00522E;
 }
 
 .typeCardDesc {
@@ -142,7 +142,7 @@
   position: absolute;
   top: 12px;
   right: 12px;
-  color: #115e59;
+  color: #00522E;
 }
 
 /* Form Controls */
@@ -220,7 +220,7 @@
   margin-top: 2px;
   width: 16px;
   height: 16px;
-  accent-color: #115e59;
+  accent-color: #00522E;
   cursor: pointer;
 }
 
@@ -262,7 +262,7 @@
 }
 
 .guideIcon {
-  color: #115e59;
+  color: #00522E;
   background: #f0fdf4;
   padding: 6px;
   border-radius: 50%;
@@ -381,7 +381,7 @@
 }
 
 .btnSubmit {
-  background: #115e59;
+  background: #00522E;
   border: none;
   border-radius: var(--radius-sm);
   padding: 8px 16px;

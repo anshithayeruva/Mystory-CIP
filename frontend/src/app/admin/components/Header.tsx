@@ -9,12 +9,14 @@ export default function Header() {
   const getHeaderTitle = () => {
     if (pathname.includes("/admin/academic-structure")) return "Academics";
     if (pathname.includes("/admin/user-management")) return "Directory";
-    return ""; // Keep empty for dashboard as requested before
+    if (pathname.includes("/admin/settings")) return "Settings";
+    if (pathname.includes("/admin/reports")) return "Reports & Analytics";
+    return "Dashboard"; 
   };
 
   return (
     <header className={styles.header}>
-      <h1 className={styles.headerTitle}>{getHeaderTitle()}</h1>
+      <h1 className={styles.headerTitle} style={{ color: "black" }}>{getHeaderTitle()}</h1>
       
       <div className={styles.headerActions}>
         <div className={styles.profileDropdown}>

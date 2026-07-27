@@ -34,7 +34,7 @@
 }
 
 .primaryButton {
-  background-color: #115e59;
+  background-color: #00522E;
   color: white;
   border: none;
   border-radius: var(--radius-sm);
@@ -49,7 +49,7 @@
 }
 
 .primaryButton:hover {
-  background-color: #134e4a;
+  background-color: #003a21;
 }
 
 /* Summary Cards (Top) */
@@ -108,8 +108,8 @@
 /* Filter Bar */
 .filterBar {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  align-items: end;
+  grid-template-columns: 1fr auto;
+  align-items: center;
   padding: 16px;
   border-bottom: 1px solid var(--surface-border);
   gap: 16px;
@@ -153,7 +153,7 @@
 }
 
 .applyButton {
-  background-color: #115e59;
+  background-color: #00522E;
   color: white;
   border: none;
   border-radius: var(--radius-sm);
@@ -222,8 +222,8 @@
 }
 
 .roleBadgeFaculty {
-  background-color: #e0e7ff;
-  color: #4338ca;
+  background-color: #e9f2ee;
+  color: #00522E;
   padding: 4px 8px;
   border-radius: var(--radius-full);
   font-size: 0.6rem;
@@ -232,8 +232,8 @@
 }
 
 .roleBadgeHod {
-  background-color: #dcfce7;
-  color: #166534;
+  background-color: #fee2e2;
+  color: #ef4444;
   padding: 4px 8px;
   border-radius: var(--radius-full);
   font-size: 0.6rem;
@@ -242,8 +242,8 @@
 }
 
 .roleBadgeStudent {
-  background-color: #f3e8ff;
-  color: #7e22ce;
+  background-color: #e2e8f0;
+  color: #475569;
   padding: 4px 8px;
   border-radius: var(--radius-full);
   font-size: 0.6rem;
@@ -318,11 +318,132 @@
 }
 
 .pageBtn.active {
-  background-color: #115e59;
+  background-color: #00522E;
   color: white;
   border-color: #115e59;
 }
 
 .pageBtn:hover:not(.active) {
   background-color: #f1f5f9;
+}
+
+.pageTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+
+.searchWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-muted);
+}
+
+.searchInput {
+  width: 100%;
+  background-color: var(--surface-container-low, #f2f4f2);
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  padding: 10px 12px 10px 36px;
+  font-size: 14px;
+  color: var(--text-main);
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: var(--text-muted);
+}
+
+.cardTopRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.cardTopIconGreen {
+  color: #00522E;
+}
+
+.cardTopIconGray {
+  color: var(--text-muted);
+}
+
+.cardTopIconRed {
+  color: #792d33;
+}
+
+.summaryCard {
+  background-color: white;
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.summaryCardLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.summaryCardValue {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+
+.summaryCardSubtext {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.progressBarContainer {
+  height: 8px;
+  background-color: var(--surface-container, #e2e8f0);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progressBarFill {
+  height: 100%;
+  background-color: #00522E;
+}
+
+.profileText {
+  display: flex;
+  flex-direction: column;
+}
+
+.profileJoined {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.pageBtnOutlined {
+  background: white;
+  border: 1px solid var(--surface-border);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--text-main);
+}
+
+.pageBtnOutlined:hover {
+  background: var(--surface-container-low, #f2f4f2);
 }

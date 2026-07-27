@@ -1,5 +1,5 @@
 import OverviewCard from "./components/OverviewCard";
-import RecentActivity from "./components/RecentActivity";
+import UpcomingEvents from "./components/UpcomingEvents";
 import TodaysSummary from "./components/TodaysSummary";
 import LiveSessionMonitor from "./components/LiveSessionMonitor";
 import styles from "./dashboard.module.css";
@@ -10,7 +10,7 @@ export default function AdminDashboard() {
       <OverviewCard />
       
       <div className={styles.middleGrid}>
-        <RecentActivity />
+        <UpcomingEvents />
         <TodaysSummary />
       </div>
       

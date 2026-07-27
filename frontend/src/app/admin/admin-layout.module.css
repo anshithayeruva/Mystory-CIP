@@ -7,13 +7,18 @@
 /* Sidebar Styles */
 .sidebar {
   width: 240px;
-  background-color: #f4f4f5; /* Light greyish */
+  background-color: #EAECE7; /* Light greyish */
   border-right: 1px solid var(--surface-border);
   display: flex;
   flex-direction: column;
   position: sticky;
   top: 0;
   height: 100vh;
+  transition: width 0.3s ease;
+}
+
+.sidebarCollapsed {
+  width: 80px;
 }
 
 .logoContainer {
@@ -21,13 +26,37 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  border-bottom: 1px solid transparent; /* Keeps spacing consistent with wireframe */
+  border-bottom: 1px solid transparent;
+  justify-content: space-between;
+}
+
+.collapseBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.collapseBtn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--text-main);
+}
+
+.sidebarCollapsed .logoContainer {
+  justify-content: center;
+  padding: 16px 0;
 }
 
 .logoIcon {
   width: 28px;
   height: 28px;
-  background-color: #115e59; /* Dark green from wireframe */
+  background-color: #00522E; /* Dark green from wireframe */
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -62,14 +91,19 @@
   gap: 6px;
 }
 
+.sidebarCollapsed .navItem {
+  justify-content: center;
+  padding: 10px 0;
+}
+
 .navItem {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  border-radius: var(--radius-md);
+  border-left: 4px solid transparent;
   color: var(--text-muted);
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.875rem;
   transition: all var(--transition-fast);
   cursor: pointer;
@@ -81,17 +115,19 @@
 }
 
 .navItemActive {
-  background-color: #e8f5e9; /* Light green from wireframe */
-  color: #115e59; /* Darker green text */
+  background-color: #e9f2ee; /* Light green from wireframe */
+  color: #00522E; /* Darker green text */
+  border-left: 4px solid #00522E;
+  font-weight: 700;
 }
 
 .navItemActive:hover {
-  background-color: #dcfce7;
+  background-color: #c9e0d3;
 }
 
 /* Override nav active icon color specifically */
 .navItemActive svg {
-  color: #115e59;
+  color: #00522E;
 }
 
 .userProfile {
@@ -104,6 +140,12 @@
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
+}
+
+.sidebarCollapsed .userProfile {
+  margin: 16px 8px;
+  justify-content: center;
+  padding: 12px 0;
 }
 
 .userInfo {
@@ -141,7 +183,7 @@
 
 /* Header Styles */
 .header {
-  height: 64px;
+  height: 48px;
   padding: 0 24px;
   background-color: var(--surface);
   border-bottom: 1px solid var(--surface-border);
@@ -156,7 +198,7 @@
 .headerTitle {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #115e59; /* Greenish title from wireframe */
+  color: #00522E; /* Greenish title from wireframe */
 }
 
 .headerActions {
@@ -197,8 +239,8 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: #e0e7ff; /* light indigo */
-  color: #4338ca;
+  background-color: #eef1f5; /* light indigo */
+  color: #1F3A5F;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -1,52 +1,62 @@
 "use client";
 
-import { Eye, Edit2, Trash2 } from "lucide-react";
+import { ArrowRight, MonitorPlay, Banknote, Microscope } from "lucide-react";
 import styles from "../academic.module.css";
+import Link from "next/link";
 
-const MOCK_DATA = [
+export interface Program {
+  id: number;
+  name: string;
+  department: string;
+  duration: string;
+  students: string;
+  badge: string;
+  icon: any;
+  iconStyle: string;
+  curriculum: string; // "Not Assigned" or a view link
+}
+
+export const INITIAL_PROGRAMS: Program[] = [
   {
     id: 1,
-    name: "B.Sc. Computer Science",
-    category: "Undergraduate Program",
-    code: "BCS-2024",
-    department: "School of Engineering",
+    name: "B.Tech Computer Science",
+    department: "Computer Science",
     duration: "4 Years",
-    students: "1,240",
-    status: "ACTIVE"
+    students: "420 Students",
+    badge: "+12%",
+    icon: MonitorPlay,
+    iconStyle: styles.iconGreen,
+    curriculum: "Assigned"
   },
   {
     id: 2,
-    name: "M.A. Global Economics",
-    category: "Postgraduate Program",
-    code: "MGE-2024",
-    department: "Business School",
+    name: "MBA Finance & Strategy",
+    department: "Business Management",
     duration: "2 Years",
-    students: "450",
-    status: "DRAFT"
+    students: "185 Students",
+    badge: "Full",
+    icon: Banknote,
+    iconStyle: styles.iconRed,
+    curriculum: "Assigned"
   },
   {
     id: 3,
-    name: "B.Eng. Civil Engineering",
-    category: "Undergraduate Program",
-    code: "BCE-2024",
-    department: "School of Engineering",
-    duration: "4 Years",
-    students: "890",
-    status: "ACTIVE"
-  },
-  {
-    id: 4,
-    name: "MBA Strategic Management",
-    category: "Professional Masters",
-    code: "MBA-2024",
-    department: "Business School",
-    duration: "1 Year",
-    students: "210",
-    status: "ARCHIVED"
+    name: "M.Sc Molecular Biology",
+    department: "Life Sciences",
+    duration: "2 Years",
+    students: "94 Students",
+    badge: "-3%",
+    icon: Microscope,
+    iconStyle: styles.iconGray,
+    curriculum: "Assigned"
   }
 ];
 
-export default function ProgramTable() {
+interface ProgramTableProps {
+  programs: Program[];
+}
+
+export default function ProgramTable({ programs }: ProgramTableProps) {
   return (
     <div>
       <div className={styles.tableContainer}>
@@ -54,61 +64,67 @@ export default function ProgramTable() {
           <thead>
             <tr>
               <th>PROGRAM NAME</th>
-              <th>PROGRAM CODE</th>
               <th>DEPARTMENT</th>
               <th>DURATION</th>
               <th>STUDENTS</th>
-              <th>STATUS</th>
+              <th>CURRICULUM</th>
               <th style={{ textAlign: "right" }}>ACTIONS</th>
             </tr>
           </thead>
           <tbody>
-            {MOCK_DATA.map((row) => (
-              <tr key={row.id}>
-                <td>
-                  <div className={styles.subjectTitle}>{row.name}</div>
-                  <div className={styles.subjectSubtitle}>{row.category}</div>
-                </td>
-                <td className={styles.codeBadge}>{row.code}</td>
-                <td>{row.department}</td>
-                <td>{row.duration}</td>
-                <td>{row.students}</td>
-                <td>
-                  {row.status === "ACTIVE" && <span className={styles.statusActive}>Active</span>}
-                  {row.status === "DRAFT" && <span className={styles.statusDraft}>Draft</span>}
-                  {row.status === "ARCHIVED" && <span className={styles.statusArchived}>Archived</span>}
-                </td>
-                <td>
-                  <div className={styles.actionsCell}>
-                    <button className={styles.iconBtn} aria-label="View">
-                      <Eye size={16} />
-                    </button>
-                    <button className={styles.iconBtn} aria-label="Edit">
-                      <Edit2 size={16} />
-                    </button>
-                    <button className={styles.iconBtn} aria-label="Delete">
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {programs.map((row) => {
+              const Icon = row.icon;
+              return (
+                <tr key={row.id}>
+                  <td>
+                    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                      <div className={`${styles.activityIcon} ${row.iconStyle}`}>
+                        <Icon size={16} />
+                      </div>
+                      <div className={styles.subjectTitle} style={{ fontWeight: 600 }}>{row.name}</div>
+                    </div>
+                  </td>
+                  <td>
+                    <span style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>{row.department}</span>
+                  </td>
+                  <td>
+                    <span style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>{row.duration}</span>
+                  </td>
+                  <td>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span style={{ fontSize: "0.875rem", color: "var(--text-main)", fontWeight: 500 }}>{row.students}</span>
+                      <span className={row.badge.includes("-") ? styles.trendBadgeRed : styles.trendBadgeNeutral}>{row.badge}</span>
+                    </div>
+                  </td>
+                  <td>
+                    {row.curriculum === "Not Assigned" ? (
+                      <span style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>Not Assigned</span>
+                    ) : (
+                      <Link href={`/admin/academic-structure/programs/${row.id}/curriculum`} className={styles.curriculumLink}>
+                        View Curriculum <ArrowRight size={14} />
+                      </Link>
+                    )}
+                  </td>
+                  <td>
+                    {/* Actions column empty in mockup */}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
 
       <div className={styles.pagination}>
         <div className={styles.paginationText}>
-          Showing <strong>1 to 10</strong> of 156 results
+          Showing {programs.length} of {programs.length} programs
         </div>
         <div className={styles.paginationControls}>
-          <button className={styles.pageBtn} style={{ color: "var(--text-muted)" }}>&lt;</button>
+          <button className={styles.pageBtn}>&lt;</button>
           <button className={`${styles.pageBtn} ${styles.active}`}>1</button>
           <button className={styles.pageBtn}>2</button>
           <button className={styles.pageBtn}>3</button>
-          <span style={{ color: "var(--text-muted)", fontSize: "0.75rem", margin: "0 4px" }}>...</span>
-          <button className={styles.pageBtn}>16</button>
-          <button className={styles.pageBtn} style={{ color: "var(--text-main)" }}>&gt;</button>
+          <button className={styles.pageBtn}>&gt;</button>
         </div>
       </div>
     </div>

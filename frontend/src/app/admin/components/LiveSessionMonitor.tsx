@@ -10,7 +10,7 @@ const sessions = [
   { id: 3, subject: "Microbiology Fundamentals", instructor: "Dr. Lisa Muller", status: "COMPLETED", schedule: "07:00 - 09:00" },
   { id: 4, subject: "Introduction to Ethics", instructor: "Rev. John Davis", status: "LIVE", schedule: "09:30 - 11:30" },
   { id: 5, subject: "Digital Marketing Trends", instructor: "Prof. Kevin Ellis", status: "SCHEDULED", schedule: "14:00 - 15:30" },
-];
+].filter(s => s.status === "LIVE");
 
 export default function LiveSessionMonitor() {
   return (

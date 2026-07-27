@@ -5,48 +5,24 @@ import styles from "../directory.module.css";
 export default function DirectoryFilterBar() {
   return (
     <div className={styles.filterBar}>
+      <div className={styles.searchWrapper}>
+        <span className={styles.searchIcon}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </span>
+        <input 
+          type="text" 
+          placeholder="Search by name, email, or Institution ID..." 
+          className={styles.searchInput} 
+        />
+      </div>
+
       <div className={styles.filterGroup}>
-        <span className={styles.filterLabel}>ROLE</span>
         <select className={styles.selectInput} defaultValue="All Users">
           <option>All Users</option>
-          <option>Faculty</option>
-          <option>HOD</option>
           <option>Student</option>
+          <option>Faculty</option>
+          <option>HoD</option>
         </select>
-      </div>
-
-      <div className={styles.filterGroup}>
-        <span className={styles.filterLabel}>DEPARTMENT</span>
-        <select className={styles.selectInput} defaultValue="All Departments">
-          <option>All Departments</option>
-          <option>Computer Science</option>
-          <option>Business Administration</option>
-          <option>Life Sciences</option>
-        </select>
-      </div>
-      
-      <div className={styles.filterGroup}>
-        <span className={styles.filterLabel}>PROGRAM</span>
-        <select className={styles.selectInput} defaultValue="All Programs">
-          <option>All Programs</option>
-          <option>B.Sc. Computer Science</option>
-          <option>MBA</option>
-          <option>B.Sc. Biology</option>
-        </select>
-      </div>
-
-      <div className={styles.filterGroup}>
-        <span className={styles.filterLabel}>STATUS</span>
-        <select className={styles.selectInput} defaultValue="All Statuses">
-          <option>All Statuses</option>
-          <option>Active</option>
-          <option>Inactive</option>
-        </select>
-      </div>
-
-      <div className={styles.filterActions}>
-        <button className={styles.applyButton}>Apply Filters</button>
-        <button className={styles.resetButton}>Reset</button>
       </div>
     </div>
   );

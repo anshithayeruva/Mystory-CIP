@@ -11,22 +11,16 @@ export default function Tabs({ activeTab, onTabChange }: TabsProps) {
   return (
     <div className={styles.tabsContainer}>
       <div 
-        className={`${styles.tab} ${activeTab === "subjects" ? styles.tabActive : ""}`}
-        onClick={() => onTabChange("subjects")}
+        className={`${styles.tab} ${activeTab === "departments" ? styles.tabActive : ""}`}
+        onClick={() => onTabChange("departments")}
       >
-        Subjects
+        Departments
       </div>
       <div 
         className={`${styles.tab} ${activeTab === "programs" ? styles.tabActive : ""}`}
         onClick={() => onTabChange("programs")}
       >
         Programs
-      </div>
-      <div 
-        className={`${styles.tab} ${activeTab === "departments" ? styles.tabActive : ""}`}
-        onClick={() => onTabChange("departments")}
-      >
-        Departments
       </div>
     </div>
   );
