@@ -16,7 +16,11 @@ export default function PageHeader({ activeTab, onCreateClick }: PageHeaderProps
     <div>
       <div className={styles.headerRow}>
         <div>
-          <h1 className={styles.title}>{isDepartments ? "Departments" : "Academics"}</h1>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+            <h1 className={styles.title} style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-main)' }}>
+              {isDepartments ? "Departments" : "Programs"}
+            </h1>
+          </div>
           <p className={styles.subtitle}>
             {isDepartments 
               ? "Manage your institution's academic structure and departmental hierarchy."

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import styles from "./academic.module.css";
 import PageHeader from "./components/PageHeader";
 import Tabs from "./components/Tabs";
@@ -20,7 +21,10 @@ import CreateProgramDrawer from "./components/CreateProgramDrawer";
 import { BookOpen } from "lucide-react";
 
 export default function AcademicStructurePage() {
-  const [activeTab, setActiveTab] = useState("departments");
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get("tab") || "departments";
+  
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [departments, setDepartments] = useState<Department[]>(INITIAL_DEPARTMENTS);
   const [programs, setPrograms] = useState<Program[]>(INITIAL_PROGRAMS);
   
@@ -28,55 +32,147 @@ export default function AcademicStructurePage() {
   const [isProgramDrawerOpen, setIsProgramDrawerOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
+  const [editingProgram, setEditingProgram] = useState<Program | null>(null);
 
-  const handleCreateDepartment = (name: string, hodName: string) => {
-    // Generate a new ID based on current length
-    const newId = departments.length > 0 ? Math.max(...departments.map(d => d.id)) + 1 : 1;
-    
-    // Create new department object with 0 stats
-    const newDept: Department = {
-      id: newId,
-      name,
-      hodName,
-      programs: 0,
-      faculty: 0,
-      students: 0,
-      icon: CheckCircle // Fallback icon for new departments
-    };
+  useEffect(() => {
+    fetchDepartments();
+    fetchPrograms();
+  }, []);
 
-    setDepartments([...departments, newDept]);
-    setIsDrawerOpen(false);
-    
-    setToastMessage("Department created successfully.");
-    setShowToast(true);
-    setTimeout(() => {
-      setShowToast(false);
-    }, 3000);
+  const fetchDepartments = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/academic/departments');
+      if (res.ok) {
+        const data = await res.json();
+        // Map the backend data to match the UI component's expected shape
+        const mapped = data.data.map((d: any) => ({
+          id: d.id, // we might need to change id to string in the interface later if needed, but for now we'll pass it as is. If interface is number, this might be a type error since mongo ID is string. Let's cast as any in the component if needed.
+          name: d.name,
+          hodName: d.hodName,
+          programs: d.programs,
+          faculty: d.faculty,
+          students: d.students,
+          icon: CheckCircle // Fallback icon
+        }));
+        setDepartments(mapped);
+      }
+    } catch (error) {
+      console.error("Failed to fetch departments", error);
+    }
   };
 
-  const handleCreateProgram = (name: string, department: string, degreeLevel: string, duration: string) => {
-    const newId = programs.length > 0 ? Math.max(...programs.map(p => p.id)) + 1 : 1;
-    
-    const newProg: Program = {
-      id: newId,
-      name,
-      department,
-      duration,
-      students: "0 Students",
-      badge: "New",
-      icon: BookOpen, // Fallback icon
-      iconStyle: styles.iconBlue,
-      curriculum: "Not Assigned"
-    };
+  const fetchPrograms = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/academic/programs');
+      if (res.ok) {
+        const data = await res.json();
+        const mapped = data.data.map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          department: p.department,
+          duration: p.duration,
+          students: `${p.students} Students`,
+          badge: "", // Removed per previous request
+          icon: BookOpen,
+          iconStyle: styles.iconBlue,
+          curriculum: p.curriculum
+        }));
+        setPrograms(mapped);
+      }
+    } catch (error) {
+      console.error("Failed to fetch programs", error);
+    }
+  };
 
-    setPrograms([...programs, newProg]);
-    setIsProgramDrawerOpen(false);
-    
-    setToastMessage("Program created successfully.");
-    setShowToast(true);
-    setTimeout(() => {
-      setShowToast(false);
-    }, 3000);
+  const handleCreateDepartment = async (name: string, hodName: string, description?: string, id?: string) => {
+    try {
+      const url = id ? `http://localhost:5000/api/academic/departments/${id}` : 'http://localhost:5000/api/academic/departments';
+      const method = id ? 'PUT' : 'POST';
+      
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, hodName, description })
+      });
+      
+      if (res.ok) {
+        setIsDrawerOpen(false);
+        setEditingDepartment(null);
+        setToastMessage(`Department ${id ? 'updated' : 'created'} successfully.`);
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3000);
+        fetchDepartments(); // Refresh data
+      } else {
+        const data = await res.json();
+        alert(data.error || `Failed to ${id ? 'update' : 'create'} department`);
+      }
+    } catch (error) {
+      console.error(`Error ${id ? 'updating' : 'creating'} department`, error);
+    }
+  };
+
+  const handleDeleteDepartment = async (id: string | number) => {
+    if (!window.confirm("Are you sure you want to delete this department?")) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/academic/departments/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setToastMessage("Department deleted successfully.");
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3000);
+        fetchDepartments();
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to delete department");
+      }
+    } catch (error) {
+      console.error("Error deleting department", error);
+    }
+  };
+
+  const handleCreateProgram = async (name: string, departmentName: string, degreeLevel: string, duration: string, intake?: string, description?: string, id?: string) => {
+    try {
+      const url = id ? `http://localhost:5000/api/academic/programs/${id}` : 'http://localhost:5000/api/academic/programs';
+      const method = id ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, departmentName, degreeLevel, duration, intake, description })
+      });
+
+      if (res.ok) {
+        setIsProgramDrawerOpen(false);
+        setEditingProgram(null);
+        setToastMessage(`Program ${id ? 'updated' : 'created'} successfully.`);
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3000);
+        fetchPrograms(); // Refresh data
+      } else {
+        const data = await res.json();
+        alert(data.error || `Failed to ${id ? 'update' : 'create'} program`);
+      }
+    } catch (error) {
+      console.error(`Error ${id ? 'updating' : 'creating'} program`, error);
+    }
+  };
+
+  const handleDeleteProgram = async (id: string | number) => {
+    if (!window.confirm("Are you sure you want to delete this program?")) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/academic/programs/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setToastMessage("Program deleted successfully.");
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3000);
+        fetchPrograms();
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to delete program");
+      }
+    } catch (error) {
+      console.error("Error deleting program", error);
+    }
   };
 
   return (
@@ -85,8 +181,10 @@ export default function AcademicStructurePage() {
         activeTab={activeTab} 
         onCreateClick={() => {
           if (activeTab === "departments") {
+            setEditingDepartment(null);
             setIsDrawerOpen(true);
           } else if (activeTab === "programs") {
+            setEditingProgram(null);
             setIsProgramDrawerOpen(true);
           }
         }} 
@@ -96,23 +194,35 @@ export default function AcademicStructurePage() {
 
       {activeTab === "departments" && (
         <>
-          <DepartmentFilterBar />
           <div className={styles.tableCard}>
-            <DepartmentTable departments={departments} />
+            <DepartmentTable 
+              departments={departments} 
+              onEdit={(dept) => {
+                setEditingDepartment(dept);
+                setIsDrawerOpen(true);
+              }}
+              onDelete={handleDeleteDepartment}
+            />
           </div>
         </>
       )}
 
       {activeTab === "programs" && (
         <>
-          <ProgramFilterBar />
           <div className={styles.tableCard}>
-            <ProgramTable programs={programs} />
+            <ProgramTable 
+              programs={programs} 
+              onEdit={(prog) => {
+                setEditingProgram(prog);
+                setIsProgramDrawerOpen(true);
+              }}
+              onDelete={handleDeleteProgram}
+            />
           </div>
         </>
       )}
 
-      {activeTab === "programs" && <ProgramInsights />}
+
       
       {activeTab === "departments" && (
         <div className={styles.footerSection}>
@@ -128,15 +238,23 @@ export default function AcademicStructurePage() {
       {/* Slide-over Drawers */}
       <CreateDepartmentDrawer 
         isOpen={isDrawerOpen} 
-        onClose={() => setIsDrawerOpen(false)} 
+        onClose={() => {
+          setIsDrawerOpen(false);
+          setEditingDepartment(null);
+        }} 
         onSubmit={handleCreateDepartment}
+        initialData={editingDepartment}
       />
       
       <CreateProgramDrawer 
         isOpen={isProgramDrawerOpen}
-        onClose={() => setIsProgramDrawerOpen(false)}
+        onClose={() => {
+          setIsProgramDrawerOpen(false);
+          setEditingProgram(null);
+        }}
         departments={departments}
         onSubmit={handleCreateProgram}
+        initialData={editingProgram}
       />
 
       {/* Success Toast */}

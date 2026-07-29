@@ -1,16 +1,17 @@
 "use client";
 
-import { Eye, Edit2, Code, FileDigit, FlaskConical, BookOpen } from "lucide-react";
+import { Edit2, Code, FileDigit, FlaskConical, BookOpen, Trash2 } from "lucide-react";
 import styles from "../academic.module.css";
 
 export interface Department {
-  id: number;
+  id: string | number;
   name: string;
   hodName: string;
   programs: number;
   faculty: number;
   students: number;
   icon: any; // Lucide icon component
+  description?: string;
 }
 
 export const INITIAL_DEPARTMENTS: Department[] = [
@@ -54,9 +55,11 @@ export const INITIAL_DEPARTMENTS: Department[] = [
 
 interface DepartmentTableProps {
   departments: Department[];
+  onEdit?: (department: Department) => void;
+  onDelete?: (id: string | number) => void;
 }
 
-export default function DepartmentTable({ departments }: DepartmentTableProps) {
+export default function DepartmentTable({ departments, onEdit, onDelete }: DepartmentTableProps) {
   return (
     <div>
       <div className={styles.tableContainer}>
@@ -88,7 +91,7 @@ export default function DepartmentTable({ departments }: DepartmentTableProps) {
                     <span style={{ fontSize: "0.875rem", color: "var(--text-main)" }}>{row.hodName}</span>
                   </td>
                   <td>
-                    <span className={styles.facultyBadge}>{row.faculty} Faculty</span>
+                    <span style={{ fontSize: "0.875rem", color: "var(--text-main)" }}>{row.faculty} Faculty</span>
                   </td>
                   <td>
                     <span style={{ fontSize: "0.875rem", color: "var(--text-main)" }}>{row.students} Students</span>
@@ -100,11 +103,11 @@ export default function DepartmentTable({ departments }: DepartmentTableProps) {
                   </td>
                   <td>
                     <div className={styles.actionsCell}>
-                      <button className={styles.iconBtn} aria-label="View">
-                        <Eye size={18} />
-                      </button>
-                      <button className={styles.iconBtn} aria-label="Edit">
+                      <button className={styles.iconBtn} aria-label="Edit" onClick={() => onEdit && onEdit(row)}>
                         <Edit2 size={18} />
+                      </button>
+                      <button className={styles.iconBtn} aria-label="Delete" onClick={() => onDelete && onDelete(row.id)}>
+                        <Trash2 size={18} />
                       </button>
                     </div>
                   </td>

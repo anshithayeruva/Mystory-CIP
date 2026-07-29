@@ -16,7 +16,9 @@ export default function SettingsPage() {
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.titleArea}>
-          <h1 className={styles.title}>Settings</h1>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+            <h1 className={styles.title} style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-main)' }}>Settings</h1>
+          </div>
           <p className={styles.subtitle}>
             {activeTab === "Institution" && "Manage your institution settings and platform configuration."}
             {activeTab === "Academic" && "Manage your institution's global academic parameters and evaluation rules."}

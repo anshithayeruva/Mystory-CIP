@@ -41,12 +41,11 @@ export default function ReportsAnalyticsPage() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <div className={styles.breadcrumbs}>
-          Dashboard &gt; <span>Reports & Analytics</span>
-        </div>
         <div className={styles.titleRow}>
           <div className={styles.titleArea}>
-            <h1 className={styles.title}>Reports & Analytics</h1>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+              <h1 className={styles.title} style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-main)' }}>Reports & Analytics</h1>
+            </div>
             <p className={styles.subtitle}>
               {activeTab === "overview" 
                 ? "Gain institution-wide insights into academic performance, student understanding, attendance, and departmental health."

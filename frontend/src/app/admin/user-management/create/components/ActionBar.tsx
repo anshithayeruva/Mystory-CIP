@@ -4,7 +4,12 @@ import { Info, Plus } from "lucide-react";
 import Link from "next/link";
 import styles from "../create.module.css";
 
-export default function ActionBar() {
+interface ActionBarProps {
+  onSubmit: () => void;
+  loading: boolean;
+}
+
+export default function ActionBar({ onSubmit, loading }: ActionBarProps) {
   return (
     <div className={styles.actionBar}>
       <div className={styles.mandatoryInfo}>
@@ -13,12 +18,12 @@ export default function ActionBar() {
       </div>
       
       <div className={styles.actionButtons}>
-        <button className={styles.btnCancel}>Cancel</button>
+        <Link href="/admin/user-management" className={styles.btnCancel} style={{ textDecoration: 'none' }}>Cancel</Link>
         <button className={styles.btnReset}>Reset</button>
-        <Link href="/admin/user-management/success" className={styles.btnSubmit} style={{ textDecoration: "none" }}>
+        <button className={styles.btnSubmit} onClick={onSubmit} disabled={loading} style={{ cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}>
           <Plus size={16} />
-          Create User
-        </Link>
+          {loading ? 'Creating...' : 'Create User'}
+        </button>
       </div>
     </div>
   );

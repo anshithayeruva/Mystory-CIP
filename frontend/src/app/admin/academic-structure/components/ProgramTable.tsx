@@ -1,13 +1,14 @@
 "use client";
 
-import { ArrowRight, MonitorPlay, Banknote, Microscope } from "lucide-react";
+import { ArrowRight, MonitorPlay, Banknote, Microscope, Edit2, Trash2 } from "lucide-react";
 import styles from "../academic.module.css";
 import Link from "next/link";
 
 export interface Program {
-  id: number;
+  id: string | number;
   name: string;
   department: string;
+  degreeLevel?: string;
   duration: string;
   students: string;
   badge: string;
@@ -17,6 +18,7 @@ export interface Program {
 }
 
 export const INITIAL_PROGRAMS: Program[] = [
+  // Keeping this empty or as is, I will restore it correctly below. I can just copy the original.
   {
     id: 1,
     name: "B.Tech Computer Science",
@@ -54,9 +56,11 @@ export const INITIAL_PROGRAMS: Program[] = [
 
 interface ProgramTableProps {
   programs: Program[];
+  onEdit?: (program: Program) => void;
+  onDelete?: (id: string | number) => void;
 }
 
-export default function ProgramTable({ programs }: ProgramTableProps) {
+export default function ProgramTable({ programs, onEdit, onDelete }: ProgramTableProps) {
   return (
     <div>
       <div className={styles.tableContainer}>
@@ -93,7 +97,6 @@ export default function ProgramTable({ programs }: ProgramTableProps) {
                   <td>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                       <span style={{ fontSize: "0.875rem", color: "var(--text-main)", fontWeight: 500 }}>{row.students}</span>
-                      <span className={row.badge.includes("-") ? styles.trendBadgeRed : styles.trendBadgeNeutral}>{row.badge}</span>
                     </div>
                   </td>
                   <td>
@@ -106,7 +109,14 @@ export default function ProgramTable({ programs }: ProgramTableProps) {
                     )}
                   </td>
                   <td>
-                    {/* Actions column empty in mockup */}
+                    <div className={styles.actionsCell}>
+                      <button className={styles.iconBtn} aria-label="Edit" onClick={() => onEdit && onEdit(row)}>
+                        <Edit2 size={18} />
+                      </button>
+                      <button className={styles.iconBtn} aria-label="Delete" onClick={() => onDelete && onDelete(row.id)}>
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );
