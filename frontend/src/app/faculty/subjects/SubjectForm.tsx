@@ -144,7 +144,10 @@ export default function SubjectForm({ initialData, isEdit, subjectId }: SubjectF
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(subjectPayload)
         });
-        if (!res.ok) throw new Error('Failed to create subject');
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData?.error?.message || errData?.message || 'Failed to create subject');
+        }
         const json = await res.json();
         targetSubjectId = json.data.id;
       }
@@ -257,7 +260,7 @@ export default function SubjectForm({ initialData, isEdit, subjectId }: SubjectF
               <label className={styles.formLabel}>Department <span>*</span></label>
               <select className={styles.select} value={departmentId} onChange={e => setDepartmentId(e.target.value)} required>
                 <option value="">Select department</option>
-                <option value="60d5ec49f3b5a1234567890a">Computer Science Engineering (Mock)</option>
+                <option value="6a66e3dc365a1d626888eea6">Test Computer Science Dept</option>
                 {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
               </select>
             </div>
@@ -265,7 +268,7 @@ export default function SubjectForm({ initialData, isEdit, subjectId }: SubjectF
               <label className={styles.formLabel}>Program</label>
               <select className={styles.select} value={programId} onChange={e => setProgramId(e.target.value)}>
                 <option value="">Select program</option>
-                <option value="60d5ec49f3b5a1234567890b">B.Tech CSE (Mock)</option>
+                <option value="6a66e3dc365a1d626888eea7">Test B.Tech CS</option>
                 {programs.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>
             </div>
