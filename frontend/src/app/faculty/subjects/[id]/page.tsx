@@ -22,7 +22,9 @@ export default function SubjectDetailsPage() {
   const fetchSubjectDetails = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/faculty/subjects/${id}`);
+      const res = await fetch(`/api/faculty/subjects/${id}`, {
+        credentials: 'include'
+      });
       if (res.ok) {
         const json = await res.json();
         setSubject(json.data);
@@ -43,7 +45,10 @@ export default function SubjectDetailsPage() {
   const handleDeleteSubject = async () => {
     if (confirm('Are you sure you want to delete this subject entirely?')) {
       try {
-        const res = await fetch(`/api/faculty/subjects/${id}`, { method: 'DELETE' });
+        const res = await fetch(`/api/faculty/subjects/${id}`, { 
+          method: 'DELETE',
+          credentials: 'include'
+        });
         if (res.ok) {
           router.push('/faculty/subjects');
         }

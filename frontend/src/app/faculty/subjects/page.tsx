@@ -35,7 +35,9 @@ export default function SubjectsPage() {
         ...(semester && { semester }),
       });
 
-      const res = await fetch(`/api/faculty/subjects?${query.toString()}`);
+      const res = await fetch(`/api/faculty/subjects?${query.toString()}`, {
+        credentials: 'include'
+      });
       if (res.ok) {
         const json = await res.json();
         setSubjects(json.data?.subjects || []);
@@ -80,6 +82,7 @@ export default function SubjectsPage() {
       try {
         const res = await fetch(`/api/faculty/subjects/${id}`, {
           method: 'DELETE',
+          credentials: 'include'
         });
         if (res.ok) {
           fetchSubjects();
