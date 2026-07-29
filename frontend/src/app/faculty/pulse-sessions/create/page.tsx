@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { RefreshCw, Download, Book, Target, Clock, Hash, Activity, CheckCircle, Eye, AlignLeft } from 'lucide-react';
+import { RefreshCw, Download, Book, Target, Clock, Hash, Activity, CheckCircle, Eye, AlignLeft, Calendar, AlertTriangle, Building, GraduationCap, Layers, Users } from 'lucide-react';
 import styles from './create-pulse.module.css';
 
 interface Subject {
@@ -179,6 +179,19 @@ export default function CreatePulseSessionPage() {
       setSaving(false);
     }
   };
+
+  const missingFields = useMemo(() => {
+    const missing = [];
+    if (!formData.title) missing.push('Session Name');
+    if (!formData.courseId) missing.push('Subject');
+    if (!formData.topicId) missing.push('Topic');
+    if (!formData.departmentId) missing.push('Department');
+    if (!formData.date) missing.push('Date');
+    if (!formData.startTime) missing.push('Start Time');
+    return missing;
+  }, [formData]);
+
+  const isReady = missingFields.length === 0;
 
   if (loading) {
     return <div className={styles.container} style={{ alignItems: 'center', justifyContent: 'center' }}>Loading...</div>;
@@ -554,112 +567,172 @@ export default function CreatePulseSessionPage() {
           </div>
 
           {/* Section 4: Session Summary */}
-          <div className={styles.card}>
-            <div className={styles.cardHeader}>
-              <div className={styles.stepNumber}>4</div>
-              <div>
-                <h3 className={styles.cardTitle}>Session Summary</h3>
-                <p className={styles.cardSubtitle}>Review your session details before publishing</p>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className={styles.summaryOverviewCard}>
+              <div className={styles.summaryOverviewLeft}>
+                <h2 className={styles.summaryOverviewTitle}>{formData.title || 'Untitled Session'}</h2>
+                <div className={styles.summaryOverviewTags}>
+                  <span className={styles.summaryTag}><Activity size={14} /> {formData.sessionType.replace(/_/g, ' ')}</span>
+                  <span className={styles.summaryTag}><Clock size={14} /> {formData.durationMinutes} Minutes</span>
+                  <span className={styles.summaryTag}><Calendar size={14} /> {formData.date || 'No date'}</span>
+                  <span className={styles.summaryTag}><CheckCircle size={14} /> {publishImmediately ? 'Live on Publish' : 'Save as Draft'}</span>
+                </div>
+              </div>
+
+              <div className={`${styles.readinessPanel} ${isReady ? styles.success : styles.warning}`}>
+                <div className={`${styles.readinessHeader} ${isReady ? styles.success : styles.warning}`}>
+                  {isReady ? <CheckCircle size={18} /> : <AlertTriangle size={18} />}
+                  {isReady ? 'Ready to Publish' : 'Session Incomplete'}
+                </div>
+                {isReady ? (
+                  <p className={styles.readinessList} style={{ paddingLeft: 0, marginTop: '4px' }}>All required information has been completed.</p>
+                ) : (
+                  <>
+                    <p className={styles.readinessList} style={{ paddingLeft: 0, marginTop: '4px' }}>{missingFields.length} fields remaining</p>
+                    <ul className={styles.readinessList}>
+                      {missingFields.map((field, idx) => (
+                        <li key={idx}>• {field}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
               </div>
             </div>
 
-            <div className={styles.summaryGrid}>
-              <div className={styles.summaryItem}>
-                <div className={styles.summaryIcon}><Book size={18} /></div>
-                <div className={styles.summaryContent}>
-                  <span className={styles.summaryLabel}>Subject</span>
-                  <span className={styles.summaryValue}>{selectedSubject?.name || '-'}</span>
+            <div className={styles.summaryDetailsGrid}>
+              <div className={styles.detailCard}>
+                <div className={styles.detailIconBox}><Book size={18} /></div>
+                <div className={styles.detailContent}>
+                  <span className={styles.detailLabel}>Subject</span>
+                  <span className={styles.detailValue}>{selectedSubject?.name || '-'}</span>
                 </div>
               </div>
 
-              <div className={styles.summaryItem}>
-                <div className={styles.summaryIcon}><AlignLeft size={18} /></div>
-                <div className={styles.summaryContent}>
-                  <span className={styles.summaryLabel}>Topic</span>
-                  <span className={styles.summaryValue}>
-                    {allTopics.find(t => t.id === formData.topicId)?.topicName || '-'}
-                  </span>
+              <div className={styles.detailCard}>
+                <div className={styles.detailIconBox}><AlignLeft size={18} /></div>
+                <div className={styles.detailContent}>
+                  <span className={styles.detailLabel}>Topic</span>
+                  <span className={styles.detailValue}>{allTopics.find(t => t.id === formData.topicId)?.topicName || '-'}</span>
                 </div>
               </div>
 
-              <div className={styles.summaryItem}>
-                <div className={styles.summaryIcon}><Activity size={18} /></div>
-                <div className={styles.summaryContent}>
-                  <span className={styles.summaryLabel}>Session Type</span>
-                  <span className={styles.summaryValue}>
-                    {formData.sessionType.replace(/_/g, ' ')}
-                  </span>
+              <div className={styles.detailCard}>
+                <div className={styles.detailIconBox}><Building size={18} /></div>
+                <div className={styles.detailContent}>
+                  <span className={styles.detailLabel}>Department</span>
+                  <span className={styles.detailValue}>{profile?.department?.name || '-'}</span>
                 </div>
               </div>
 
-              <div className={styles.summaryItem}>
-                <div className={styles.summaryIcon}><Clock size={18} /></div>
-                <div className={styles.summaryContent}>
-                  <span className={styles.summaryLabel}>Duration</span>
-                  <span className={styles.summaryValue}>{formData.durationMinutes} Minutes</span>
+              <div className={styles.detailCard}>
+                <div className={styles.detailIconBox}><GraduationCap size={18} /></div>
+                <div className={styles.detailContent}>
+                  <span className={styles.detailLabel}>Program</span>
+                  <span className={styles.detailValue}>{selectedSubject?.program?.name || '-'}</span>
                 </div>
               </div>
 
-              <div className={styles.summaryItem}>
-                <div className={styles.summaryIcon}><CheckCircle size={18} /></div>
-                <div className={styles.summaryContent}>
-                  <span className={styles.summaryLabel}>Questions</span>
-                  <span className={styles.summaryValue}>{formData.questionCount}</span>
+              <div className={styles.detailCard}>
+                <div className={styles.detailIconBox}><Layers size={18} /></div>
+                <div className={styles.detailContent}>
+                  <span className={styles.detailLabel}>Semester</span>
+                  <span className={styles.detailValue}>{formData.semester || '-'}</span>
                 </div>
               </div>
 
-              <div className={styles.summaryItem}>
-                <div className={styles.summaryIcon}><Target size={18} /></div>
-                <div className={styles.summaryContent}>
-                  <span className={styles.summaryLabel}>Difficulty</span>
-                  <span className={styles.summaryValue}>{formData.difficultyLevel}</span>
-                </div>
-              </div>
-              
-              <div className={styles.summaryItem}>
-                <div className={styles.summaryIcon}><Eye size={18} /></div>
-                <div className={styles.summaryContent}>
-                  <span className={styles.summaryLabel}>Visibility</span>
-                  <span className={styles.summaryValue}>
-                    {formData.resultVisibility === 'IMMEDIATE' ? 'Immediate' : 'After Session'}
-                  </span>
+              <div className={styles.detailCard}>
+                <div className={styles.detailIconBox}><Users size={18} /></div>
+                <div className={styles.detailContent}>
+                  <span className={styles.detailLabel}>Section</span>
+                  <span className={styles.detailValue}>{formData.section || '-'}</span>
                 </div>
               </div>
 
-              <div className={styles.summaryItem}>
-                <div className={styles.summaryIcon}><Hash size={18} /></div>
-                <div className={styles.summaryContent}>
-                  <span className={styles.summaryLabel}>Session Code</span>
-                  <span className={styles.summaryValue}>{sessionCode || '-'}</span>
+              <div className={styles.detailCard}>
+                <div className={styles.detailIconBox}><Hash size={18} /></div>
+                <div className={styles.detailContent}>
+                  <span className={styles.detailLabel}>Question Count</span>
+                  <span className={styles.detailValue}>{formData.questionCount}</span>
+                </div>
+              </div>
+
+              <div className={styles.detailCard}>
+                <div className={styles.detailIconBox}><Target size={18} /></div>
+                <div className={styles.detailContent}>
+                  <span className={styles.detailLabel}>Difficulty</span>
+                  <span className={styles.detailValue}>{formData.difficultyLevel}</span>
+                </div>
+              </div>
+
+              <div className={styles.detailCard}>
+                <div className={styles.detailIconBox}><CheckCircle size={18} /></div>
+                <div className={styles.detailContent}>
+                  <span className={styles.detailLabel}>Attendance Rule</span>
+                  <span className={styles.detailValue}>{formData.attendanceRule === 'ATTEMPT_REQUIRED' ? 'Mandatory' : 'Optional'}</span>
+                </div>
+              </div>
+
+              <div className={styles.detailCard}>
+                <div className={styles.detailIconBox}><Eye size={18} /></div>
+                <div className={styles.detailContent}>
+                  <span className={styles.detailLabel}>Result Visibility</span>
+                  <span className={styles.detailValue}>{formData.resultVisibility === 'IMMEDIATE' ? 'Immediate' : 'After Session'}</span>
+                </div>
+              </div>
+
+              <div className={styles.detailCard}>
+                <div className={styles.detailIconBox}><Hash size={18} /></div>
+                <div className={styles.detailContent}>
+                  <span className={styles.detailLabel}>Session Code</span>
+                  <span className={styles.detailValue}>{sessionCode || '-'}</span>
+                </div>
+              </div>
+
+              <div className={styles.detailCard}>
+                <div className={styles.detailIconBox}><Activity size={18} /></div>
+                <div className={styles.detailContent}>
+                  <span className={styles.detailLabel}>Session Status</span>
+                  <span className={styles.detailValue}>{publishImmediately ? 'Published' : 'Draft'}</span>
                 </div>
               </div>
             </div>
 
-            <div className={styles.actionBar}>
-              <button 
-                type="button" 
-                className="btn btn-secondary"
-                onClick={() => router.push('/faculty/pulse-sessions')}
-                disabled={saving}
-              >
-                Cancel
-              </button>
-              <button 
-                type="button" 
-                className="btn btn-outline"
-                onClick={(e) => handleSubmit(e, true)}
-                disabled={saving}
-              >
-                Save Draft
-              </button>
-              <button 
-                type="button" 
-                className="btn btn-primary"
-                onClick={(e) => handleSubmit(e, false)}
-                disabled={saving}
-              >
-                {saving ? 'Saving...' : 'Publish Session'}
-              </button>
+            <div className={styles.finalActionBar}>
+              <div className={styles.actionBarLeft}>
+                <span className={styles.hintText} style={{ fontWeight: 600, color: '#475569' }}>Please review your session before publishing.</span>
+                <span className={styles.hintText}>Once published, students can immediately join using the Session Code or QR Code.</span>
+              </div>
+              <div className={styles.actionBarRight}>
+                <button 
+                  type="button" 
+                  className="btn btn-secondary"
+                  onClick={() => router.push('/faculty/pulse-sessions')}
+                  disabled={saving}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="button" 
+                  className="btn btn-outline"
+                  onClick={(e) => handleSubmit(e, true)}
+                  disabled={saving}
+                >
+                  Save Draft
+                </button>
+                <div style={{ position: 'relative' }} title={!isReady ? "Complete all required fields before publishing" : ""}>
+                  <button 
+                    type="submit" 
+                    className="btn btn-primary"
+                    disabled={saving || !isReady}
+                    onClick={(e) => {
+                      if (isReady) handleSubmit(e, false);
+                    }}
+                    style={!isReady ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+                  >
+                    {saving ? 'Publishing...' : 'Publish Session'}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
