@@ -1,4 +1,6 @@
 "use client";
+import { apiClient } from '@/lib/apiClient';
+
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
@@ -57,8 +59,8 @@ export default function CreatePulseSessionPage() {
     async function fetchData() {
       try {
         const [profileRes, subjectsRes] = await Promise.all([
-          fetch('/api/faculty/profile', { credentials: 'include' }),
-          fetch('/api/faculty/subjects?limit=100', { credentials: 'include' })
+          apiClient.fetch('/api/faculty/profile', { credentials: 'include' }),
+          apiClient.fetch('/api/faculty/subjects?limit=100', { credentials: 'include' })
         ]);
         
         if (profileRes.ok) {
@@ -136,7 +138,7 @@ export default function CreatePulseSessionPage() {
       // 1. Create Session
       const payload = { ...formData };
       
-      const res = await fetch('/api/faculty/pulse-sessions', {
+      const res = await apiClient.fetch('/api/faculty/pulse-sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -153,17 +155,17 @@ export default function CreatePulseSessionPage() {
 
       // 2. Generate Code if requested
       if (sessionCode) {
-        await fetch(`/api/faculty/pulse-sessions/${newSessionId}/generate-code`, {
+        await apiClient.fetch(`/api/faculty/pulse-sessions/${newSessionId}/generate-code`, {
           method: 'POST', credentials: 'include'
         });
-        await fetch(`/api/faculty/pulse-sessions/${newSessionId}/generate-qr`, {
+        await apiClient.fetch(`/api/faculty/pulse-sessions/${newSessionId}/generate-qr`, {
           method: 'POST', credentials: 'include'
         });
       }
 
       // 3. Publish if requested (and not saving as pure draft)
       if (!asDraft && publishImmediately) {
-        await fetch(`/api/faculty/pulse-sessions/${newSessionId}/publish`, {
+        await apiClient.fetch(`/api/faculty/pulse-sessions/${newSessionId}/publish`, {
           method: 'POST', credentials: 'include'
         });
       }

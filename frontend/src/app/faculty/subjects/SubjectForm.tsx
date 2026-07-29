@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import { apiClient } from '@/lib/apiClient';
+
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -132,7 +134,7 @@ export default function SubjectForm({ initialData, isEdit, subjectId }: SubjectF
       let targetSubjectId = subjectId;
 
       if (isEdit && targetSubjectId) {
-        const res = await fetch(`/api/faculty/subjects/${targetSubjectId}`, {
+        const res = await apiClient.fetch(`/api/faculty/subjects/${targetSubjectId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -140,7 +142,7 @@ export default function SubjectForm({ initialData, isEdit, subjectId }: SubjectF
         });
         if (!res.ok) throw new Error('Failed to update subject info');
       } else {
-        const res = await fetch(`/api/faculty/subjects`, {
+        const res = await apiClient.fetch(`/api/faculty/subjects`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -163,7 +165,7 @@ export default function SubjectForm({ initialData, isEdit, subjectId }: SubjectF
       if (!isEdit && outcomes.length > 0) {
         for (const out of outcomes) {
           if (out.title && out.coNumber) {
-            await fetch(`/api/faculty/subjects/${targetSubjectId}/outcomes`, {
+            await apiClient.fetch(`/api/faculty/subjects/${targetSubjectId}/outcomes`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               credentials: 'include',
@@ -177,7 +179,7 @@ export default function SubjectForm({ initialData, isEdit, subjectId }: SubjectF
       if (!isEdit && units.length > 0) {
         for (const unit of units) {
           if (unit.unitName) {
-            const unitRes = await fetch(`/api/faculty/subjects/${targetSubjectId}/units`, {
+            const unitRes = await apiClient.fetch(`/api/faculty/subjects/${targetSubjectId}/units`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               credentials: 'include',
@@ -191,7 +193,7 @@ export default function SubjectForm({ initialData, isEdit, subjectId }: SubjectF
               if (unit.topics && unit.topics.length > 0) {
                 for (const topic of unit.topics) {
                   if (topic.topicName) {
-                    await fetch(`/api/faculty/subjects/${targetSubjectId}/units/${newUnitId}/topics`, {
+                    await apiClient.fetch(`/api/faculty/subjects/${targetSubjectId}/units/${newUnitId}/topics`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       credentials: 'include',

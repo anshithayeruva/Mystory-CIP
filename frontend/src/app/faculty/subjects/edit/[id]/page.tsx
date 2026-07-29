@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import { apiClient } from '@/lib/apiClient';
+
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -15,7 +17,7 @@ export default function EditSubjectPage() {
   useEffect(() => {
     const fetchSubject = async () => {
       try {
-        const res = await fetch(`/api/faculty/subjects/${id}`);
+        const res = await apiClient.fetch(`/api/faculty/subjects/${id}`);
         if (res.ok) {
           const json = await res.json();
           setInitialData(json.data);

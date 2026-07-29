@@ -1,4 +1,6 @@
 "use client";
+import { apiClient } from '@/lib/apiClient';
+
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -37,9 +39,9 @@ export default function ConceptGapAnalysisPage() {
       const qs = queryParams.toString();
       
       const [dashRes, trendRes, insRes] = await Promise.all([
-        fetch(`/api/faculty/analytics/concept-gap?${qs}`),
-        fetch(`/api/faculty/analytics/concept-gap/trend?${qs}`),
-        fetch(`/api/faculty/analytics/concept-gap/insights?${qs}`)
+        apiClient.fetch(`/api/faculty/analytics/concept-gap?${qs}`),
+        apiClient.fetch(`/api/faculty/analytics/concept-gap/trend?${qs}`),
+        apiClient.fetch(`/api/faculty/analytics/concept-gap/insights?${qs}`)
       ]);
       
       if (dashRes.ok && trendRes.ok && insRes.ok) {
