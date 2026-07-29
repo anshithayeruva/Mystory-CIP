@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   FileText, 
   PlusCircle, 
@@ -16,33 +16,95 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
   PieChart,
   Pie,
-  Cell
+  Cell,
+  ResponsiveContainer
 } from 'recharts';
 
-// --- MOCK DATA ---
-
-const distributionData = [
-  { name: 'Algorithms', value: 45, color: '#10633B' },
-  { name: 'OS', value: 30, color: '#059669' },
-  { name: 'Databases', value: 25, color: '#064E3B' },
-];
-
-const recentSessions = [
-  { id: 'ALG-CS401-B', subject: 'Advanced Algorithms', date: 'Oct 24, 2023', attendance: '54/62', score: '82%', status: 'LIVE', isLive: true },
-  { id: 'DBS-CS302-A', subject: 'Database Systems', date: 'Oct 23, 2023', attendance: '58/60', score: '75%', status: 'COMPLETED', isLive: false },
-  { id: 'OPS-CS305-C', subject: 'Operating Systems', date: 'Oct 22, 2023', attendance: '60/60', score: '88%', status: 'COMPLETED', isLive: false },
-];
-
 export default function FacultyDashboard() {
+  const [dashboardSummary, setDashboardSummary] = useState<any>(null);
+  const [liveSession, setLiveSession] = useState<any>(null);
+  const [distributionData, setDistributionData] = useState<any[]>([]);
+  const [conceptGaps, setConceptGaps] = useState<any>(null);
+  const [assignedSubjects, setAssignedSubjects] = useState<any[]>([]);
+  const [recentSessions, setRecentSessions] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const [
+          summaryRes, 
+          pulseSessionsRes, 
+          distributionRes, 
+          gapsRes, 
+          subjectsRes, 
+          sessionsRes
+        ] = await Promise.all([
+          fetch('/api/faculty/analytics/dashboard-summary'),
+          fetch('/api/faculty/pulse-sessions?limit=10'),
+          fetch('/api/faculty/analytics/charts/session-count-per-subject'),
+          fetch('/api/faculty/analytics/concept-gaps'),
+          fetch('/api/faculty/profile/subjects?limit=4'),
+          fetch('/api/faculty/analytics/sessions?limit=5')
+        ]);
+
+        if (summaryRes.ok) {
+          const json = await summaryRes.json();
+          setDashboardSummary(json.data);
+        }
+        
+        if (pulseSessionsRes.ok) {
+          const json = await pulseSessionsRes.json();
+          const sessions = json.data?.sessions || [];
+          if (sessions.length > 0) {
+             setLiveSession(sessions[0]);
+          }
+        }
+
+        if (distributionRes.ok) {
+          const json = await distributionRes.json();
+          const colors = ['#10633B', '#059669', '#064E3B', '#166534', '#047857'];
+          const distData = (json.data || []).map((item: any, idx: number) => ({
+            name: item.subject,
+            value: item.sessionCount,
+            color: colors[idx % colors.length]
+          }));
+          setDistributionData(distData);
+        }
+
+        if (gapsRes.ok) {
+          const json = await gapsRes.json();
+          setConceptGaps(json.data);
+        }
+
+        if (subjectsRes.ok) {
+          const json = await subjectsRes.json();
+          setAssignedSubjects(json.data?.data || []);
+        }
+
+        if (sessionsRes.ok) {
+          const json = await sessionsRes.json();
+          setRecentSessions(json.data?.data || []);
+        }
+
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  if (isLoading) {
+    return <div style={{ padding: '24px' }}>Loading dashboard...</div>;
+  }
+
+  const totalDonutValue = distributionData.reduce((acc, curr) => acc + curr.value, 0);
+
   return (
     <div className="dashboard-scroll">
       
@@ -52,7 +114,7 @@ export default function FacultyDashboard() {
           <h1 className="page-title">Faculty Dashboard</h1>
           <div className="page-tags">
             <span className="tag"><Settings size={14}/> Department: Computer Science Engineering</span>
-            <span className="tag"><BookOpen size={14}/> Assigned Subjects: 04</span>
+            <span className="tag"><BookOpen size={14}/> Assigned Subjects: {(dashboardSummary?.totalAssignedSubjects || 0) < 10 ? '0' + (dashboardSummary?.totalAssignedSubjects || 0) : dashboardSummary?.totalAssignedSubjects || 0}</span>
           </div>
         </div>
         <div className="page-actions">
@@ -70,23 +132,22 @@ export default function FacultyDashboard() {
         <div className="kpi-card">
           <span className="kpi-title">Total Sessions</span>
           <div className="kpi-value-row">
-            <span className="kpi-value">124</span>
-            <span className="kpi-badge kpi-badge-green">+12%</span>
+            <span className="kpi-value">{dashboardSummary?.totalSessionsCreated || 0}</span>
           </div>
         </div>
         
         <div className="kpi-card">
           <span className="kpi-title">Active Sessions</span>
           <div className="kpi-value-row">
-            <span className="kpi-value">02</span>
-            <span className="kpi-indicator"></span>
+            <span className="kpi-value">{(dashboardSummary?.activeSessions || 0) < 10 ? '0'+(dashboardSummary?.activeSessions || 0) : dashboardSummary?.activeSessions || 0}</span>
+            {dashboardSummary?.activeSessions > 0 && <span className="kpi-indicator"></span>}
           </div>
         </div>
 
         <div className="kpi-card">
           <span className="kpi-title">Completed</span>
           <div className="kpi-value-row">
-            <span className="kpi-value">118</span>
+            <span className="kpi-value">{dashboardSummary?.completedSessions || 0}</span>
             <span className="kpi-subtitle">Total</span>
           </div>
         </div>
@@ -94,7 +155,7 @@ export default function FacultyDashboard() {
         <div className="kpi-card">
           <span className="kpi-title">Assigned Subjects</span>
           <div className="kpi-value-row">
-            <span className="kpi-value">04</span>
+            <span className="kpi-value">{(dashboardSummary?.totalAssignedSubjects || 0) < 10 ? '0'+(dashboardSummary?.totalAssignedSubjects || 0) : dashboardSummary?.totalAssignedSubjects || 0}</span>
             <BookOpen size={20} color="#64748b" />
           </div>
         </div>
@@ -102,66 +163,66 @@ export default function FacultyDashboard() {
         <div className="kpi-card">
           <span className="kpi-title">Attendance Rate</span>
           <div className="kpi-value-row">
-            <span className="kpi-value">92.4%</span>
-            <span className="kpi-subtitle" style={{ fontSize: '0.65rem' }}>Above<br/>Avg</span>
+            <span className="kpi-value">{dashboardSummary?.overallAttendancePercentage || 0}%</span>
+            <span className="kpi-subtitle" style={{ fontSize: '0.65rem' }}>Overall</span>
           </div>
         </div>
 
         <div className="kpi-card">
           <span className="kpi-title">Understanding</span>
           <div className="kpi-value-row">
-            <span className="kpi-value">78%</span>
-            <span className="kpi-subtitle" style={{ fontSize: '0.65rem', color: '#2563eb' }}>Moderate</span>
+            <span className="kpi-value">{dashboardSummary?.overallTopicUnderstandingPercentage || 0}%</span>
+            <span className="kpi-subtitle" style={{ fontSize: '0.65rem', color: '#2563eb' }}>Avg</span>
           </div>
         </div>
       </div>
-
-
 
       {/* Live Session Card */}
-      <div className="live-session-card">
-        <div className="live-left">
-          <div className="live-badge-row">
-            <span className="badge-live">LIVE</span>
-            <span className="live-time">Active for 17m</span>
-          </div>
-          
-          <h2 className="live-title">Advanced Algorithms (CS401-B)</h2>
-          <p className="live-topic">
-            Topic: Graph Traversals - Depth First Search (DFS) vs Breadth First Search (BFS) performance benchmarks.
-          </p>
-
-          <div className="live-stats">
-            <div className="live-stat-group">
-              <span className="live-stat-label">Remaining Time</span>
-              <span className="live-stat-value green">42 : 09</span>
+      {liveSession && (
+        <div className="live-session-card">
+          <div className="live-left">
+            <div className="live-badge-row">
+              <span className="badge-live">{liveSession.status || 'ACTIVE'}</span>
+              <span className="live-time">Started: {new Date(liveSession.date).toLocaleDateString()}</span>
             </div>
-            <div className="live-stat-group">
-              <span className="live-stat-label" style={{ borderLeft: '1px solid #cbd5e1', paddingLeft: '24px' }}>Current Participants</span>
-              <span className="live-stat-value" style={{ paddingLeft: '24px' }}>54 / 62</span>
+            
+            <h2 className="live-title">{liveSession.course?.name} ({liveSession.course?.code})</h2>
+            <p className="live-topic">
+              Topic: {liveSession.topic?.topicName}
+            </p>
+
+            <div className="live-stats">
+              <div className="live-stat-group">
+                <span className="live-stat-label">Duration</span>
+                <span className="live-stat-value green">{liveSession.durationMinutes} min</span>
+              </div>
+              <div className="live-stat-group">
+                <span className="live-stat-label" style={{ borderLeft: '1px solid #cbd5e1', paddingLeft: '24px' }}>Questions</span>
+                <span className="live-stat-value" style={{ paddingLeft: '24px' }}>{liveSession.questionCount}</span>
+              </div>
+            </div>
+
+            <div className="live-actions">
+              <button className="btn btn-outline">
+                <Pause size={16} /> Pause
+              </button>
+              <button className="btn btn-primary">
+                <Play size={16} /> Resume
+              </button>
+              <button className="btn btn-danger">
+                <Square size={16} /> End Session
+              </button>
             </div>
           </div>
 
-          <div className="live-actions">
-            <button className="btn btn-outline">
-              <Pause size={16} /> Pause
-            </button>
-            <button className="btn btn-primary">
-              <Play size={16} /> Resume
-            </button>
-            <button className="btn btn-danger">
-              <Square size={16} /> End Session
-            </button>
+          <div className="live-right">
+            <div className="qr-box">
+              <QrCode size={64} color="#64748b" />
+            </div>
+            <span className="qr-text">Join: {liveSession.id.substring(0,6).toUpperCase()}</span>
           </div>
         </div>
-
-        <div className="live-right">
-          <div className="qr-box">
-            <QrCode size={64} color="#64748b" />
-          </div>
-          <span className="qr-text">Join: 402-192</span>
-        </div>
-      </div>
+      )}
 
       {/* Gap Section */}
       <div className="gap-section">
@@ -173,38 +234,44 @@ export default function FacultyDashboard() {
           </div>
           
           <div className="donut-container" style={{ height: '200px' }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={distributionData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={70}
-                  outerRadius={90}
-                  paddingAngle={5}
-                  dataKey="value"
-                  stroke="none"
-                >
-                  {distributionData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="donut-center-text">
-              <span className="donut-val">124</span>
-              <span className="donut-sub">Total</span>
-            </div>
+            {distributionData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={distributionData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={70}
+                    outerRadius={90}
+                    paddingAngle={5}
+                    dataKey="value"
+                    stroke="none"
+                  >
+                    {distributionData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', color: '#64748b' }}>No data</div>
+            )}
+            {distributionData.length > 0 && (
+              <div className="donut-center-text">
+                <span className="donut-val">{totalDonutValue}</span>
+                <span className="donut-sub">Total</span>
+              </div>
+            )}
           </div>
 
           <div className="donut-legend">
             {distributionData.map((item, i) => (
               <div className="legend-item" key={i}>
                 <div className="legend-left">
-                  <div className={`legend-dot c${i+1}`}></div>
+                  <div className={`legend-dot`} style={{ backgroundColor: item.color }}></div>
                   <span>{item.name}</span>
                 </div>
-                <span className="legend-val">{item.value}%</span>
+                <span className="legend-val">{item.value}</span>
               </div>
             ))}
           </div>
@@ -214,41 +281,41 @@ export default function FacultyDashboard() {
         <div className="gap-card">
           <div className="gap-header">
             <span className="gap-title">Concept Gap Summary</span>
-            <span className="badge-attention">Attention Needed</span>
+            {conceptGaps?.weaklyUnderstoodTopics?.length > 0 && (
+              <span className="badge-attention">Attention Needed</span>
+            )}
           </div>
 
           <div className="progress-list">
-            
-            <div className="progress-item">
-              <div className="progress-header">
-                <span className="progress-label">Dynamic Programming</span>
-                <span className="progress-val red">42% Understanding</span>
+            {/* Weakly Understood Topics (Red/Blue) */}
+            {conceptGaps?.weaklyUnderstoodTopics?.slice(0, 3).map((topic: any, idx: number) => (
+              <div className="progress-item" key={topic.topicId}>
+                <div className="progress-header">
+                  <span className="progress-label">{topic.topicName}</span>
+                  <span className={`progress-val ${idx === 0 ? 'red' : 'blue'}`}>{topic.averageScorePercentage}% Understanding</span>
+                </div>
+                <div className="progress-track">
+                  <div className={`progress-fill ${idx === 0 ? 'red' : 'blue'}`} style={{ width: `${topic.averageScorePercentage}%` }}></div>
+                </div>
               </div>
-              <div className="progress-track">
-                <div className="progress-fill red" style={{ width: '42%' }}></div>
-              </div>
-            </div>
+            ))}
 
-            <div className="progress-item">
-              <div className="progress-header">
-                <span className="progress-label">Process Synchronization</span>
-                <span className="progress-val blue">58% Understanding</span>
+            {/* Strongly Understood Topics (Green) */}
+            {conceptGaps?.stronglyUnderstoodTopics?.slice(0, 1).map((topic: any) => (
+              <div className="progress-item" key={topic.topicId}>
+                <div className="progress-header">
+                  <span className="progress-label">{topic.topicName}</span>
+                  <span className="progress-val green">{topic.averageScorePercentage}% Understanding</span>
+                </div>
+                <div className="progress-track">
+                  <div className="progress-fill green" style={{ width: `${topic.averageScorePercentage}%` }}></div>
+                </div>
               </div>
-              <div className="progress-track">
-                <div className="progress-fill blue" style={{ width: '58%' }}></div>
-              </div>
-            </div>
+            ))}
 
-            <div className="progress-item">
-              <div className="progress-header">
-                <span className="progress-label">Transaction Isolation Levels</span>
-                <span className="progress-val green">72% Understanding</span>
-              </div>
-              <div className="progress-track">
-                <div className="progress-fill green" style={{ width: '72%' }}></div>
-              </div>
-            </div>
-
+            {(!conceptGaps?.weaklyUnderstoodTopics?.length && !conceptGaps?.stronglyUnderstoodTopics?.length) && (
+              <div style={{ color: '#64748b', fontSize: '14px', marginTop: '10px' }}>No concept gap data available.</div>
+            )}
           </div>
 
           <button className="link-btn">
@@ -267,7 +334,7 @@ export default function FacultyDashboard() {
         <table className="table-container">
           <thead>
             <tr>
-              <th>Session ID</th>
+              <th>Session Name</th>
               <th>Subject</th>
               <th>Date</th>
               <th>Attendance</th>
@@ -277,23 +344,29 @@ export default function FacultyDashboard() {
             </tr>
           </thead>
           <tbody>
-            {recentSessions.map((session, i) => (
+            {recentSessions.length > 0 ? recentSessions.map((session, i) => (
               <tr key={i}>
-                <td style={{ fontWeight: 600 }}>{session.id}</td>
+                <td style={{ fontWeight: 600 }}>{session.sessionName}</td>
                 <td>{session.subject}</td>
-                <td>{session.date}</td>
-                <td>{session.attendance}</td>
-                <td className={`score ${parseInt(session.score) > 80 ? 'green' : 'blue'}`}>{session.score}</td>
+                <td>{new Date(session.date).toLocaleDateString()}</td>
+                <td>{session.attendanceCount} / {session.totalStudents}</td>
+                <td className={`score ${session.averageScore && session.averageScore > 80 ? 'green' : 'blue'}`}>
+                  {session.averageScore !== null ? `${session.averageScore}%` : '-'}
+                </td>
                 <td>
-                  <span className={`status-badge ${session.isLive ? 'live' : 'completed'}`}>
-                    {session.status}
+                  <span className={`status-badge completed`}>
+                    COMPLETED
                   </span>
                 </td>
                 <td>
                   <Eye className="action-icon" size={18} />
                 </td>
               </tr>
-            ))}
+            )) : (
+              <tr>
+                <td colSpan={7} style={{ textAlign: 'center', padding: '20px', color: '#64748b' }}>No recent sessions found.</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -302,53 +375,28 @@ export default function FacultyDashboard() {
       <h3 className="subjects-section-title">Assigned Subjects</h3>
       <div className="subjects-grid">
         
-        <div className="subject-card">
-          <div className="subject-icon-box green">
-            <BookOpen size={20} />
-          </div>
-          <span className="subject-name">Advanced Algorithms</span>
-          <span className="subject-meta">CS401-B | 62 Students</span>
-          <div className="subject-footer">
-            <span className="subject-badge">32 Sessions</span>
-            <a href="#" className="subject-link">View Subject</a>
-          </div>
-        </div>
-
-        <div className="subject-card">
-          <div className="subject-icon-box blue">
-            <Server size={20} />
-          </div>
-          <span className="subject-name">Database Systems</span>
-          <span className="subject-meta">CS302-A | 60 Students</span>
-          <div className="subject-footer">
-            <span className="subject-badge">28 Sessions</span>
-            <a href="#" className="subject-link">View Subject</a>
-          </div>
-        </div>
-
-        <div className="subject-card">
-          <div className="subject-icon-box red">
-            <Settings size={20} />
-          </div>
-          <span className="subject-name">Operating Systems</span>
-          <span className="subject-meta">CS305-C | 60 Students</span>
-          <div className="subject-footer">
-            <span className="subject-badge">35 Sessions</span>
-            <a href="#" className="subject-link">View Subject</a>
-          </div>
-        </div>
-
-        <div className="subject-card">
-          <div className="subject-icon-box green">
-            <ShieldCheck size={20} />
-          </div>
-          <span className="subject-name">Network Security</span>
-          <span className="subject-meta">CS405-D | 45 Students</span>
-          <div className="subject-footer">
-            <span className="subject-badge">20 Sessions</span>
-            <a href="#" className="subject-link">View Subject</a>
-          </div>
-        </div>
+        {assignedSubjects.length > 0 ? assignedSubjects.map((subject, i) => {
+          const colors = ['green', 'blue', 'red', 'green'];
+          const colorClass = colors[i % colors.length];
+          const icons = [BookOpen, Server, Settings, ShieldCheck];
+          const Icon = icons[i % icons.length];
+          
+          return (
+            <div className="subject-card" key={subject.id}>
+              <div className={`subject-icon-box ${colorClass}`}>
+                <Icon size={20} />
+              </div>
+              <span className="subject-name">{subject.subjectName}</span>
+              <span className="subject-meta">{subject.subjectCode} | Dept: {subject.department}</span>
+              <div className="subject-footer">
+                <span className="subject-badge">{subject.totalSessionsCreated} Sessions</span>
+                <a href="#" className="subject-link">View Subject</a>
+              </div>
+            </div>
+          );
+        }) : (
+          <div style={{ color: '#64748b', gridColumn: '1 / -1' }}>No subjects assigned.</div>
+        )}
 
       </div>
 
