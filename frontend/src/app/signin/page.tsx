@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import styles from './signin.module.css';
 
-type RoleType = 'ADMIN' | 'STUDENT' | 'HOD' | 'FACULTY';
+type RoleType = 'ADMIN' | 'STUDENT' | 'HOD' ;
 
 interface RoleOption {
   id: RoleType;
@@ -53,19 +53,10 @@ const ROLE_OPTIONS: RoleOption[] = [
     id: 'HOD',
     title: 'HOD',
     badge: 'Dept Head',
-    description: 'Department analytics, faculty performance, and reporting',
+    description: 'Department analytics, staff performance, and reporting',
     icon: Building2,
     defaultEmail: 'hod.cs@mystory.edu',
     targetPath: '/hod',
-  },
-  {
-    id: 'FACULTY',
-    title: 'Faculty',
-    badge: 'Faculty Portal',
-    description: 'Manage courses, conduct pulse sessions, and review metrics',
-    icon: BookOpen,
-    defaultEmail: 'faculty@mystory.edu',
-    targetPath: '/faculty',
   },
 ];
 

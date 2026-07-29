@@ -2,15 +2,15 @@ import db from '@/lib/db';
 
 export class DashboardService {
   static async getDashboardStats() {
-    const [facultyCount, hodCount, departmentCount, courseCount] = await Promise.all([
-      db.facultyProfile.count(),
+    const [staffCount, hodCount, departmentCount, courseCount] = await Promise.all([
+      0,
       db.hodProfile.count(),
       db.department.count(),
       db.course.count(),
     ]);
 
     return {
-      facultyCount,
+      staffCount,
       hodCount,
       departmentCount,
       courseCount,
@@ -36,18 +36,7 @@ export class DashboardService {
   }
 
   static async getActiveSessions() {
-    const sessions = await db.facultyCourse.findMany({
-      take: 4,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        course: true,
-        faculty: {
-          include: {
-            user: true
-          }
-        }
-      }
-    });
+    const sessions: any[] = [];
     
     return sessions;
   }

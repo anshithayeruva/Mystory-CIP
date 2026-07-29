@@ -1,4 +1,5 @@
 "use client";
+import React from 'react';
 
 import { ArrowRight, MonitorPlay, Banknote, Microscope, Edit2, Trash2 } from "lucide-react";
 import styles from "../academic.module.css";
@@ -12,7 +13,7 @@ export interface Program {
   duration: string;
   students: string;
   badge: string;
-  icon: any;
+  icon: React.ElementType;
   iconStyle: string;
   curriculum: string; // "Not Assigned" or a view link
 }

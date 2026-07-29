@@ -3,11 +3,11 @@
 import React, { useState } from "react";
 import { 
   User, 
-  Mail, 
-  Phone, 
-  Building2, 
-  MapPin, 
-  IdCard, 
+   
+   
+   
+   
+   
   ShieldCheck, 
   Lock, 
   Bell, 
@@ -33,24 +33,21 @@ export default function HodAccountPage() {
     staffId: "HOD-CSE-2024",
     office: "Block B, Room 304 (3rd Floor)",
     department: "Computer Science & Engineering",
-    institution: "SRM University AP",
-  });
+    institution: "SRM University AP" });
 
   // Password Security Form State
   const [security, setSecurity] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
-    enableMFA: true,
-  });
+    enableMFA: true });
   const [showPassword, setShowPassword] = useState(false);
 
   // Notification Preferences State
   const [notifications, setNotifications] = useState({
     weeklyDigest: true,
     lowAttendance: true,
-    securityAlerts: true,
-  });
+    securityAlerts: true });
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
@@ -156,7 +153,7 @@ export default function HodAccountPage() {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label className={styles.label}>Phone Number</label>
+                  <label className={styles.label}>Number</label>
                   <input
                     type="text"
                     className={styles.input}

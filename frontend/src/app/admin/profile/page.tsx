@@ -1,4 +1,5 @@
 "use client";
+import Image from 'next/image';
 
 import React, { useState } from "react";
 import styles from "./profile.module.css";
@@ -28,7 +29,7 @@ export default function ProfilePage() {
         
         <div className={styles.profileLayout}>
           <div className={styles.avatarSection}>
-            <img 
+            <Image width={40} height={40} 
               src="https://api.dicebear.com/7.x/initials/svg?seed=Nitya%20Nara&backgroundColor=e2e8f0&textColor=475569" 
               alt="Profile" 
               className={styles.avatarImage}

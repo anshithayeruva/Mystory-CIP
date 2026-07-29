@@ -10,7 +10,7 @@ export default function QuickActions() {
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     subject: "CS-302: Data Structures",
-    faculty: "Dr. Anita Sharma",
+    staff: "Dr. Anita Sharma",
     room: "Lab Room 4A",
     time: "11:30 AM - 01:00 PM",
   });
@@ -124,7 +124,7 @@ export default function QuickActions() {
 
               <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                 <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "#475569", textTransform: "uppercase" }}>
-                  Assigned Faculty *
+                  Assigned Staff *
                 </label>
                 <div style={{ position: "relative" }}>
                   <User size={16} style={{ position: "absolute", left: "12px", top: "12px", color: "#64748b" }} />
@@ -139,8 +139,8 @@ export default function QuickActions() {
                       fontSize: "0.875rem",
                       color: "#0f172a",
                     }}
-                    value={formData.faculty}
-                    onChange={(e) => setFormData({ ...formData, faculty: e.target.value })}
+                    value={formData.staff}
+                    onChange={(e) => setFormData({ ...formData, staff: e.target.value })}
                   />
                 </div>
               </div>
