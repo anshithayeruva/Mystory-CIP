@@ -151,11 +151,11 @@ export default function SessionSummaryPage({ params }: SummaryPageProps) {
       <div className={styles.kpiGrid}>
         <div className={styles.kpiCard}>
           <div className={`${styles.kpiIcon} ${styles.blue}`}>
-            <Users size={24} />
+            <Activity size={24} />
           </div>
           <div>
-            <div className={styles.kpiValue}>{kpis.studentsJoined}</div>
-            <div className={styles.kpiLabel}>Enrolled</div>
+            <div className={styles.kpiValue}>{kpis.participationPercentage}%</div>
+            <div className={styles.kpiLabel}>Participation</div>
           </div>
         </div>
         <div className={styles.kpiCard}>
@@ -191,7 +191,16 @@ export default function SessionSummaryPage({ params }: SummaryPageProps) {
           </div>
           <div>
             <div className={styles.kpiValue}>{durationMin}m</div>
-            <div className={styles.kpiLabel}>Duration</div>
+            <div className={styles.kpiLabel}>Average Completion Time</div>
+          </div>
+        </div>
+        <div className={styles.kpiCard}>
+          <div className={`${styles.kpiIcon} ${styles.red}`}>
+            <AlertCircle size={24} />
+          </div>
+          <div>
+            <div className={styles.kpiValue}>{needsRemedial}</div>
+            <div className={styles.kpiLabel}>Students Requiring Attention</div>
           </div>
         </div>
       </div>
@@ -297,30 +306,20 @@ export default function SessionSummaryPage({ params }: SummaryPageProps) {
           <div className={styles.card}>
             <h3 className={styles.cardTitle}><BrainCircuit size={20} color="#10633B" /> Session Insights</h3>
             
-            <div className={styles.insightBox}>
-              <div className={styles.insightTitle}>Overall Performance</div>
-              <div className={styles.insightDesc}>
-                The class achieved an average score of <strong>{kpis.averageScore}%</strong> with a participation rate of <strong>{kpis.participationPercentage}%</strong>.
+            <div className={styles.insightBox} style={{ borderLeftColor: '#10633B', marginTop: '16px' }}>
+              <div className={styles.insightDesc} style={{ lineHeight: '1.6' }}>
+                Students achieved a participation rate of <strong>{kpis.participationPercentage}%</strong> and an average score of <strong>{kpis.averageScore}%</strong>.
+                {lowestQuestion && (
+                  <span> <strong>Question {lowestQuestion.questionNumber}</strong> had the lowest accuracy at <strong>{lowestAccuracy.toFixed(0)}%</strong>.</span>
+                )}
+                {needsRemedial > 0 && (
+                  <span> <strong>{needsRemedial}</strong> students struggled significantly with the concepts presented.</span>
+                )}
+                <br /><br />
+                <span style={{ color: '#17223B', fontWeight: 600 }}>Recommended Action: </span>
+                {lowestQuestion ? `Spend 10-15 minutes revising the concepts from Question ${lowestQuestion.questionNumber} before introducing new topics.` : `Great job! Review any minor gaps and proceed with the syllabus.`}
               </div>
             </div>
-
-            {lowestQuestion && lowestAccuracy < 60 && (
-              <div className={styles.insightBox} style={{ borderLeftColor: '#DC2626' }}>
-                <div className={styles.insightTitle} style={{ color: '#DC2626' }}>Critical Concept Gap</div>
-                <div className={styles.insightDesc}>
-                  <strong>Question {lowestQuestion.questionNumber}</strong> had the lowest accuracy ({lowestAccuracy.toFixed(0)}%). It is highly recommended to reteach or review the concepts associated with this question.
-                </div>
-              </div>
-            )}
-
-            {needsRemedial > 0 && (
-              <div className={styles.insightBox} style={{ borderLeftColor: '#D97706' }}>
-                <div className={styles.insightTitle}>Students Requiring Attention</div>
-                <div className={styles.insightDesc}>
-                  <strong>{needsRemedial}</strong> students scored below 40% and may require remedial support or direct intervention.
-                </div>
-              </div>
-            )}
           </div>
           
         </div>
@@ -345,7 +344,7 @@ export default function SessionSummaryPage({ params }: SummaryPageProps) {
             </thead>
             <tbody>
               {students.filter((s: any) => !s.hasAttempted || (s.percentage !== null && s.percentage <= 75)).length > 0 ? (
-                students.filter((s: any) => !s.hasAttempted || (s.percentage !== null && s.percentage <= 75)).map((student: any) => {
+                students.filter((s: any) => !s.hasAttempted || (s.percentage !== null && s.percentage <= 75)).slice(0, 5).map((student: any) => {
                   
                   let rec = 'Review Topic';
                   let recClass = styles.yellow;
@@ -385,6 +384,13 @@ export default function SessionSummaryPage({ params }: SummaryPageProps) {
             </tbody>
           </table>
         </div>
+        {students.filter((s: any) => !s.hasAttempted || (s.percentage !== null && s.percentage <= 75)).length > 5 && (
+          <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
+            <button className="btn btn-secondary" style={{ padding: '8px 24px' }}>
+              View All Students
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Sticky Bottom Bar */}
@@ -395,11 +401,11 @@ export default function SessionSummaryPage({ params }: SummaryPageProps) {
           </Link>
         </div>
         <div className={styles.actionRight}>
-          <button className="btn btn-secondary">
-            <Share2 size={18} style={{ marginRight: '8px' }} /> Share Report
-          </button>
-          <button className="btn btn-primary">
+          <Link href="/faculty/concept-gap-analysis" className="btn btn-primary" style={{ textDecoration: 'none' }}>
             <FileText size={18} style={{ marginRight: '8px' }} /> View Concept Gap Analysis
+          </Link>
+          <button className="btn btn-secondary">
+            <Download size={18} style={{ marginRight: '8px' }} /> Download Report
           </button>
         </div>
       </div>

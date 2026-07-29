@@ -23,7 +23,7 @@ export default function Sidebar() {
     { name: 'Dashboard', path: '/faculty/dashboard', icon: LayoutDashboard },
     { name: 'Subjects', path: '/faculty/subjects', icon: BookOpen },
     { name: 'Pulse Sessions', path: '/faculty/pulse-sessions', icon: Activity },
-    { name: 'Session Summary', path: '/faculty/session-summary', icon: BarChart2 },
+
     { name: 'Concept Gap Analysis', path: '/faculty/concept-gap-analysis', icon: Target },
     { name: 'Reports', path: '/faculty/reports', icon: FileText },
   ];

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { 
   PlusCircle, 
   Calendar, 
@@ -17,7 +18,10 @@ import {
   PlayCircle,
   StopCircle,
   Trash2,
-  Activity
+  Activity,
+  FileText,
+  Download,
+  Users
 } from 'lucide-react';
 import styles from './pulse-sessions.module.css';
 
@@ -27,6 +31,9 @@ export default function PulseSessionsPage() {
   const [loading, setLoading] = useState(true);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [activeLiveSession, setActiveLiveSession] = useState<any | null>(null);
+  const [elapsedTime, setElapsedTime] = useState('00:00');
+  const [showStartDialog, setShowStartDialog] = useState<string | null>(null);
+  const router = useRouter();
 
   // Pagination state
   const [page, setPage] = useState(1);
@@ -98,6 +105,23 @@ export default function PulseSessionsPage() {
   }, []);
 
   useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (activeLiveSession) {
+      const startTime = new Date(activeLiveSession.timerActualStartTime || activeLiveSession.createdAt).getTime();
+      interval = setInterval(() => {
+        const now = Date.now();
+        const diff = Math.floor((now - startTime) / 1000);
+        const m = Math.floor(diff / 60).toString().padStart(2, '0');
+        const s = (diff % 60).toString().padStart(2, '0');
+        setElapsedTime(`${m}:${s}`);
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    }
+  }, [activeLiveSession]);
+
+  useEffect(() => {
     fetchSessions();
   }, [fetchSessions]);
 
@@ -125,6 +149,16 @@ export default function PulseSessionsPage() {
         await fetch(`/api/faculty/pulse-sessions/${id}`, { method: 'DELETE', credentials: 'include' });
       } else {
         await fetch(`/api/faculty/pulse-sessions/${id}/${action}`, { method: 'POST', credentials: 'include' });
+      }
+      if (action === 'start') {
+        setShowStartDialog(null);
+        router.push(`/faculty/pulse-sessions/${id}/live`);
+        return;
+      }
+      if (action === 'end') {
+        if (!confirm('End Session?')) return;
+        router.push(`/faculty/pulse-sessions/${id}/summary`);
+        return; // Redirecting, no need to refetch
       }
       fetchSessions();
       fetchSummary();
@@ -178,7 +212,7 @@ export default function PulseSessionsPage() {
           backgroundColor: '#EEF7F1',
           border: '1px solid #166534',
           borderRadius: '12px',
-          padding: '16px 24px',
+          padding: '20px 32px',
           marginBottom: '24px',
           display: 'flex',
           justifyContent: 'space-between',
@@ -186,18 +220,17 @@ export default function PulseSessionsPage() {
           boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
         }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
               <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#166534', animation: 'pulse 2s infinite' }}></div>
-              <span style={{ color: '#166534', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Live Session In Progress</span>
+              <span style={{ color: '#166534', fontWeight: '600', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Live Session In Progress</span>
             </div>
-            <h3 style={{ margin: '0 0 4px 0', fontSize: '1.25rem', color: '#17223B' }}>{activeLiveSession.title}</h3>
-            <div style={{ display: 'flex', gap: '16px', color: '#667085', fontSize: '0.9rem' }}>
-              <span>{activeLiveSession.course?.name || 'Unknown Subject'}</span>
-              <span>•</span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={14} /> Started: {new Date(activeLiveSession.timerActualStartTime || activeLiveSession.createdAt).toLocaleTimeString()}</span>
+            <h3 style={{ margin: '0 0 8px 0', fontSize: '1.25rem', color: '#17223B' }}>{activeLiveSession.title}</h3>
+            <div style={{ display: 'flex', gap: '24px', color: '#667085', fontSize: '0.95rem' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Users size={16} /> {activeLiveSession.participations?.length || 0} Students Joined</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Clock size={16} /> Elapsed Time: {elapsedTime}</span>
             </div>
           </div>
-          <Link href={`/faculty/pulse-sessions/${activeLiveSession.id}/live`} className="btn btn-primary" style={{ textDecoration: 'none', backgroundColor: '#10633B', padding: '10px 20px' }}>
+          <Link href={`/faculty/pulse-sessions/${activeLiveSession.id}/live`} className="btn btn-primary" style={{ textDecoration: 'none', backgroundColor: '#10633B', padding: '12px 24px', fontSize: '1rem' }}>
             Monitor Session
           </Link>
         </div>
@@ -343,14 +376,23 @@ export default function PulseSessionsPage() {
                     <td>-</td>
                     <td>
                       {session.status === 'LIVE' ? (
-                        <Link 
-                          href={`/faculty/pulse-sessions/${session.id}/live`}
-                          className="btn btn-primary"
-                          style={{ textDecoration: 'none', backgroundColor: '#10633B', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', padding: '6px 12px' }}
-                        >
-                          <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#4ADE80', animation: 'pulse 2s infinite' }}></div>
-                          Monitor Live
-                        </Link>
+                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                          <Link 
+                            href={`/faculty/pulse-sessions/${session.id}/live`}
+                            className="btn btn-primary"
+                            style={{ textDecoration: 'none', backgroundColor: '#10633B', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', padding: '6px 12px' }}
+                          >
+                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#4ADE80', animation: 'pulse 2s infinite' }}></div>
+                            Monitor Live
+                          </Link>
+                          <button 
+                            className="btn btn-secondary"
+                            onClick={() => handleAction(session.id, 'end')}
+                            style={{ fontSize: '0.85rem', padding: '6px 12px', color: '#DC2626', borderColor: '#DC2626' }}
+                          >
+                            End Session
+                          </button>
+                        </div>
                       ) : (
                         <div className={styles.actionMenu}>
                           <button 
@@ -370,10 +412,10 @@ export default function PulseSessionsPage() {
                                   <button className={styles.dropdownItem}>
                                     <Copy size={16} /> Duplicate
                                   </button>
+                                  <div style={{ height: '1px', backgroundColor: '#E7E3DB', margin: '4px 0' }}></div>
                                   <button className={styles.dropdownItem} onClick={() => handleAction(session.id, 'publish')}>
                                     <CheckCircle size={16} /> Publish
                                   </button>
-                                  <div style={{ height: '1px', backgroundColor: '#E7E3DB', margin: '4px 0' }}></div>
                                   <button className={`${styles.dropdownItem} ${styles.danger}`} onClick={() => handleAction(session.id, 'DELETE')}>
                                     <Trash2 size={16} /> Delete
                                   </button>
@@ -392,7 +434,7 @@ export default function PulseSessionsPage() {
                                     <Hash size={16} /> Copy Session Code
                                   </button>
                                   <div style={{ height: '1px', backgroundColor: '#E7E3DB', margin: '4px 0' }}></div>
-                                  <button className={styles.dropdownItem} style={{ color: '#166534' }} onClick={() => { handleAction(session.id, 'start'); setTimeout(() => { fetchSessions(); fetchActiveLiveSession(); }, 500); }}>
+                                  <button className={styles.dropdownItem} style={{ color: '#166534' }} onClick={() => setShowStartDialog(session.id)}>
                                     <PlayCircle size={16} /> Start Session
                                   </button>
                                 </>
@@ -401,10 +443,16 @@ export default function PulseSessionsPage() {
                               {['CLOSED', 'COMPLETED', 'ARCHIVED'].includes(session.status) && (
                                 <>
                                   <Link href={`/faculty/pulse-sessions/${session.id}/summary`} className={styles.dropdownItem} style={{ textDecoration: 'none', color: 'inherit' }}>
-                                    <Activity size={16} /> Session Summary
+                                    <Activity size={16} /> View Summary
                                   </Link>
                                   <button className={styles.dropdownItem}>
-                                    <Copy size={16} /> Duplicate
+                                    <Download size={16} /> Download Report
+                                  </button>
+                                  <Link href={`/faculty/concept-gap-analysis`} className={styles.dropdownItem} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    <FileText size={16} /> View Concept Gap Analysis
+                                  </Link>
+                                  <button className={styles.dropdownItem}>
+                                    <Copy size={16} /> Duplicate Session
                                   </button>
                                 </>
                               )}
@@ -465,6 +513,33 @@ export default function PulseSessionsPage() {
           )}
         </div>
       </div>
+
+      {/* Start Session Dialog */}
+      {showStartDialog && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '24px', width: '100%', maxWidth: '400px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
+            <h3 style={{ margin: '0 0 12px 0', fontSize: '1.25rem', color: '#17223B' }}>Start Session</h3>
+            <p style={{ color: '#667085', marginBottom: '24px', lineHeight: '1.5' }}>
+              Start this session now? Students will be able to join and submit answers.
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+              <button 
+                className="btn btn-secondary" 
+                onClick={() => setShowStartDialog(null)}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn btn-primary" 
+                style={{ backgroundColor: '#10633B', borderColor: '#10633B' }}
+                onClick={() => handleAction(showStartDialog, 'start')}
+              >
+                Start Session
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
