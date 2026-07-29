@@ -26,6 +26,7 @@ export default function PulseSessionsPage() {
   const [summary, setSummary] = useState({ total: 0, live: 0, upcoming: 0, completed: 0 });
   const [loading, setLoading] = useState(true);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [activeLiveSession, setActiveLiveSession] = useState<any | null>(null);
 
   // Pagination state
   const [page, setPage] = useState(1);
@@ -75,8 +76,25 @@ export default function PulseSessionsPage() {
     }
   }, [page, search, subject, type, status, semester]);
 
+  const fetchActiveLiveSession = async () => {
+    try {
+      const res = await fetch('/api/faculty/pulse-sessions?status=LIVE&limit=1', { credentials: 'include' });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.data?.sessions && json.data.sessions.length > 0) {
+          setActiveLiveSession(json.data.sessions[0]);
+        } else {
+          setActiveLiveSession(null);
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   useEffect(() => {
     fetchSummary();
+    fetchActiveLiveSession();
   }, []);
 
   useEffect(() => {
@@ -154,6 +172,36 @@ export default function PulseSessionsPage() {
           </Link>
         </div>
       </div>
+
+      {activeLiveSession && (
+        <div style={{
+          backgroundColor: '#EEF7F1',
+          border: '1px solid #166534',
+          borderRadius: '12px',
+          padding: '16px 24px',
+          marginBottom: '24px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+        }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+              <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#166534', animation: 'pulse 2s infinite' }}></div>
+              <span style={{ color: '#166534', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Live Session In Progress</span>
+            </div>
+            <h3 style={{ margin: '0 0 4px 0', fontSize: '1.25rem', color: '#17223B' }}>{activeLiveSession.title}</h3>
+            <div style={{ display: 'flex', gap: '16px', color: '#667085', fontSize: '0.9rem' }}>
+              <span>{activeLiveSession.course?.name || 'Unknown Subject'}</span>
+              <span>•</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={14} /> Started: {new Date(activeLiveSession.timerActualStartTime || activeLiveSession.createdAt).toLocaleTimeString()}</span>
+            </div>
+          </div>
+          <Link href={`/faculty/pulse-sessions/${activeLiveSession.id}/live`} className="btn btn-primary" style={{ textDecoration: 'none', backgroundColor: '#10633B', padding: '10px 20px' }}>
+            Monitor Session
+          </Link>
+        </div>
+      )}
 
       <div className={styles.container}>
         {/* KPI Cards */}
@@ -294,52 +342,76 @@ export default function PulseSessionsPage() {
                     <td>{getStatusBadge(session.status)}</td>
                     <td>-</td>
                     <td>
-                      <div className={styles.actionMenu}>
-                        <button 
-                          className={styles.actionButton} 
-                          onClick={(e) => { e.stopPropagation(); toggleMenu(session.id); }}
+                      {session.status === 'LIVE' ? (
+                        <Link 
+                          href={`/faculty/pulse-sessions/${session.id}/live`}
+                          className="btn btn-primary"
+                          style={{ textDecoration: 'none', backgroundColor: '#10633B', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', padding: '6px 12px' }}
                         >
-                          <MoreVertical size={18} />
-                        </button>
-                        
-                        {activeMenu === session.id && (
-                          <div className={styles.dropdownMenu}>
-                            <button className={styles.dropdownItem}>
-                              <Eye size={16} /> View
-                            </button>
-                            <button className={styles.dropdownItem}>
-                              <Edit size={16} /> Edit
-                            </button>
-                            <button className={styles.dropdownItem}>
-                              <Copy size={16} /> Duplicate
-                            </button>
-                            <button className={styles.dropdownItem} onClick={() => handleAction(session.id, 'generate-qr')}>
-                              <QrCode size={16} /> Generate QR
-                            </button>
-                            <button className={styles.dropdownItem} onClick={() => handleAction(session.id, 'generate-code')}>
-                              <Hash size={16} /> Generate Session Code
-                            </button>
-                            <button className={styles.dropdownItem} onClick={() => handleAction(session.id, 'publish')}>
-                              <Hash size={16} /> Publish
-                            </button>
-                            
-                            <div style={{ height: '1px', backgroundColor: '#E7E3DB', margin: '4px 0' }}></div>
-                            
-                            <button className={styles.dropdownItem} style={{ color: '#166534' }} onClick={() => handleAction(session.id, 'start')}>
-                              <PlayCircle size={16} /> Start Session
-                            </button>
-                            <button className={styles.dropdownItem} style={{ color: '#d97706' }} onClick={() => handleAction(session.id, 'close')}>
-                              <StopCircle size={16} /> Close Session
-                            </button>
-                            
-                            <div style={{ height: '1px', backgroundColor: '#E7E3DB', margin: '4px 0' }}></div>
-                            
-                            <button className={`${styles.dropdownItem} ${styles.danger}`} onClick={() => handleAction(session.id, 'DELETE')}>
-                              <Trash2 size={16} /> Delete
-                            </button>
-                          </div>
-                        )}
-                      </div>
+                          <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#4ADE80', animation: 'pulse 2s infinite' }}></div>
+                          Monitor Live
+                        </Link>
+                      ) : (
+                        <div className={styles.actionMenu}>
+                          <button 
+                            className={styles.actionButton} 
+                            onClick={(e) => { e.stopPropagation(); toggleMenu(session.id); }}
+                          >
+                            <MoreVertical size={18} />
+                          </button>
+                          
+                          {activeMenu === session.id && (
+                            <div className={styles.dropdownMenu}>
+                              {session.status === 'DRAFT' && (
+                                <>
+                                  <button className={styles.dropdownItem}>
+                                    <Edit size={16} /> Edit
+                                  </button>
+                                  <button className={styles.dropdownItem}>
+                                    <Copy size={16} /> Duplicate
+                                  </button>
+                                  <button className={styles.dropdownItem} onClick={() => handleAction(session.id, 'publish')}>
+                                    <CheckCircle size={16} /> Publish
+                                  </button>
+                                  <div style={{ height: '1px', backgroundColor: '#E7E3DB', margin: '4px 0' }}></div>
+                                  <button className={`${styles.dropdownItem} ${styles.danger}`} onClick={() => handleAction(session.id, 'DELETE')}>
+                                    <Trash2 size={16} /> Delete
+                                  </button>
+                                </>
+                              )}
+                              
+                              {session.status === 'PUBLISHED' && (
+                                <>
+                                  <button className={styles.dropdownItem}>
+                                    <Eye size={16} /> View
+                                  </button>
+                                  <button className={styles.dropdownItem} onClick={() => handleAction(session.id, 'generate-qr')}>
+                                    <QrCode size={16} /> Generate QR
+                                  </button>
+                                  <button className={styles.dropdownItem} onClick={() => handleAction(session.id, 'generate-code')}>
+                                    <Hash size={16} /> Copy Session Code
+                                  </button>
+                                  <div style={{ height: '1px', backgroundColor: '#E7E3DB', margin: '4px 0' }}></div>
+                                  <button className={styles.dropdownItem} style={{ color: '#166534' }} onClick={() => { handleAction(session.id, 'start'); setTimeout(() => { fetchSessions(); fetchActiveLiveSession(); }, 500); }}>
+                                    <PlayCircle size={16} /> Start Session
+                                  </button>
+                                </>
+                              )}
+                              
+                              {['CLOSED', 'COMPLETED', 'ARCHIVED'].includes(session.status) && (
+                                <>
+                                  <Link href={`/faculty/pulse-sessions/${session.id}/summary`} className={styles.dropdownItem} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    <Activity size={16} /> Session Summary
+                                  </Link>
+                                  <button className={styles.dropdownItem}>
+                                    <Copy size={16} /> Duplicate
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))

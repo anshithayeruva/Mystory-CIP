@@ -501,4 +501,101 @@ export class PulseService {
       completed
     };
   }
+
+  static async getLiveSessionData(userId: string, sessionId: string) {
+    const facultyProfile = await this.getFacultyProfile(userId);
+    
+    const session = await db.pulseSession.findUnique({
+      where: { id: sessionId },
+      include: {
+        course: true,
+        topic: true,
+        department: true,
+        questions: {
+          orderBy: { questionNumber: 'asc' }
+        },
+        participations: {
+          include: {
+            student: {
+              include: {
+                user: true
+              }
+            },
+            answers: true
+          }
+        }
+      }
+    });
+
+    if (!session) throw new NotFoundError('Pulse session not found.');
+    if (session.facultyId !== facultyProfile.id) throw new ForbiddenError('Unauthorized.');
+
+    const studentsJoined = session.participations.length;
+    const responsesSubmitted = session.participations.filter(p => p.hasAttempted).length;
+    
+    let totalScore = 0;
+    let scoredStudents = 0;
+    session.participations.forEach(p => {
+      if (p.score !== null && p.score !== undefined) {
+        totalScore += p.percentage || 0;
+        scoredStudents++;
+      }
+    });
+    
+    const averageScore = scoredStudents > 0 ? (totalScore / scoredStudents).toFixed(1) : 0;
+    const participationPercentage = session.section ? 100 : 0; // Ideally needs total section count, mock 100 for now if no total
+
+    // Question Progress
+    const questionProgress = session.questions.map(q => {
+      let answersCount = 0;
+      let correctCount = 0;
+      session.participations.forEach(p => {
+        const answer = p.answers.find(a => a.questionId === q.id);
+        if (answer) {
+          answersCount++;
+          if (answer.isCorrect) correctCount++;
+        }
+      });
+      return {
+        questionId: q.id,
+        questionNumber: q.questionNumber,
+        totalAnswers: answersCount,
+        correctAnswers: correctCount
+      };
+    });
+
+    return {
+      session: {
+        id: session.id,
+        title: session.title,
+        courseName: session.course?.name || 'N/A',
+        status: session.status,
+        sessionCode: session.sessionCode,
+        qrCodeUrl: session.qrCodeUrl,
+        timerActualStartTime: session.timerActualStartTime,
+        durationMinutes: session.durationMinutes,
+        questionCount: session.questionCount,
+        createdAt: session.createdAt
+      },
+      kpis: {
+        studentsJoined,
+        responsesSubmitted,
+        averageScore,
+        participationPercentage,
+        studentsRemaining: Math.max(0, studentsJoined - responsesSubmitted)
+      },
+      questionProgress,
+      students: session.participations.map(p => ({
+        id: p.id,
+        studentName: `${p.student.user?.firstName || ''} ${p.student.user?.lastName || ''}`.trim() || 'Unknown',
+        rollNumber: p.student.rollNumber || 'N/A',
+        joinedAt: p.createdAt,
+        hasAttempted: p.hasAttempted,
+        score: p.score,
+        percentage: p.percentage,
+        timeTakenSeconds: p.timeTakenSeconds,
+        status: p.hasAttempted ? 'Submitted' : 'In Progress'
+      }))
+    };
+  }
 }
