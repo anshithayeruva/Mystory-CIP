@@ -4,8 +4,8 @@ import { CheckCircle2, GraduationCap, Users, UserSquare2, FileText, Settings2, B
 import styles from "../create.module.css";
 
 interface FormFieldsProps {
-  userType: "student" | "faculty" | "hod";
-  setUserType: (type: "student" | "faculty" | "hod") => void;
+  userType: "student" | "staff" | "hod";
+  setUserType: (type: "student" | "staff" | "hod") => void;
 }
 
 export default function FormFields({ userType, setUserType }: FormFieldsProps) {
@@ -27,12 +27,12 @@ export default function FormFields({ userType, setUserType }: FormFieldsProps) {
           </div>
           
           <div 
-            className={`${styles.typeCard} ${userType === "faculty" ? styles.typeCardActive : ""}`}
-            onClick={() => setUserType("faculty")}
+            className={`${styles.typeCard} ${userType === "staff" ? styles.typeCardActive : ""}`}
+            onClick={() => setUserType("staff")}
           >
-            {userType === "faculty" && <CheckCircle2 className={styles.checkIcon} size={16} />}
+            {userType === "staff" && <CheckCircle2 className={styles.checkIcon} size={16} />}
             <UserSquare2 className={styles.typeCardIcon} size={24} />
-            <div className={styles.typeCardTitle}>Faculty</div>
+            <div className={styles.typeCardTitle}>Staff</div>
             <div className={styles.typeCardDesc}>Academic staff member</div>
           </div>
 

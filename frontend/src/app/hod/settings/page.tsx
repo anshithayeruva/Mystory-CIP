@@ -13,8 +13,8 @@ import {
   Save, 
   Check, 
   Lock, 
-  Link2,
-  RefreshCw,
+  
+  
   Eye,
   EyeOff
 } from "lucide-react";
@@ -38,48 +38,42 @@ export default function HodSettingsPage() {
   const [deptForm, setDeptForm] = useState({
     name: "Computer Science & Engineering",
     code: "CSE-101",
-    mission: "To provide high-quality education in computer science through a curriculum that combines fundamental concepts with hands-on practice, fostering innovation and ethical responsibility.",
-  });
+    mission: "To provide high-quality education in computer science through a curriculum that combines fundamental concepts with hands-on practice, fostering innovation and ethical responsibility." });
 
   // 2. Contact Details Form State
   const [contactForm, setContactForm] = useState({
     email: "cse.hod@mystory.edu",
     phone: "+91 98765 43210",
     office: "Block B, Room 304 (Third Floor)",
-    portalUrl: "https://mystory-cip.edu/dept/cse",
-  });
+    portalUrl: "https://mystory-cip.edu/dept/cse" });
 
   // 3. HoD Profile Form State
   const [hodForm, setHodForm] = useState({
     name: "Dr. Naveen Nair",
     designation: "Head of Department & Senior Professor",
     staffId: "FAC-CSE-001",
-    qualification: "Ph.D. in Computer Science (IIT Bombay), M.Tech",
-  });
+    qualification: "Ph.D. in Computer Science (IIT Bombay), M.Tech" });
 
   // 4. Notifications State
   const [notifications, setNotifications] = useState({
     lowAttendance: true,
     syllabusMilestones: true,
     studentWarning: true,
-    weeklyDigest: false,
-  });
+    weeklyDigest: false });
 
   // 5. Academic Info State
   const [academicForm, setAcademicForm] = useState({
     academicYear: "2024 - 2025",
     termType: "Odd Semester (July - December)",
     passScore: 40,
-    minAttendance: 75,
-  });
+    minAttendance: 75 });
 
   // 6. Security State
   const [securityForm, setSecurityForm] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
-    enable2FA: true,
-  });
+    enable2FA: true });
   const [showPassword, setShowPassword] = useState(false);
 
   // 7. Integrations State
@@ -106,7 +100,7 @@ export default function HodSettingsPage() {
     }, 500);
   };
 
-  const handleReset = (tab: SettingsTab) => {
+  const handleReset = (_tab: SettingsTab) => {
     triggerToast("Form reverted to stored department defaults.");
   };
 
@@ -445,7 +439,7 @@ export default function HodSettingsPage() {
                   <div className={styles.toggleMeta}>
                     <span className={styles.toggleTitle}>Syllabus Milestone Tracking</span>
                     <span className={styles.toggleDesc}>
-                      Weekly automated tracking summary of faculty course completion rates.
+                      Weekly automated tracking summary of staff course completion rates.
                     </span>
                   </div>
                   <label className={styles.switch}>
@@ -701,8 +695,7 @@ export default function HodSettingsPage() {
                         color: tool.status === "Connected" ? "#00522e" : "#475569",
                         fontWeight: 700,
                         fontSize: "0.8rem",
-                        cursor: "pointer",
-                      }}
+                        cursor: "pointer" }}
                       onClick={() => toggleIntegration(tool.id)}
                     >
                       {tool.status === "Connected" ? "Connected ✓" : "Connect Tool"}

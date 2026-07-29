@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
+
 import { 
   TrendingUp, TrendingDown, GraduationCap, FileText, Calendar, Activity, 
-  Building2, Users, BookOpen, CheckCircle, BarChart, 
-  List, Download, Info, X, FileSpreadsheet, FileJson,
-  ChevronDown, Award, UserCheck, MoreVertical, Minus, ArrowRight, ChevronLeft, ChevronRight
+  Building2, Users,    
+   Download, Info, X, FileSpreadsheet, FileJson,
+   Award, UserCheck, MoreVertical,  ArrowRight, ChevronLeft, ChevronRight
 } from "lucide-react";
 import styles from "./reports.module.css";
 
@@ -15,7 +15,7 @@ const reportsData = [
   { id: 2, name: "Attendance Report", desc: "Student attendance and participation records.", date: "Oct 11, 2023", icon: Calendar },
   { id: 3, name: "Understanding Report", desc: "Student understanding and learning performance.", date: "Oct 10, 2023", icon: Activity },
   { id: 4, name: "Department Report", desc: "Department-wise academic performance.", date: "Oct 09, 2023", icon: Building2 },
-  { id: 5, name: "Faculty Report", desc: "Faculty assessment and teaching performance.", date: "Oct 08, 2023", icon: Users },
+  { id: 5, name: "Staff Report", desc: "Staff assessment and teaching performance.", date: "Oct 08, 2023", icon: Users },
   { id: 6, name: "Student Report", desc: "Individual student academic performance.", date: "Oct 07, 2023", icon: GraduationCap },
 ];
 
@@ -27,7 +27,7 @@ export default function ReportsAnalyticsPage() {
   const [selectedReport, setSelectedReport] = useState<any>(null);
   const [selectedFormat, setSelectedFormat] = useState("pdf");
 
-  const openDownloadModal = (report: any) => {
+  const openDownloadModal = (report: unknown) => {
     setSelectedReport(report);
     setDownloadModalOpen(true);
     setSelectedFormat("pdf"); // Reset to default

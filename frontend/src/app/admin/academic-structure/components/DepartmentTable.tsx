@@ -1,4 +1,5 @@
 "use client";
+import React from 'react';
 
 import { Eye, Edit2, Code, FileDigit, FlaskConical, BookOpen } from "lucide-react";
 import styles from "../academic.module.css";
@@ -8,9 +9,9 @@ export interface Department {
   name: string;
   hodName: string;
   programs: number;
-  faculty: number;
+  staff: number;
   students: number;
-  icon: any; // Lucide icon component
+  icon: React.ElementType; // Lucide icon component
 }
 
 export const INITIAL_DEPARTMENTS: Department[] = [
@@ -19,7 +20,7 @@ export const INITIAL_DEPARTMENTS: Department[] = [
     name: "Computer Science",
     hodName: "Dr. Alan Turing",
     programs: 4,
-    faculty: 42,
+    staff: 42,
     students: 820,
     icon: Code
   },
@@ -28,7 +29,7 @@ export const INITIAL_DEPARTMENTS: Department[] = [
     name: "Mathematics",
     hodName: "Dr. Katherine Johnson",
     programs: 3,
-    faculty: 28,
+    staff: 28,
     students: 450,
     icon: FileDigit
   },
@@ -37,7 +38,7 @@ export const INITIAL_DEPARTMENTS: Department[] = [
     name: "Bio-Engineering",
     hodName: "Dr. Jennifer Doudna",
     programs: 5,
-    faculty: 35,
+    staff: 35,
     students: 580,
     icon: FlaskConical
   },
@@ -46,7 +47,7 @@ export const INITIAL_DEPARTMENTS: Department[] = [
     name: "Theoretical Physics",
     hodName: "Dr. Richard Feynman",
     programs: 2,
-    faculty: 18,
+    staff: 18,
     students: 210,
     icon: BookOpen
   }
@@ -65,7 +66,7 @@ export default function DepartmentTable({ departments }: DepartmentTableProps) {
             <tr>
               <th>Department Name</th>
               <th>Head of Department</th>
-              <th>Faculty Count</th>
+              <th>Staff Count</th>
               <th>Student Count</th>
               <th>Programs</th>
               <th style={{ textAlign: "right" }}>Actions</th>
@@ -88,7 +89,7 @@ export default function DepartmentTable({ departments }: DepartmentTableProps) {
                     <span style={{ fontSize: "0.875rem", color: "var(--text-main)" }}>{row.hodName}</span>
                   </td>
                   <td>
-                    <span className={styles.facultyBadge}>{row.faculty} Faculty</span>
+                    <span className={styles.staffBadge}>{row.staff} Staff</span>
                   </td>
                   <td>
                     <span style={{ fontSize: "0.875rem", color: "var(--text-main)" }}>{row.students} Students</span>

@@ -17,7 +17,7 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
     let token = '';
     
     if (authHeader && authHeader.startsWith('Bearer ')) {
-      token = authHeader.split(' ')[1];
+      token = authHeader.split(' ')[1] || '';
     } else if (req.cookies && req.cookies.session) {
       // Fallback to cookie if present
       token = req.cookies.session;
@@ -54,4 +54,4 @@ export const requireRole = (allowedRoles: Role[]) => {
   };
 };
 
-export const requireFaculty = requireRole(['FACULTY', 'HOD']);
+

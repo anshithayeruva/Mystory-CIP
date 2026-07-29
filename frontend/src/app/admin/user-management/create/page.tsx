@@ -7,7 +7,7 @@ import FormFields from "./components/FormFields";
 import ActionBar from "./components/ActionBar";
 
 export default function CreateUserPage() {
-  const [userType, setUserType] = useState<"student" | "faculty" | "hod">("student");
+  const [userType, setUserType] = useState<"student" | "staff" | "hod">("student");
 
   return (
     <div className={styles.pageContainer}>

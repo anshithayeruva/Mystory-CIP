@@ -5,8 +5,7 @@ const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost
  */
 export const apiClient = {
   async fetch(endpoint: string, options: RequestInit = {}) {
-    // If the endpoint starts with /api/faculty, we route it to the external backend.
-    // Ensure the endpoint starts with a slash
+        // Ensure the endpoint starts with a slash
     const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
     const url = `${NEXT_PUBLIC_API_URL}${path}`;
 

@@ -9,7 +9,7 @@ const MOCK_DATA = [
     joined: "Joined Oct 2023",
     email: "e.rodriguez@mystory.edu",
     institutionId: "FAC-2023-8842",
-    role: "Faculty",
+    role: "Staff",
     department: "Biomedical Engineering"
   },
   {
@@ -45,7 +45,7 @@ const MOCK_DATA = [
     joined: "Joined Nov 2015",
     email: "t.wright@mystory.edu",
     institutionId: "FAC-2015-0911",
-    role: "Faculty",
+    role: "Staff",
     department: "History of Art"
   }
 ];
@@ -80,7 +80,7 @@ export default function DirectoryTable() {
                   {row.institutionId}
                 </td>
                 <td>
-                  {row.role === "Faculty" && <span className={styles.roleBadgeFaculty}>Faculty</span>}
+                  {row.role === "Staff" && <span className={styles.roleBadgeStaff}>Staff</span>}
                   {row.role === "HoD" && <span className={styles.roleBadgeHod}>HoD</span>}
                   {row.role === "Student" && <span className={styles.roleBadgeStudent}>Student</span>}
                 </td>

@@ -23,7 +23,7 @@ interface SubjectReport {
   id: string;
   code: string;
   name: string;
-  faculty: string;
+  staff: string;
   score: number;
   status: "EXCELLENT" | "ON TRACK" | "NEEDS ATTENTION" | "UNDER REVIEW";
 }
@@ -33,7 +33,7 @@ const initialSubjectReports: SubjectReport[] = [
     id: "1",
     code: "DS",
     name: "Data Structures & Algorithms",
-    faculty: "Prof. Rajesh Kumar",
+    staff: "Prof. Rajesh Kumar",
     score: 88,
     status: "EXCELLENT",
   },
@@ -41,7 +41,7 @@ const initialSubjectReports: SubjectReport[] = [
     id: "2",
     code: "OS",
     name: "Operating Systems",
-    faculty: "Dr. Kavitha S.",
+    staff: "Dr. Kavitha S.",
     score: 74,
     status: "ON TRACK",
   },
@@ -49,7 +49,7 @@ const initialSubjectReports: SubjectReport[] = [
     id: "3",
     code: "DB",
     name: "Database Management",
-    faculty: "Prof. Amit Shah",
+    staff: "Prof. Amit Shah",
     score: 52,
     status: "NEEDS ATTENTION",
   },
@@ -57,7 +57,7 @@ const initialSubjectReports: SubjectReport[] = [
     id: "4",
     code: "CN",
     name: "Computer Networks",
-    faculty: "Dr. Aruna Sharma",
+    staff: "Dr. Aruna Sharma",
     score: 83,
     status: "EXCELLENT",
   },
@@ -65,7 +65,7 @@ const initialSubjectReports: SubjectReport[] = [
     id: "5",
     code: "AI",
     name: "Artificial Intelligence & ML",
-    faculty: "Dr. Vikram Singh",
+    staff: "Dr. Vikram Singh",
     score: 62,
     status: "UNDER REVIEW",
   },
@@ -73,7 +73,7 @@ const initialSubjectReports: SubjectReport[] = [
     id: "6",
     code: "DAA",
     name: "Design & Analysis of Algorithms",
-    faculty: "Dr. Sneha Roy",
+    staff: "Dr. Sneha Roy",
     score: 91,
     status: "EXCELLENT",
   },
@@ -81,7 +81,7 @@ const initialSubjectReports: SubjectReport[] = [
     id: "7",
     code: "SE",
     name: "Software Engineering",
-    faculty: "Prof. Meera Joshi",
+    staff: "Prof. Meera Joshi",
     score: 78,
     status: "ON TRACK",
   },
@@ -89,7 +89,7 @@ const initialSubjectReports: SubjectReport[] = [
     id: "8",
     code: "WC",
     name: "Web Development & Cloud",
-    faculty: "Dr. Ananya Reddy",
+    staff: "Dr. Ananya Reddy",
     score: 85,
     status: "EXCELLENT",
   },
@@ -97,7 +97,7 @@ const initialSubjectReports: SubjectReport[] = [
     id: "9",
     code: "CS",
     name: "Cyber Security & Cryptography",
-    faculty: "Prof. Sunita Patil",
+    staff: "Prof. Sunita Patil",
     score: 58,
     status: "NEEDS ATTENTION",
   },
@@ -105,7 +105,7 @@ const initialSubjectReports: SubjectReport[] = [
     id: "10",
     code: "CD",
     name: "Compiler Design",
-    faculty: "Dr. Manoj Verma",
+    staff: "Dr. Manoj Verma",
     score: 72,
     status: "ON TRACK",
   },
@@ -113,7 +113,7 @@ const initialSubjectReports: SubjectReport[] = [
     id: "11",
     code: "DM",
     name: "Discrete Mathematics",
-    faculty: "Prof. R. C. Rao",
+    staff: "Prof. R. C. Rao",
     score: 68,
     status: "ON TRACK",
   },
@@ -121,7 +121,7 @@ const initialSubjectReports: SubjectReport[] = [
     id: "12",
     code: "CA",
     name: "Computer Architecture",
-    faculty: "Dr. Alok Nath",
+    staff: "Dr. Alok Nath",
     score: 64,
     status: "UNDER REVIEW",
   },
@@ -148,7 +148,7 @@ export default function HodReportsPage() {
   // Edit Subject Modal
   const [editingSubject, setEditingSubject] = useState<SubjectReport | null>(null);
   const [subjectFormData, setSubjectFormData] = useState({
-    faculty: "",
+    staff: "",
     score: 80,
     status: "ON TRACK" as SubjectReport["status"],
   });
@@ -172,7 +172,7 @@ export default function HodReportsPage() {
   const filteredSubjects = subjectReports.filter(
     (item) =>
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.faculty.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.staff.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.code.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -181,7 +181,7 @@ export default function HodReportsPage() {
   const handleOpenEditSubject = (item: SubjectReport) => {
     setEditingSubject(item);
     setSubjectFormData({
-      faculty: item.faculty,
+      staff: item.staff,
       score: item.score,
       status: item.status,
     });
@@ -196,7 +196,7 @@ export default function HodReportsPage() {
         s.id === editingSubject.id
           ? {
               ...s,
-              faculty: subjectFormData.faculty,
+              staff: subjectFormData.staff,
               score: Number(subjectFormData.score),
               status: subjectFormData.status,
             }
@@ -486,7 +486,7 @@ export default function HodReportsPage() {
             <thead>
               <tr>
                 <th>Subject Name</th>
-                <th>Faculty In-charge</th>
+                <th>Staff In-charge</th>
                 <th>Avg. Score</th>
                 <th>Status</th>
                 <th style={{ textAlign: "right", paddingRight: "20px" }}>Action</th>
@@ -502,7 +502,7 @@ export default function HodReportsPage() {
                     </div>
                   </td>
                   <td>
-                    <span className={styles.facultyName}>{item.faculty}</span>
+                    <span className={styles.staffName}>{item.staff}</span>
                   </td>
                   <td>
                     <span className={item.score < 60 ? styles.scoreValLow : styles.scoreVal}>
@@ -566,13 +566,13 @@ export default function HodReportsPage() {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Faculty In-charge *</label>
+                  <label className={styles.formLabel}>Staff In-charge *</label>
                   <input
                     type="text"
                     required
                     className={styles.formInput}
-                    value={subjectFormData.faculty}
-                    onChange={(e) => setSubjectFormData((prev) => ({ ...prev, faculty: e.target.value }))}
+                    value={subjectFormData.staff}
+                    onChange={(e) => setSubjectFormData((prev) => ({ ...prev, staff: e.target.value }))}
                   />
                 </div>
 

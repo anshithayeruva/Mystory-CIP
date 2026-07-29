@@ -39,7 +39,7 @@ export default function AcademicStructurePage() {
       name,
       hodName,
       programs: 0,
-      faculty: 0,
+      staff: 0,
       students: 0,
       icon: CheckCircle // Fallback icon for new departments
     };

@@ -134,11 +134,6 @@ export async function middleware(request: NextRequest) {
   if (pathname.startsWith('/api/hod') && !hasAccess(userRole, Role.HOD)) {
     return NextResponse.json({ success: false, message: 'Forbidden: HOD access required' }, { status: 403 });
   }
-
-  if (pathname.startsWith('/api/faculty') && !hasAccess(userRole, Role.FACULTY)) {
-    return NextResponse.json({ success: false, message: 'Forbidden: Faculty access required' }, { status: 403 });
-  }
-
   if (pathname.startsWith('/api/student') && !hasAccess(userRole, Role.STUDENT)) {
     return NextResponse.json({ success: false, message: 'Forbidden: Student access required' }, { status: 403 });
   }
@@ -160,9 +155,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/api/admin/:path*',
-    '/api/hod/:path*',
-    '/api/faculty/:path*',
-    '/api/student/:path*',
+    '/api/hod/:path*',    '/api/student/:path*',
     '/api/analytics/:path*',
     '/portal/:path*', // Protected dashboard views
   ],

@@ -20,15 +20,7 @@ export const studentRegisterSchema = z.object({
   batch: z.string().regex(/^\d{4}-\d{4}$/, 'Batch must follow format YYYY-YYYY (e.g. 2023-2027)'),
 });
 
-export const facultyRegisterSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters long'),
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
-  employeeId: z.string().min(3, 'Employee ID is required'),
-  designation: z.string().min(1, 'Designation is required'),
-  departmentId: z.string().uuid('Invalid department ID'),
-});
+
 
 /**
  * Grading Validation Schema

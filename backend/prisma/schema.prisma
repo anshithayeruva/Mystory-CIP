@@ -20,7 +20,6 @@ model User {
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   adminProfile   AdminProfile?
-  facultyProfile FacultyProfile?
   hodProfile     HodProfile?
   studentProfile StudentProfile?
 
@@ -34,11 +33,9 @@ model Department {
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
   courses       Course[]
-  faculty       FacultyProfile[]
   hod           HodProfile?
   programs      Program[]
   students      StudentProfile[]
-  pulseSessions PulseSession[]
 }
 
 model AdminProfile {
@@ -60,24 +57,7 @@ model HodProfile {
   user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model FacultyProfile {
-  id           String          @id @default(auto()) @map("_id") @db.ObjectId
-  userId       String          @unique @db.ObjectId
-  employeeId   String          @unique
-  designation  String
-  departmentId String          @db.ObjectId
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-  status        FacultyStatus   @default(ACTIVE)
-  profilePicture String?
-  officeLocation String?
-  courses       FacultyCourse[]
-  pulseSessions PulseSession[]
-  department    Department      @relation(fields: [departmentId], references: [id])
-  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([departmentId])
-}
 
 model StudentProfile {
   id                 String        @id @default(auto()) @map("_id") @db.ObjectId
@@ -95,7 +75,6 @@ model StudentProfile {
   status             StudentStatus @default(ACTIVE)
   attendance         Attendance[]
   enrollments        Enrollment[]
-  pulseParticipations PulseParticipation[]
   department         Department    @relation(fields: [departmentId], references: [id])
   program            Program?      @relation(fields: [programId], references: [id])
   section            Section?      @relation(fields: [sectionId], references: [id])
@@ -123,11 +102,9 @@ model Course {
   department     Department      @relation(fields: [departmentId], references: [id])
   program        Program?        @relation(fields: [programId], references: [id])
   enrollments    Enrollment[]
-  facultyCourses FacultyCourse[]
   syllabus       Syllabus?
   courseOutcomes CourseOutcome[]
   units          Unit[]
-  pulseSessions  PulseSession[]
 
   @@index([departmentId])
   @@index([programId])
@@ -170,23 +147,6 @@ model Attendance {
   @@index([date])
 }
 
-model FacultyCourse {
-  id           String         @id @default(auto()) @map("_id") @db.ObjectId
-  facultyId    String         @db.ObjectId
-  courseId     String         @db.ObjectId
-  section      String
-  semester     Int
-  academicYear String
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  course       Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  faculty      FacultyProfile @relation(fields: [facultyId], references: [id], onDelete: Cascade)
-
-  @@unique([facultyId, courseId, section, academicYear, semester])
-  @@index([facultyId])
-  @@index([courseId])
-}
-
 model Program {
   id           String           @id @default(auto()) @map("_id") @db.ObjectId
   name         String           @unique
@@ -198,7 +158,6 @@ model Program {
   semesters     Semester[]
   students      StudentProfile[]
   courses       Course[]
-  pulseSessions PulseSession[]
 
   @@index([departmentId])
 }
@@ -233,7 +192,6 @@ model Section {
 enum Role {
   ADMIN
   HOD
-  FACULTY
   STUDENT
 }
 
@@ -250,11 +208,7 @@ enum StudentStatus {
   BLOCKED
 }
 
-enum FacultyStatus {
-  ACTIVE
-  INACTIVE
-  BLOCKED
-}
+
 
 enum HodStatus {
   ACTIVE
@@ -310,173 +264,7 @@ model Topic {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   unit          Unit           @relation(fields: [unitId], references: [id], onDelete: Cascade)
-  pulseSessions PulseSession[]
 
   @@index([unitId])
-}
-
-enum PulseSessionType {
-  MID_CLASS_CHECK
-  END_OF_CLASS_CHECK
-  END_OF_DAY_REVIEW
-  WEEKLY_REVISION
-  LAB_UNDERSTANDING_CHECK
-  TUTORIAL_SESSION
-  REMEDIAL_SESSION
-  PLACEMENT_TRAINING_SESSION
-  CONTEST_PREPARATION_SESSION
-}
-
-enum PulseQuestionType {
-  MCQ
-  TRUE_FALSE
-  SHORT_ANSWER
-}
-
-enum PulseDifficultyLevel {
-  EASY
-  MEDIUM
-  HARD
-  MIXED
-}
-
-enum PulseAttendanceRule {
-  ATTEMPT_REQUIRED
-  QR_ATTENDANCE_ONLY
-  BOTH
-}
-
-enum PulseResultVisibility {
-  FACULTY_ONLY
-  STUDENTS_AFTER_SESSION
-  IMMEDIATE
-}
-
-enum PulseSessionStatus {
-  DRAFT
-  PUBLISHED
-  LIVE
-  PAUSED
-  COMPLETED
-  CLOSED
-  ARCHIVED
-}
-
-enum PulseTimerStatus {
-  IDLE
-  RUNNING
-  PAUSED
-  COMPLETED
-}
-
-model PulseSession {
-  id               String                @id @default(auto()) @map("_id") @db.ObjectId
-  courseId         String                @db.ObjectId
-  topicId          String                @db.ObjectId
-  departmentId     String                @db.ObjectId
-  programId        String?               @db.ObjectId
-  semester         Int
-  section          String
-  facultyId        String                @db.ObjectId
-  sessionType      PulseSessionType
-  title            String
-  description      String?
-  date             DateTime
-  startTime        String
-  durationMinutes  Int
-  questionCount    Int
-  questionType     PulseQuestionType
-  difficultyLevel  PulseDifficultyLevel
-  attendanceRule   PulseAttendanceRule
-  resultVisibility PulseResultVisibility
-  status                PulseSessionStatus    @default(DRAFT)
-  sessionCode           String?               @unique
-  codeCreatedAt         DateTime?
-  codeExpiresAt         DateTime?
-  isCodeActive          Boolean               @default(false)
-  qrCodeUrl             String?
-  timerStatus           PulseTimerStatus      @default(IDLE)
-  timerDurationMinutes  Int?
-  timerActualStartTime  DateTime?
-  timerActualEndTime    DateTime?
-  timerRemainingSeconds Int?
-  createdAt        DateTime              @default(now())
-  updatedAt        DateTime              @updatedAt
-
-  course     Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  topic      Topic          @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  department Department     @relation(fields: [departmentId], references: [id])
-  program    Program?       @relation(fields: [programId], references: [id])
-  faculty    FacultyProfile @relation(fields: [facultyId], references: [id], onDelete: Cascade)
-  questions      PulseQuestion[]
-  participations PulseParticipation[]
-
-  @@index([courseId])
-  @@index([topicId])
-  @@index([departmentId])
-  @@index([programId])
-  @@index([facultyId])
-  @@index([date])
-  @@index([status])
-}
-
-model PulseQuestion {
-  id             String          @id @default(auto()) @map("_id") @db.ObjectId
-  sessionId      String          @db.ObjectId
-  questionNumber Int
-  questionText   String
-  options        String[]
-  correctAnswer  String
-  marks          Float           @default(1.0)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-
-  session        PulseSession    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  answers        PulseAnswer[]
-
-  @@unique([sessionId, questionNumber])
-  @@index([sessionId])
-}
-
-model PulseParticipation {
-  id               String          @id @default(auto()) @map("_id") @db.ObjectId
-  sessionId        String          @db.ObjectId
-  studentId        String          @db.ObjectId
-  isPresent        Boolean         @default(true)
-  hasAttempted     Boolean         @default(false)
-  score            Float?
-  maxScore         Float?
-  percentage       Float?
-  timeTakenSeconds Int?
-  attemptedAt      DateTime?
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-
-  session          PulseSession    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  student          StudentProfile  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  answers          PulseAnswer[]
-
-  @@unique([sessionId, studentId])
-  @@index([sessionId])
-  @@index([studentId])
-}
-
-model PulseAnswer {
-  id               String             @id @default(auto()) @map("_id") @db.ObjectId
-  participationId  String             @db.ObjectId
-  questionId       String             @db.ObjectId
-  studentAnswer    String
-  isCorrect        Boolean
-  marksAwarded     Float              @default(0.0)
-  timeTakenSeconds Int?
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-
-  participation    PulseParticipation @relation(fields: [participationId], references: [id], onDelete: Cascade)
-  question         PulseQuestion      @relation(fields: [questionId], references: [id], onDelete: Cascade)
-
-  @@unique([participationId, questionId])
-  @@index([participationId])
-  @@index([questionId])
 }
 

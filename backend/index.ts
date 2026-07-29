@@ -3,7 +3,6 @@ import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
-import facultyRoutes from './src/routes/faculty';
 
 dotenv.config();
 
@@ -19,22 +18,13 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Mount routes
-app.use('/api/faculty', facultyRoutes);
 
 // Basic health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Backend is running correctly!' });
 });
 
-// Example route for fetching faculties
-app.get('/api/admin/faculty', async (req, res) => {
-  try {
-    const faculty = await prisma.user.findMany({ where: { role: 'FACULTY' } });
-    res.json(faculty);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch faculty' });
-  }
-});
+
 
 async function startServer() {
   try {

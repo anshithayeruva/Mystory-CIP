@@ -12,7 +12,6 @@ const liveSessions = [
     name: "Data Structures",
     room: "Lab Room 4A",
     time: "10:00 - 11:30",
-    faculty: "Dr. Anita Sharma",
     attendance: 92,
   },
   {
@@ -21,7 +20,6 @@ const liveSessions = [
     name: "AI & Robotics",
     room: "Lecture Hall 2",
     time: "10:30 - 12:00",
-    faculty: "Prof. K. Subramaniam",
     attendance: 78,
   },
   {
@@ -30,7 +28,6 @@ const liveSessions = [
     name: "Database Systems",
     room: "Seminar Hall",
     time: "11:00 - 12:30",
-    faculty: "Ms. Rhea Kapoor",
     attendance: 85,
   },
 ];
@@ -51,7 +48,7 @@ export default function LiveSessionMonitor() {
           <thead>
             <tr>
               <th>Class / Subject</th>
-              <th>Faculty</th>
+              <th>Staff</th>
               <th>Attendance</th>
               <th style={{ textAlign: "right", paddingRight: "24px" }}>Actions</th>
             </tr>
@@ -67,7 +64,6 @@ export default function LiveSessionMonitor() {
                     {session.room} • {session.time}
                   </div>
                 </td>
-                <td className={styles.facultyName}>{session.faculty}</td>
                 <td>
                   <div className={styles.attendanceCol}>
                     <div className={styles.progressTrack}>

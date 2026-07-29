@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Building2, Clock, FileText, Printer, FileDown, Lock, ShieldCheck } from "lucide-react";
 import styles from "./curriculum.module.css";
 
-export default function CurriculumPage({ params }: { params: { id: string } }) {
+export default function CurriculumPage({}) {
   return (
     <div className={styles.pageContainer}>
       <div className={styles.breadcrumb}>

@@ -9,13 +9,11 @@ import {
   Pencil, 
   X,
   LayoutGrid,
-  ListFilter,
-  Users
-} from "lucide-react";
+  ListFilter } from "lucide-react";
 import Link from "next/link";
 import styles from "./subjects.module.css";
 
-interface FacultyMember {
+interface StaffMember {
   name: string;
   avatar: string;
   role?: string;
@@ -26,7 +24,7 @@ interface SubjectItem {
   code: string;
   name: string;
   type: "Core Subject" | "Elective";
-  facultyList: FacultyMember[];
+  staffList: StaffMember[];
   semSec: string;
   studentsCount: number;
   credits: number;
@@ -35,7 +33,7 @@ interface SubjectItem {
   status: "Excellent" | "Active" | "Steady" | "Under Review";
 }
 
-const availableFacultyList: FacultyMember[] = [
+const availableStaffList: StaffMember[] = [
   { name: "Dr. Aruna Sharma", avatar: "AS", role: "Lead Lecturer" },
   { name: "Prof. Rajesh Kumar", avatar: "RK", role: "Co-Lecturer" },
   { name: "Ms. Sneha Patil", avatar: "SP", role: "Lab Instructor" },
@@ -52,7 +50,7 @@ const initialSubjectData: SubjectItem[] = [
     code: "CS-302",
     name: "Data Structures & Algorithms",
     type: "Core Subject",
-    facultyList: [
+    staffList: [
       { name: "Dr. Aruna Sharma", avatar: "AS", role: "Lead Lecturer" },
       { name: "Prof. Rajesh Kumar", avatar: "RK", role: "Lab Instructor" },
     ],
@@ -61,14 +59,13 @@ const initialSubjectData: SubjectItem[] = [
     credits: 4,
     hoursPerWeek: 4,
     completionPercent: 88,
-    status: "Excellent",
-  },
+    status: "Excellent" },
   {
     id: "2",
     code: "CS-401",
     name: "Operating Systems",
     type: "Core Subject",
-    facultyList: [
+    staffList: [
       { name: "Prof. Rajesh Kumar", avatar: "RK", role: "Lecturer" },
     ],
     semSec: "SEM-04 • SEC-B",
@@ -76,14 +73,13 @@ const initialSubjectData: SubjectItem[] = [
     credits: 4,
     hoursPerWeek: 4,
     completionPercent: 76,
-    status: "Steady",
-  },
+    status: "Steady" },
   {
     id: "3",
     code: "CS-703",
     name: "Cloud Computing Architecture",
     type: "Elective",
-    facultyList: [
+    staffList: [
       { name: "Ms. Sneha Patil", avatar: "SP", role: "Lead Lecturer" },
       { name: "Dr. Sanjay Gupta", avatar: "SG", role: "Lab Mentor" },
     ],
@@ -92,14 +88,13 @@ const initialSubjectData: SubjectItem[] = [
     credits: 3,
     hoursPerWeek: 3,
     completionPercent: 92,
-    status: "Excellent",
-  },
+    status: "Excellent" },
   {
     id: "4",
     code: "CS-505",
     name: "Artificial Intelligence & ML",
     type: "Core Subject",
-    facultyList: [
+    staffList: [
       { name: "Dr. Vikram Singh", avatar: "VS", role: "Lead Lecturer" },
       { name: "Ms. Sneha Patil", avatar: "SP", role: "Co-Lecturer" },
       { name: "Dr. Sanjay Gupta", avatar: "SG", role: "Lab Mentor" },
@@ -109,14 +104,13 @@ const initialSubjectData: SubjectItem[] = [
     credits: 4,
     hoursPerWeek: 4,
     completionPercent: 62,
-    status: "Under Review",
-  },
+    status: "Under Review" },
   {
     id: "5",
     code: "CS-304",
     name: "Database Management Systems",
     type: "Core Subject",
-    facultyList: [
+    staffList: [
       { name: "Prof. Anita Rao", avatar: "AR", role: "Lead Lecturer" },
       { name: "Dr. Ramesh Nair", avatar: "RN", role: "Co-Lecturer" },
     ],
@@ -125,14 +119,13 @@ const initialSubjectData: SubjectItem[] = [
     credits: 4,
     hoursPerWeek: 4,
     completionPercent: 84,
-    status: "Active",
-  },
+    status: "Active" },
   {
     id: "6",
     code: "CS-601",
     name: "Compiler Design & Construction",
     type: "Core Subject",
-    facultyList: [
+    staffList: [
       { name: "Dr. Sanjay Gupta", avatar: "SG", role: "Lead Lecturer" },
     ],
     semSec: "SEM-06 • SEC-A",
@@ -140,14 +133,13 @@ const initialSubjectData: SubjectItem[] = [
     credits: 4,
     hoursPerWeek: 4,
     completionPercent: 80,
-    status: "Active",
-  },
+    status: "Active" },
   {
     id: "7",
     code: "CS-802",
     name: "Cyber Security & Cryptography",
     type: "Elective",
-    facultyList: [
+    staffList: [
       { name: "Prof. Meera Joshi", avatar: "MJ", role: "Lead Lecturer" },
       { name: "Dr. Vikram Singh", avatar: "VS", role: "Guest Mentor" },
     ],
@@ -156,14 +148,13 @@ const initialSubjectData: SubjectItem[] = [
     credits: 3,
     hoursPerWeek: 3,
     completionPercent: 95,
-    status: "Excellent",
-  },
+    status: "Excellent" },
   {
     id: "8",
     code: "CS-201",
     name: "Discrete Mathematical Structures",
     type: "Core Subject",
-    facultyList: [
+    staffList: [
       { name: "Dr. Ramesh Nair", avatar: "RN", role: "Lead Lecturer" },
     ],
     semSec: "SEM-02 • SEC-C",
@@ -171,14 +162,13 @@ const initialSubjectData: SubjectItem[] = [
     credits: 4,
     hoursPerWeek: 4,
     completionPercent: 78,
-    status: "Steady",
-  },
+    status: "Steady" },
   {
     id: "9",
     code: "CS-502",
     name: "Computer Networks & Protocols",
     type: "Core Subject",
-    facultyList: [
+    staffList: [
       { name: "Dr. Aruna Sharma", avatar: "AS", role: "Co-Lecturer" },
       { name: "Prof. Anita Rao", avatar: "AR", role: "Lead Lecturer" },
     ],
@@ -187,8 +177,7 @@ const initialSubjectData: SubjectItem[] = [
     credits: 4,
     hoursPerWeek: 4,
     completionPercent: 83,
-    status: "Active",
-  },
+    status: "Active" },
 ];
 
 export default function HodSubjectsPage() {
@@ -227,20 +216,19 @@ export default function HodSubjectsPage() {
     };
   }, [isFilterOpen]);
 
-  // Form State with Multi-Faculty array selection & separate Semester / Section dropdowns
+  // Form State with Multi-Staff array selection & separate Semester / Section dropdowns
   const [formData, setFormData] = useState({
     code: "",
     name: "",
     type: "Core Subject" as SubjectItem["type"],
-    selectedFacultyNames: ["Dr. Aruna Sharma"],
+    selectedStaffNames: ["Dr. Aruna Sharma"],
     semester: "SEM-03",
     section: "SEC-A",
     studentsCount: 60,
     credits: 4,
     hoursPerWeek: 4,
     completionPercent: 85,
-    status: "Active" as SubjectItem["status"],
-  });
+    status: "Active" as SubjectItem["status"] });
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -249,20 +237,18 @@ export default function HodSubjectsPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFacultyCheckboxToggle = (facultyName: string) => {
+  const handleStaffCheckboxToggle = (staffName: string) => {
     setFormData((prev) => {
-      const exists = prev.selectedFacultyNames.includes(facultyName);
+      const exists = prev.selectedStaffNames.includes(staffName);
       if (exists) {
-        if (prev.selectedFacultyNames.length === 1) return prev;
+        if (prev.selectedStaffNames.length === 1) return prev;
         return {
           ...prev,
-          selectedFacultyNames: prev.selectedFacultyNames.filter((n) => n !== facultyName),
-        };
+          selectedStaffNames: prev.selectedStaffNames.filter((n) => n !== staffName) };
       } else {
         return {
           ...prev,
-          selectedFacultyNames: [...prev.selectedFacultyNames, facultyName],
-        };
+          selectedStaffNames: [...prev.selectedStaffNames, staffName] };
       }
     });
   };
@@ -273,15 +259,14 @@ export default function HodSubjectsPage() {
       code: "",
       name: "",
       type: "Core Subject",
-      selectedFacultyNames: ["Dr. Aruna Sharma"],
+      selectedStaffNames: ["Dr. Aruna Sharma"],
       semester: "SEM-03",
       section: "SEC-A",
       studentsCount: 60,
       credits: 4,
       hoursPerWeek: 4,
       completionPercent: 85,
-      status: "Active",
-    });
+      status: "Active" });
     setIsModalOpen(true);
   };
 
@@ -295,15 +280,14 @@ export default function HodSubjectsPage() {
       code: item.code,
       name: item.name,
       type: item.type,
-      selectedFacultyNames: item.facultyList.map((f) => f.name),
+      selectedStaffNames: item.staffList.map((f) => f.name),
       semester: semVal,
       section: secVal,
       studentsCount: item.studentsCount,
       credits: item.credits,
       hoursPerWeek: item.hoursPerWeek,
       completionPercent: item.completionPercent,
-      status: item.status,
-    });
+      status: item.status });
     setIsModalOpen(true);
   };
 
@@ -311,14 +295,13 @@ export default function HodSubjectsPage() {
     e.preventDefault();
     if (!formData.name.trim()) return;
 
-    // Map selected names to faculty list objects
-    const mappedFaculty: FacultyMember[] = formData.selectedFacultyNames.map((name, index) => {
-      const matched = availableFacultyList.find((f) => f.name === name);
+    // Map selected names to staff list objects
+    const mappedStaff: StaffMember[] = formData.selectedStaffNames.map((name, index) => {
+      const matched = availableStaffList.find((f) => f.name === name);
       return {
         name,
         avatar: matched ? matched.avatar : name.substring(0, 2).toUpperCase(),
-        role: index === 0 ? "Lead Lecturer" : "Co-Lecturer / Mentor",
-      };
+        role: index === 0 ? "Lead Lecturer" : "Co-Lecturer / Mentor" };
     });
 
     const generatedCode = formData.code.trim()
@@ -336,14 +319,13 @@ export default function HodSubjectsPage() {
                 code: generatedCode,
                 name: formData.name.trim(),
                 type: formData.type,
-                facultyList: mappedFaculty,
+                staffList: mappedStaff,
                 semSec: combinedSemSec,
                 studentsCount: Number(formData.studentsCount) || 60,
                 credits: Number(formData.credits) || 4,
                 hoursPerWeek: Number(formData.hoursPerWeek) || 4,
                 completionPercent: Number(formData.completionPercent) || 85,
-                status: formData.status,
-              }
+                status: formData.status }
             : s
         )
       );
@@ -353,14 +335,13 @@ export default function HodSubjectsPage() {
         code: generatedCode,
         name: formData.name.trim(),
         type: formData.type,
-        facultyList: mappedFaculty,
+        staffList: mappedStaff,
         semSec: combinedSemSec,
         studentsCount: Number(formData.studentsCount) || 60,
         credits: Number(formData.credits) || 4,
         hoursPerWeek: Number(formData.hoursPerWeek) || 4,
         completionPercent: Number(formData.completionPercent) || 85,
-        status: formData.status,
-      };
+        status: formData.status };
       setSubjectList((prev) => [newSubjectItem, ...prev]);
       setCurrentPage(1);
     }
@@ -393,7 +374,7 @@ export default function HodSubjectsPage() {
     let matchesTab = true;
     if (activeTab === "CORE") matchesTab = item.type === "Core Subject";
     if (activeTab === "ELECTIVE") matchesTab = item.type === "Elective";
-    if (activeTab === "MULTI_FACULTY") matchesTab = item.facultyList.length > 1;
+    if (activeTab === "MULTI_STAFF") matchesTab = item.staffList.length > 1;
 
     let matchesYearSem = true;
     if (yearSemFilter === "YEAR_1") matchesYearSem = item.semSec.includes("SEM-01") || item.semSec.includes("SEM-02");
@@ -405,7 +386,7 @@ export default function HodSubjectsPage() {
     const matchesSearch =
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.facultyList.some((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      item.staffList.some((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
       item.semSec.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesType = typeFilter === "ALL" || item.type === typeFilter;
@@ -446,7 +427,7 @@ export default function HodSubjectsPage() {
         <div className={styles.titleArea}>
           <h1 className={styles.pageTitle}>Curriculum & Subject Modules</h1>
           <p className={styles.pageSubtitle}>
-            Explore offered courses, multi-faculty teaching assignments, syllabus completion, and semester structures.
+            Explore offered courses, multi-staff teaching assignments, syllabus completion, and semester structures.
           </p>
         </div>
 
@@ -471,10 +452,10 @@ export default function HodSubjectsPage() {
             All Courses
           </button>
           <button
-            className={`${styles.tabBtn} ${activeTab === "MULTI_FACULTY" ? styles.tabBtnActive : ""}`}
-            onClick={() => { setActiveTab("MULTI_FACULTY"); setCurrentPage(1); }}
+            className={`${styles.tabBtn} ${activeTab === "MULTI_STAFF" ? styles.tabBtnActive : ""}`}
+            onClick={() => { setActiveTab("MULTI_STAFF"); setCurrentPage(1); }}
           >
-            Multi-Faculty ({subjectList.filter(s => s.facultyList.length > 1).length})
+            Multi-Staff ({subjectList.filter(s => s.staffList.length > 1).length})
           </button>
           <button
             className={`${styles.tabBtn} ${activeTab === "CORE" ? styles.tabBtnActive : ""}`}
@@ -496,7 +477,7 @@ export default function HodSubjectsPage() {
             <input
               type="text"
               className={styles.searchInput}
-              placeholder="Search course or faculty..."
+              placeholder="Search course or staff..."
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
@@ -606,9 +587,9 @@ export default function HodSubjectsPage() {
         <div className={styles.cardsGrid}>
           {paginatedSubjects.length > 0 ? (
             paginatedSubjects.map((item) => {
-              const allFacultyNames = item.facultyList.map((f) => f.name).join(", ");
-              const leadFaculty = item.facultyList[0];
-              const extraCount = item.facultyList.length - 1;
+              const allStaffNames = item.staffList.map((f) => f.name).join(", ");
+              const leadStaff = item.staffList[0];
+              const extraCount = item.staffList.length - 1;
 
               return (
                 <div key={item.id} className={styles.subjectCard}>
@@ -641,29 +622,29 @@ export default function HodSubjectsPage() {
 
                   <div className={styles.cardMetaGrid}>
                     <div className={styles.metaItemFull}>
-                      <div className={styles.facultyStackWrapper}>
-                        <span className={styles.metaLabel}>ASSIGNED FACULTY ({item.facultyList.length})</span>
+                      <div className={styles.staffStackWrapper}>
+                        <span className={styles.metaLabel}>ASSIGNED STAFF ({item.staffList.length})</span>
                         {extraCount > 0 && (
-                          <span className={styles.coFacultyBadge}>
+                          <span className={styles.coStaffBadge}>
                             +{extraCount} Co-Instructor{extraCount > 1 ? "s" : ""}
                           </span>
                         )}
                       </div>
                       
-                      <div className={styles.facultyStackWrapper} title={`Instructors: ${allFacultyNames}`}>
+                      <div className={styles.staffStackWrapper} title={`Instructors: ${allStaffNames}`}>
                         <div className={styles.avatarStack}>
-                          {item.facultyList.map((fac, idx) => (
+                          {item.staffList.map((staff, idx) => (
                             <div 
                               key={idx} 
                               className={styles.stackedAvatar} 
-                              title={`${fac.name} (${fac.role || "Instructor"})`}
+                              title={`${staff.name} (${fac.role || "Instructor"})`}
                             >
                               {fac.avatar}
                             </div>
                           ))}
                         </div>
-                        <div className={styles.facultyNamesList}>
-                          {leadFaculty.name}
+                        <div className={styles.staffNamesList}>
+                          {leadStaff.name}
                           {extraCount > 0 && <span style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}> & others</span>}
                         </div>
                       </div>
@@ -707,7 +688,7 @@ export default function HodSubjectsPage() {
           )}
         </div>
       ) : (
-        /* TABLE LIST VIEW WITH MULTI-FACULTY STACK */
+        /* TABLE LIST VIEW WITH MULTI-STAFF STACK */
         <div className={styles.tableCard}>
           <div className={styles.tableWrapper}>
             <table className={styles.table}>
@@ -725,9 +706,9 @@ export default function HodSubjectsPage() {
               </thead>
               <tbody>
                 {paginatedSubjects.map((item) => {
-                  const allFacultyNames = item.facultyList.map((f) => f.name).join(", ");
-                  const leadFaculty = item.facultyList[0];
-                  const extraCount = item.facultyList.length - 1;
+                  const allStaffNames = item.staffList.map((f) => f.name).join(", ");
+                  const leadStaff = item.staffList[0];
+                  const extraCount = item.staffList.length - 1;
 
                   return (
                     <tr key={item.id}>
@@ -743,16 +724,16 @@ export default function HodSubjectsPage() {
                         </div>
                       </td>
                       <td>
-                        <div className={styles.facultyStackWrapper} title={`Instructors: ${allFacultyNames}`}>
+                        <div className={styles.staffStackWrapper} title={`Instructors: ${allStaffNames}`}>
                           <div className={styles.avatarStack}>
-                            {item.facultyList.map((fac, idx) => (
-                              <div key={idx} className={styles.stackedAvatar} title={`${fac.name} (${fac.role || "Instructor"})`}>
+                            {item.staffList.map((staff, idx) => (
+                              <div key={idx} className={styles.stackedAvatar} title={`${staff.name} (${fac.role || "Instructor"})`}>
                                 {fac.avatar}
                               </div>
                             ))}
                           </div>
                           <div style={{ display: "flex", flexDirection: "column" }}>
-                            <span style={{ fontSize: "0.85rem", fontWeight: 600 }}>{leadFaculty.name}</span>
+                            <span style={{ fontSize: "0.85rem", fontWeight: 600 }}>{leadStaff.name}</span>
                             {extraCount > 0 && (
                               <span style={{ fontSize: "0.725rem", color: "#00522E", fontWeight: 700 }}>
                                 +{extraCount} Co-Instructor{extraCount > 1 ? "s" : ""}
@@ -831,7 +812,7 @@ export default function HodSubjectsPage() {
         </div>
       </div>
 
-      {/* Add / Edit Subject Modal Popup with Multi-Faculty Checkboxes */}
+      {/* Add / Edit Subject Modal Popup with Multi-Staff Checkboxes */}
       {isModalOpen && (
         <div className={styles.modalOverlay} onClick={() => setIsModalOpen(false)}>
           <div 
@@ -844,7 +825,7 @@ export default function HodSubjectsPage() {
                   {editingId ? "Edit Course Module" : "Add New Subject"}
                 </h2>
                 <p className={styles.modalSubtitle}>
-                  Assign single or multiple faculty members (lead & co-instructors) to this subject.
+                  Assign single or multiple staff members (lead & co-instructors) to this subject.
                 </p>
               </div>
               <button 
@@ -898,23 +879,23 @@ export default function HodSubjectsPage() {
                     />
                   </div>
 
-                  {/* Multi-Faculty Selection Grid */}
+                  {/* Multi-Staff Selection Grid */}
                   <div className={styles.formGroupFull}>
                     <label className={styles.formLabel}>
-                      Assigned Faculty Members ({formData.selectedFacultyNames.length} Selected) *
+                      Assigned Staff Members ({formData.selectedStaffNames.length} Selected) *
                     </label>
-                    <div className={styles.facultyCheckboxGrid}>
-                      {availableFacultyList.map((fac) => {
-                        const isChecked = formData.selectedFacultyNames.includes(fac.name);
+                    <div className={styles.staffCheckboxGrid}>
+                      {availableStaffList.map((fac) => {
+                        const isChecked = formData.selectedStaffNames.includes(staff.name);
                         return (
-                          <label key={fac.name} className={styles.checkboxLabel}>
+                          <label key={staff.name} className={styles.checkboxLabel}>
                             <input
                               type="checkbox"
                               className={styles.checkboxInput}
                               checked={isChecked}
-                              onChange={() => handleFacultyCheckboxToggle(fac.name)}
+                              onChange={() => handleStaffCheckboxToggle(staff.name)}
                             />
-                            <span>{fac.name}</span>
+                            <span>{staff.name}</span>
                           </label>
                         );
                       })}
