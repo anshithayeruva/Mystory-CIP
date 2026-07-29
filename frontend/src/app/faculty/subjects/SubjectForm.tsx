@@ -135,6 +135,7 @@ export default function SubjectForm({ initialData, isEdit, subjectId }: SubjectF
         const res = await fetch(`/api/faculty/subjects/${targetSubjectId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(subjectPayload)
         });
         if (!res.ok) throw new Error('Failed to update subject info');
@@ -142,6 +143,7 @@ export default function SubjectForm({ initialData, isEdit, subjectId }: SubjectF
         const res = await fetch(`/api/faculty/subjects`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(subjectPayload)
         });
         if (!res.ok) {
@@ -164,6 +166,7 @@ export default function SubjectForm({ initialData, isEdit, subjectId }: SubjectF
             await fetch(`/api/faculty/subjects/${targetSubjectId}/outcomes`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
               body: JSON.stringify({ coNumber: out.coNumber, title: out.title, description: out.description || ' ' })
             });
           }
@@ -177,6 +180,7 @@ export default function SubjectForm({ initialData, isEdit, subjectId }: SubjectF
             const unitRes = await fetch(`/api/faculty/subjects/${targetSubjectId}/units`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
               body: JSON.stringify({ unitNumber: unit.unitNumber, unitName: unit.unitName, description: unit.description })
             });
             
@@ -190,6 +194,7 @@ export default function SubjectForm({ initialData, isEdit, subjectId }: SubjectF
                     await fetch(`/api/faculty/subjects/${targetSubjectId}/units/${newUnitId}/topics`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
+                      credentials: 'include',
                       body: JSON.stringify({ topicName: topic.topicName, description: topic.description })
                     });
                   }
