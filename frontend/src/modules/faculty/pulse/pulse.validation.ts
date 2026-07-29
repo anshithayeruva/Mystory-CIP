@@ -5,6 +5,7 @@ import {
   PulseDifficultyLevel,
   PulseAttendanceRule,
   PulseResultVisibility,
+  PulseSessionStatus,
 } from '@prisma/client';
 
 /**
@@ -237,6 +238,7 @@ export const pulseSessionQuerySchema = z.object({
   sessionType: z.nativeEnum(PulseSessionType).optional(),
   difficultyLevel: z.nativeEnum(PulseDifficultyLevel).optional(),
   date: z.string().optional(),
+  status: z.nativeEnum(PulseSessionStatus).optional(),
 });
 
 export type PulseSessionQueryInput = z.infer<typeof pulseSessionQuerySchema>;

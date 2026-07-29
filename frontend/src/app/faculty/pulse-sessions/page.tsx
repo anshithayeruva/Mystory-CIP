@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { 
   PlusCircle, 
@@ -21,68 +21,15 @@ import {
 } from 'lucide-react';
 import styles from './pulse-sessions.module.css';
 
-// Mock Data
-const MOCK_SESSIONS = [
-  {
-    id: '1',
-    name: 'Mid-Class Understanding Check',
-    subject: 'Data Structures (CS201)',
-    type: 'Mid-Class Check',
-    code: 'PULSE-X789',
-    date: '2026-08-01',
-    time: '10:30 AM',
-    status: 'Live',
-    participants: '45/60'
-  },
-  {
-    id: '2',
-    name: 'End of Class Summary Quiz',
-    subject: 'Database Systems (CS305)',
-    type: 'End-of-Class Check',
-    code: 'PULSE-B442',
-    date: '2026-08-01',
-    time: '02:00 PM',
-    status: 'Upcoming',
-    participants: '0/55'
-  },
-  {
-    id: '3',
-    name: 'Previous Lecture Recap',
-    subject: 'Data Structures (CS201)',
-    type: 'Start-of-Class Check',
-    code: 'PULSE-M121',
-    date: '2026-07-28',
-    time: '09:00 AM',
-    status: 'Evaluated',
-    participants: '58/60'
-  },
-  {
-    id: '4',
-    name: 'Quick Feedback Survey',
-    subject: 'Web Development (CS401)',
-    type: 'Feedback',
-    code: 'PULSE-F993',
-    date: '2026-07-25',
-    time: '11:15 AM',
-    status: 'Closed',
-    participants: '42/45'
-  },
-  {
-    id: '5',
-    name: 'Draft Mid-Term Review',
-    subject: 'Data Structures (CS201)',
-    type: 'Review',
-    code: 'PULSE-D334',
-    date: '-',
-    time: '-',
-    status: 'Draft',
-    participants: '-'
-  }
-];
-
 export default function PulseSessionsPage() {
-  const [sessions, setSessions] = useState(MOCK_SESSIONS);
+  const [sessions, setSessions] = useState<any[]>([]);
+  const [summary, setSummary] = useState({ total: 0, live: 0, upcoming: 0, completed: 0 });
+  const [loading, setLoading] = useState(true);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   // Filters state
   const [search, setSearch] = useState('');
@@ -90,6 +37,51 @@ export default function PulseSessionsPage() {
   const [type, setType] = useState('');
   const [status, setStatus] = useState('');
   const [semester, setSemester] = useState('');
+
+  const fetchSummary = async () => {
+    try {
+      const res = await fetch('/api/faculty/pulse-sessions/summary', { credentials: 'include' });
+      if (res.ok) {
+        const json = await res.json();
+        setSummary(json.data);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const fetchSessions = useCallback(async () => {
+    setLoading(true);
+    try {
+      const query = new URLSearchParams();
+      query.append('page', page.toString());
+      query.append('limit', '10');
+      if (search) query.append('search', search);
+      if (subject) query.append('courseId', subject);
+      if (type) query.append('sessionType', type);
+      if (status) query.append('status', status.toUpperCase());
+      if (semester) query.append('semester', semester);
+
+      const res = await fetch(`/api/faculty/pulse-sessions?${query.toString()}`, { credentials: 'include' });
+      if (res.ok) {
+        const json = await res.json();
+        setSessions(json.data?.sessions || []);
+        setTotalPages(json.data?.pagination?.totalPages || 1);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, search, subject, type, status, semester]);
+
+  useEffect(() => {
+    fetchSummary();
+  }, []);
+
+  useEffect(() => {
+    fetchSessions();
+  }, [fetchSessions]);
 
   const toggleMenu = (id: string) => {
     if (activeMenu === id) {
@@ -105,19 +97,42 @@ export default function PulseSessionsPage() {
     setType('');
     setStatus('');
     setSemester('');
+    setPage(1);
+  };
+
+  const handleAction = async (id: string, action: string) => {
+    try {
+      if (action === 'DELETE') {
+        if (!confirm('Are you sure you want to delete this session?')) return;
+        await fetch(`/api/faculty/pulse-sessions/${id}`, { method: 'DELETE', credentials: 'include' });
+      } else {
+        await fetch(`/api/faculty/pulse-sessions/${id}/${action}`, { method: 'POST', credentials: 'include' });
+      }
+      fetchSessions();
+      fetchSummary();
+      setActiveMenu(null);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const getStatusBadge = (statusStr: string) => {
-    switch (statusStr) {
-      case 'Draft': return <span className={`${styles.badge} ${styles.badgeDraft}`}>Draft</span>;
-      case 'Published': return <span className={`${styles.badge} ${styles.badgePublished}`}>Published</span>;
-      case 'Live': return <span className={`${styles.badge} ${styles.badgeLive}`}><span style={{width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#166534', marginRight: '4px'}}></span> Live</span>;
-      case 'Upcoming': return <span className={`${styles.badge} ${styles.badgePublished}`}>Upcoming</span>;
-      case 'Closed': return <span className={`${styles.badge} ${styles.badgeClosed}`}>Closed</span>;
-      case 'Evaluated': return <span className={`${styles.badge} ${styles.badgeEvaluated}`}>Evaluated</span>;
-      case 'Archived': return <span className={`${styles.badge} ${styles.badgeArchived}`}>Archived</span>;
+    const s = statusStr?.toUpperCase() || 'DRAFT';
+    switch (s) {
+      case 'DRAFT': return <span className={`${styles.badge} ${styles.badgeDraft}`}>Draft</span>;
+      case 'PUBLISHED': return <span className={`${styles.badge} ${styles.badgePublished}`}>Published</span>;
+      case 'LIVE': return <span className={`${styles.badge} ${styles.badgeLive}`}><span style={{width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#166534', marginRight: '4px'}}></span> Live</span>;
+      case 'UPCOMING': return <span className={`${styles.badge} ${styles.badgePublished}`}>Upcoming</span>;
+      case 'CLOSED': return <span className={`${styles.badge} ${styles.badgeClosed}`}>Closed</span>;
+      case 'EVALUATED': return <span className={`${styles.badge} ${styles.badgeEvaluated}`}>Evaluated</span>;
+      case 'ARCHIVED': return <span className={`${styles.badge} ${styles.badgeArchived}`}>Archived</span>;
       default: return <span className={`${styles.badge} ${styles.badgeDraft}`}>{statusStr}</span>;
     }
+  };
+
+  const formatType = (t: string) => {
+    if (!t) return 'Unknown';
+    return t.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   };
 
   return (
@@ -152,7 +167,7 @@ export default function PulseSessionsPage() {
             </div>
             <div className={styles.kpiContent}>
               <div className={styles.kpiLabel}>Total Sessions</div>
-              <div className={styles.kpiValue}>124</div>
+              <div className={styles.kpiValue}>{summary.total}</div>
             </div>
           </div>
 
@@ -163,7 +178,7 @@ export default function PulseSessionsPage() {
             </div>
             <div className={styles.kpiContent}>
               <div className={styles.kpiLabel}>Live Sessions</div>
-              <div className={styles.kpiValue}>1</div>
+              <div className={styles.kpiValue}>{summary.live}</div>
             </div>
           </div>
 
@@ -174,7 +189,7 @@ export default function PulseSessionsPage() {
             </div>
             <div className={styles.kpiContent}>
               <div className={styles.kpiLabel}>Upcoming</div>
-              <div className={styles.kpiValue}>3</div>
+              <div className={styles.kpiValue}>{summary.upcoming}</div>
             </div>
           </div>
 
@@ -185,7 +200,7 @@ export default function PulseSessionsPage() {
             </div>
             <div className={styles.kpiContent}>
               <div className={styles.kpiLabel}>Completed</div>
-              <div className={styles.kpiValue}>120</div>
+              <div className={styles.kpiValue}>{summary.completed}</div>
             </div>
           </div>
         </div>
@@ -199,12 +214,12 @@ export default function PulseSessionsPage() {
               className={styles.input} 
               placeholder="Search by name or code..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             />
           </div>
           <div className={styles.filterGroup}>
             <label>Subject</label>
-            <select className={styles.select} value={subject} onChange={(e) => setSubject(e.target.value)}>
+            <select className={styles.select} value={subject} onChange={(e) => { setSubject(e.target.value); setPage(1); }}>
               <option value="">All Subjects</option>
               <option value="CS201">Data Structures (CS201)</option>
               <option value="CS305">Database Systems (CS305)</option>
@@ -213,28 +228,28 @@ export default function PulseSessionsPage() {
           </div>
           <div className={styles.filterGroup}>
             <label>Session Type</label>
-            <select className={styles.select} value={type} onChange={(e) => setType(e.target.value)}>
+            <select className={styles.select} value={type} onChange={(e) => { setType(e.target.value); setPage(1); }}>
               <option value="">All Types</option>
-              <option value="Start-of-Class Check">Start-of-Class Check</option>
-              <option value="Mid-Class Check">Mid-Class Check</option>
-              <option value="End-of-Class Check">End-of-Class Check</option>
-              <option value="Feedback">Feedback</option>
+              <option value="START_OF_CLASS_CHECK">Start-of-Class Check</option>
+              <option value="MID_CLASS_CHECK">Mid-Class Check</option>
+              <option value="END_OF_CLASS_CHECK">End-of-Class Check</option>
+              <option value="FEEDBACK">Feedback</option>
             </select>
           </div>
           <div className={styles.filterGroup}>
             <label>Status</label>
-            <select className={styles.select} value={status} onChange={(e) => setStatus(e.target.value)}>
+            <select className={styles.select} value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }}>
               <option value="">All Statuses</option>
-              <option value="Draft">Draft</option>
-              <option value="Upcoming">Upcoming</option>
-              <option value="Live">Live</option>
-              <option value="Closed">Closed</option>
-              <option value="Evaluated">Evaluated</option>
+              <option value="DRAFT">Draft</option>
+              <option value="PUBLISHED">Published</option>
+              <option value="LIVE">Live</option>
+              <option value="CLOSED">Closed</option>
+              <option value="EVALUATED">Evaluated</option>
             </select>
           </div>
           <div className={styles.filterGroup}>
             <label>Semester</label>
-            <select className={styles.select} value={semester} onChange={(e) => setSemester(e.target.value)}>
+            <select className={styles.select} value={semester} onChange={(e) => { setSemester(e.target.value); setPage(1); }}>
               <option value="">All Semesters</option>
               {[1,2,3,4,5,6,7,8].map(s => <option key={s} value={s}>Semester {s}</option>)}
             </select>
@@ -267,17 +282,19 @@ export default function PulseSessionsPage() {
               </tr>
             </thead>
             <tbody>
-              {sessions.length > 0 ? (
+              {loading ? (
+                <tr><td colSpan={9} style={{ textAlign: 'center', padding: '40px' }}>Loading sessions...</td></tr>
+              ) : sessions.length > 0 ? (
                 sessions.map((session) => (
                   <tr key={session.id}>
-                    <td style={{ fontWeight: 600 }}>{session.name}</td>
-                    <td>{session.subject}</td>
-                    <td>{session.type}</td>
-                    <td style={{ fontFamily: 'monospace' }}>{session.code}</td>
-                    <td>{session.date}</td>
-                    <td>{session.time}</td>
+                    <td style={{ fontWeight: 600 }}>{session.title}</td>
+                    <td>{session.course?.name || 'Unknown Subject'}</td>
+                    <td>{formatType(session.sessionType)}</td>
+                    <td style={{ fontFamily: 'monospace' }}>{session.sessionCode || '-'}</td>
+                    <td>{new Date(session.date).toLocaleDateString()}</td>
+                    <td>{session.startTime}</td>
                     <td>{getStatusBadge(session.status)}</td>
-                    <td>{session.participants}</td>
+                    <td>-</td>
                     <td>
                       <div className={styles.actionMenu}>
                         <button 
@@ -298,25 +315,28 @@ export default function PulseSessionsPage() {
                             <button className={styles.dropdownItem}>
                               <Copy size={16} /> Duplicate
                             </button>
-                            <button className={styles.dropdownItem}>
+                            <button className={styles.dropdownItem} onClick={() => handleAction(session.id, 'generate-qr')}>
                               <QrCode size={16} /> Generate QR
                             </button>
-                            <button className={styles.dropdownItem}>
-                              <Hash size={16} /> Copy Session Code
+                            <button className={styles.dropdownItem} onClick={() => handleAction(session.id, 'generate-code')}>
+                              <Hash size={16} /> Generate Session Code
+                            </button>
+                            <button className={styles.dropdownItem} onClick={() => handleAction(session.id, 'publish')}>
+                              <Hash size={16} /> Publish
                             </button>
                             
                             <div style={{ height: '1px', backgroundColor: '#E7E3DB', margin: '4px 0' }}></div>
                             
-                            <button className={styles.dropdownItem} style={{ color: '#166534' }}>
+                            <button className={styles.dropdownItem} style={{ color: '#166534' }} onClick={() => handleAction(session.id, 'start')}>
                               <PlayCircle size={16} /> Start Session
                             </button>
-                            <button className={styles.dropdownItem} style={{ color: '#d97706' }}>
+                            <button className={styles.dropdownItem} style={{ color: '#d97706' }} onClick={() => handleAction(session.id, 'close')}>
                               <StopCircle size={16} /> Close Session
                             </button>
                             
                             <div style={{ height: '1px', backgroundColor: '#E7E3DB', margin: '4px 0' }}></div>
                             
-                            <button className={`${styles.dropdownItem} ${styles.danger}`}>
+                            <button className={`${styles.dropdownItem} ${styles.danger}`} onClick={() => handleAction(session.id, 'DELETE')}>
                               <Trash2 size={16} /> Delete
                             </button>
                           </div>
@@ -344,13 +364,33 @@ export default function PulseSessionsPage() {
             </tbody>
           </table>
 
-          {sessions.length > 0 && (
+          {!loading && sessions.length > 0 && (
             <div className={styles.pagination}>
-              <button className={styles.pageBtn}>Previous</button>
-              <button className={`${styles.pageBtn} ${styles.active}`}>1</button>
-              <button className={styles.pageBtn}>2</button>
-              <button className={styles.pageBtn}>3</button>
-              <button className={styles.pageBtn}>Next</button>
+              <button 
+                className={styles.pageBtn} 
+                disabled={page === 1}
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+              >
+                Previous
+              </button>
+              
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <button 
+                  key={i} 
+                  className={`${styles.pageBtn} ${page === i + 1 ? styles.active : ''}`}
+                  onClick={() => setPage(i + 1)}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              
+              <button 
+                className={styles.pageBtn}
+                disabled={page === totalPages}
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              >
+                Next
+              </button>
             </div>
           )}
         </div>

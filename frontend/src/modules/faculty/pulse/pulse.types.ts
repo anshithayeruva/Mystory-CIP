@@ -72,6 +72,7 @@ export interface PulseSessionQueryDTO {
   sessionType?: PulseSessionType;
   difficultyLevel?: PulseDifficultyLevel;
   date?: string;
+  status?: string;
 }
 
 /**

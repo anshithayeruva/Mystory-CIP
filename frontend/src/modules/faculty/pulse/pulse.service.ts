@@ -305,7 +305,7 @@ export class PulseService {
   static async listSessions(userId: string, query: PulseSessionQueryDTO): Promise<PulseSessionListResponse> {
     const facultyProfile = await this.getFacultyProfile(userId);
 
-    const { page = 1, limit = 10, search, courseId, topicId, sessionType, difficultyLevel, date } = query;
+    const { page = 1, limit = 10, search, courseId, topicId, sessionType, difficultyLevel, date, status } = query;
     const skip = (page - 1) * limit;
 
     // Build Prisma where clause
@@ -313,6 +313,11 @@ export class PulseService {
     const where: Prisma.PulseSessionWhereInput = {
       facultyId: facultyProfile.id,
     };
+
+    if (status) {
+      // @ts-ignore
+      where.status = status;
+    }
 
     if (courseId) {
       where.courseId = courseId;
@@ -378,6 +383,122 @@ export class PulseService {
         limit,
         totalPages,
       },
+    };
+  }
+
+  /**
+   * Action methods for pulse sessions
+   */
+  static async publishSession(userId: string, sessionId: string): Promise<PulseSessionResponse> {
+    const facultyProfile = await this.getFacultyProfile(userId);
+    const session = await db.pulseSession.findUnique({ where: { id: sessionId } });
+    if (!session) throw new NotFoundError('Pulse session not found.');
+    if (session.facultyId !== facultyProfile.id) throw new ForbiddenError('Unauthorized.');
+    
+    const updated = await db.pulseSession.update({
+      where: { id: sessionId },
+      data: { status: 'PUBLISHED' },
+      include: { course: true, topic: true, department: true }
+    });
+    return this.formatPulseSessionResponse(updated);
+  }
+
+  static async startSession(userId: string, sessionId: string): Promise<PulseSessionResponse> {
+    const facultyProfile = await this.getFacultyProfile(userId);
+    const session = await db.pulseSession.findUnique({ where: { id: sessionId } });
+    if (!session) throw new NotFoundError('Pulse session not found.');
+    if (session.facultyId !== facultyProfile.id) throw new ForbiddenError('Unauthorized.');
+    
+    const updated = await db.pulseSession.update({
+      where: { id: sessionId },
+      data: { status: 'LIVE', timerStatus: 'RUNNING', timerActualStartTime: new Date() },
+      include: { course: true, topic: true, department: true }
+    });
+    return this.formatPulseSessionResponse(updated);
+  }
+
+  static async closeSession(userId: string, sessionId: string): Promise<PulseSessionResponse> {
+    const facultyProfile = await this.getFacultyProfile(userId);
+    const session = await db.pulseSession.findUnique({ where: { id: sessionId } });
+    if (!session) throw new NotFoundError('Pulse session not found.');
+    if (session.facultyId !== facultyProfile.id) throw new ForbiddenError('Unauthorized.');
+    
+    const updated = await db.pulseSession.update({
+      where: { id: sessionId },
+      data: { status: 'CLOSED', timerStatus: 'COMPLETED', timerActualEndTime: new Date() },
+      include: { course: true, topic: true, department: true }
+    });
+    return this.formatPulseSessionResponse(updated);
+  }
+
+  static async archiveSession(userId: string, sessionId: string): Promise<PulseSessionResponse> {
+    const facultyProfile = await this.getFacultyProfile(userId);
+    const session = await db.pulseSession.findUnique({ where: { id: sessionId } });
+    if (!session) throw new NotFoundError('Pulse session not found.');
+    if (session.facultyId !== facultyProfile.id) throw new ForbiddenError('Unauthorized.');
+    
+    const updated = await db.pulseSession.update({
+      where: { id: sessionId },
+      data: { status: 'ARCHIVED' },
+      include: { course: true, topic: true, department: true }
+    });
+    return this.formatPulseSessionResponse(updated);
+  }
+
+  static async generateSessionCode(userId: string, sessionId: string): Promise<PulseSessionResponse> {
+    const facultyProfile = await this.getFacultyProfile(userId);
+    const session = await db.pulseSession.findUnique({ where: { id: sessionId } });
+    if (!session) throw new NotFoundError('Pulse session not found.');
+    if (session.facultyId !== facultyProfile.id) throw new ForbiddenError('Unauthorized.');
+    
+    // Generate a random 6 character code like PULSE-X1Y2
+    const code = 'PULSE-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+    
+    const updated = await db.pulseSession.update({
+      where: { id: sessionId },
+      data: { 
+        sessionCode: code,
+        isCodeActive: true,
+        codeCreatedAt: new Date(),
+        // Expires in 24 hours
+        codeExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+      },
+      include: { course: true, topic: true, department: true }
+    });
+    return this.formatPulseSessionResponse(updated);
+  }
+
+  static async generateQrCode(userId: string, sessionId: string): Promise<PulseSessionResponse> {
+    const facultyProfile = await this.getFacultyProfile(userId);
+    const session = await db.pulseSession.findUnique({ where: { id: sessionId } });
+    if (!session) throw new NotFoundError('Pulse session not found.');
+    if (session.facultyId !== facultyProfile.id) throw new ForbiddenError('Unauthorized.');
+    
+    const mockQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=mysession_${sessionId}`;
+    
+    const updated = await db.pulseSession.update({
+      where: { id: sessionId },
+      data: { qrCodeUrl: mockQrUrl },
+      include: { course: true, topic: true, department: true }
+    });
+    return this.formatPulseSessionResponse(updated);
+  }
+
+  static async getSessionSummary(userId: string) {
+    const facultyProfile = await this.getFacultyProfile(userId);
+    
+    const [total, live, upcoming, completed] = await Promise.all([
+      db.pulseSession.count({ where: { facultyId: facultyProfile.id } }),
+      db.pulseSession.count({ where: { facultyId: facultyProfile.id, status: 'LIVE' } }),
+      db.pulseSession.count({ where: { facultyId: facultyProfile.id, status: { in: ['DRAFT', 'PUBLISHED'] } } }),
+      db.pulseSession.count({ where: { facultyId: facultyProfile.id, status: { in: ['CLOSED', 'COMPLETED', 'ARCHIVED'] } } }),
+    ]);
+    
+    return {
+      total,
+      live,
+      upcoming,
+      completed
     };
   }
 }

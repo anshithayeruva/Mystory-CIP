@@ -22,6 +22,7 @@ export async function GET(req: NextRequest) {
       sessionType: searchParams.get('sessionType') || undefined,
       difficultyLevel: searchParams.get('difficultyLevel') || undefined,
       date: searchParams.get('date') || undefined,
+      status: searchParams.get('status') || undefined,
     };
 
     const query = pulseSessionQuerySchema.parse(rawQuery);
