@@ -4,14 +4,14 @@ import Link from "next/link";
 import styles from "../create.module.css";
 
 interface HeaderAreaProps {
-  userType: "student" | "staff" | "hod";
+  userType: "student" | "faculty" | "hod";
 }
 
 export default function HeaderArea({ userType }: HeaderAreaProps) {
   const getTitle = () => {
     switch (userType) {
       case "student": return "Create User";
-      case "staff": return "Create Staff";
+      case "faculty": return "Create Faculty";
       case "hod": return "Create HoD";
       default: return "Create User";
     }
