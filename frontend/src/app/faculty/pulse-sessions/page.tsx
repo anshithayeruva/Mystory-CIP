@@ -140,9 +140,7 @@ export default function PulseSessionsPage() {
       {/* Page Header */}
       <div className="page-header">
         <div className="page-title-section">
-          <div className="breadcrumb">
-            Faculty &gt; Pulse Sessions
-          </div>
+
           <h1 className="page-title" style={{ marginTop: '4px' }}>Pulse Sessions</h1>
           <div className="page-tags">
             <span style={{ color: '#667085', fontSize: '0.85rem' }}>

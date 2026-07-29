@@ -108,9 +108,7 @@ export default function SubjectsPage() {
       {/* Page Header */}
       <div className="page-header">
         <div className="page-title-section">
-          <div className="breadcrumb">
-            Faculty &gt; Subjects
-          </div>
+
           <h1 className="page-title" style={{ marginTop: '4px' }}>Subject Configuration</h1>
           <div className="page-tags">
             <span style={{ color: '#64748b', fontSize: '0.85rem' }}>
