@@ -170,11 +170,44 @@
   background-color: #10633B;
 }
 
-/* Session Settings specific */
 .settingsGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
+  gap: 24px;
+  align-items: stretch;
+}
+
+@media (max-width: 1024px) {
+  .settingsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .settingsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.settingsColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.settingsCard {
+  border: 1px solid #E7E3DB;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  background-color: #FFFFFF;
+}
+
+.settingsCardTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #17223B;
+  margin: 0 0 16px 0;
 }
 
 .qrContainer {
@@ -182,6 +215,7 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
+  flex: 1;
 }
 
 .qrBox {
@@ -196,10 +230,17 @@
   overflow: hidden;
 }
 
-.toggleGroup {
+.toggleList {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  flex: 1;
+}
+
+.toggleDivider {
+  height: 1px;
+  background-color: #E7E3DB;
+  margin: 0;
 }
 
 .toggleItem {

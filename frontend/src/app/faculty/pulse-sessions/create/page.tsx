@@ -471,68 +471,83 @@ export default function CreatePulseSessionPage() {
             </div>
 
             <div className={styles.settingsGrid}>
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Session Code</label>
-                <div className={styles.flexRow}>
-                  <input 
-                    type="text" 
-                    className={styles.input} 
-                    value={sessionCode} 
-                    placeholder="Auto generated"
-                    disabled 
-                    style={{ flex: 1, fontFamily: 'monospace', letterSpacing: '1px' }}
-                  />
-                  <button type="button" className={styles.iconButton} onClick={generateLocalCode} title="Generate Code">
-                    <RefreshCw size={18} />
+              {/* Column 1 */}
+              <div className={styles.settingsColumn}>
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Session Code</label>
+                  <div className={styles.flexRow}>
+                    <input 
+                      type="text" 
+                      className={styles.input} 
+                      value={sessionCode} 
+                      placeholder="Auto generated"
+                      disabled 
+                      style={{ flex: 1, fontFamily: 'monospace', letterSpacing: '1px' }}
+                    />
+                    <button type="button" className={styles.iconButton} onClick={generateLocalCode} title="Generate Code">
+                      <RefreshCw size={18} />
+                    </button>
+                  </div>
+                  <span className={styles.hintText}>A unique code generated for students to join.</span>
+                </div>
+              </div>
+
+              {/* Column 2 */}
+              <div className={styles.settingsCard}>
+                <h4 className={styles.settingsCardTitle}>QR Code</h4>
+                <div className={styles.qrContainer}>
+                  <div className={styles.qrBox}>
+                    {qrCodeUrl ? (
+                      <img src={qrCodeUrl} alt="QR Code" width={100} height={100} />
+                    ) : (
+                      <span style={{ color: '#ccc', fontSize: '12px' }}>No QR generated</span>
+                    )}
+                  </div>
+                  <button 
+                    type="button" 
+                    className="btn btn-outline" 
+                    disabled={!qrCodeUrl} 
+                    style={{ width: '120px', justifyContent: 'center' }}
+                  >
+                    <Download size={16} /> Download
                   </button>
+                  <span className={styles.hintText} style={{ textAlign: 'center', marginTop: '4px' }}>
+                    Students can scan this QR code to join.
+                  </span>
                 </div>
-                <span className={styles.hintText}>Auto generated unique session code.</span>
               </div>
 
-              <div className={styles.qrContainer}>
-                <label className={styles.formLabel}>QR Code Preview</label>
-                <div className={styles.qrBox}>
-                  {qrCodeUrl ? (
-                    <img src={qrCodeUrl} alt="QR Code" width={100} height={100} />
-                  ) : (
-                    <span style={{ color: '#ccc' }}>No QR generated</span>
-                  )}
-                </div>
-                <button 
-                  type="button" 
-                  className="btn btn-outline" 
-                  disabled={!qrCodeUrl} 
-                  style={{ width: '100%' }}
-                >
-                  <Download size={16} /> Download QR Code
-                </button>
-              </div>
-
-              <div className={styles.toggleGroup}>
-                <div className={styles.toggleItem}>
-                  <div className={styles.toggleRow}>
-                    <div 
-                      className={`${styles.toggleSwitch} ${publishImmediately ? styles.active : ''}`}
-                      onClick={() => setPublishImmediately(!publishImmediately)}
-                    >
-                      <div className={styles.toggleKnob}></div>
+              {/* Column 3 */}
+              <div className={styles.settingsCard}>
+                <h4 className={styles.settingsCardTitle}>Publishing Options</h4>
+                <div className={styles.toggleList}>
+                  <div className={styles.toggleItem}>
+                    <div className={styles.toggleRow}>
+                      <div 
+                        className={`${styles.toggleSwitch} ${publishImmediately ? styles.active : ''}`}
+                        onClick={() => setPublishImmediately(true)}
+                      >
+                        <div className={styles.toggleKnob}></div>
+                      </div>
+                      Publish Immediately
                     </div>
-                    Publish Immediately
+                    <span className={styles.hintText}>Students can join as soon as the session is published.</span>
                   </div>
-                  <span className={styles.hintText}>Make this session live for students right away.</span>
-                </div>
+                  
+                  <div className={styles.toggleDivider}></div>
 
-                <div className={styles.toggleItem}>
-                  <div className={styles.toggleRow}>
-                    <div 
-                      className={`${styles.toggleSwitch} ${!publishImmediately ? styles.active : ''}`}
-                      onClick={() => setPublishImmediately(false)}
-                    >
-                      <div className={styles.toggleKnob}></div>
+                  <div className={styles.toggleItem}>
+                    <div className={styles.toggleRow}>
+                      <div 
+                        className={`${styles.toggleSwitch} ${!publishImmediately ? styles.active : ''}`}
+                        onClick={() => setPublishImmediately(false)}
+                      >
+                        <div className={styles.toggleKnob}></div>
+                      </div>
+                      Save as Draft
                     </div>
-                    Save as Draft
+                    <span className={styles.hintText}>Save now and publish later.</span>
                   </div>
-                  <span className={styles.hintText}>Save this session as draft to publish later.</span>
                 </div>
               </div>
             </div>
