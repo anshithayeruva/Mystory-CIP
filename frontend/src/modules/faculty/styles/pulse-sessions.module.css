@@ -1,0 +1,150 @@
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.statCard {
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.statIconWrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.statTitle {
+  font-size: 14px;
+  color: #4B5563;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.statValue {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1;
+}
+
+/* Specific colors */
+.statCardGreen { background-color: #F0FDF4; border: 1px solid #DCFCE7; }
+.statIconGreen { background-color: #DCFCE7; color: #166534; }
+
+.statCardBlue { background-color: #EFF6FF; border: 1px solid #DBEAFE; }
+.statIconBlue { background-color: #DBEAFE; color: #1E40AF; }
+
+.statCardYellow { background-color: #FEFCE8; border: 1px solid #FEF08A; }
+.statIconYellow { background-color: #FEF08A; color: #854D0E; }
+
+.statCardPurple { background-color: #FAF5FF; border: 1px solid #F3E8FF; }
+.statIconPurple { background-color: #F3E8FF; color: #6B21A8; }
+
+.filterContainer {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 150px;
+}
+
+.filterSearch {
+  flex: 2;
+  min-width: 250px;
+}
+
+.filterLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4B5563;
+}
+
+.filterInput, .filterSelect {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #111827;
+  background-color: #FFFFFF;
+  transition: border-color 0.2s;
+  height: 42px;
+}
+
+.filterInput:focus, .filterSelect:focus {
+  outline: none;
+  border-color: #10633B;
+  box-shadow: 0 0 0 3px rgba(16, 99, 59, 0.1);
+}
+
+.resetButton {
+  padding: 0 20px;
+  border: 1px solid #10633B;
+  background-color: #FFFFFF;
+  color: #10633B;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.resetButton:hover {
+  background-color: #F0FDF4;
+}
+
+.emptyStateContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  text-align: center;
+  background-color: transparent;
+}
+
+.emptyStateIcon {
+  color: #94A3B8;
+  margin-bottom: 20px;
+}
+
+.emptyStateTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1E293B;
+  margin-bottom: 12px;
+}
+
+.emptyStateSubtitle {
+  font-size: 14px;
+  color: #64748B;
+  margin-bottom: 24px;
+  max-width: 400px;
+  line-height: 1.5;
+}
