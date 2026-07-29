@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import { apiClient } from '@/lib/apiClient';
+
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -34,7 +36,7 @@ export default function SessionSummaryPage({ params }: SummaryPageProps) {
   useEffect(() => {
     const fetchSummaryData = async () => {
       try {
-        const res = await fetch(`/api/faculty/pulse-sessions/${id}/summary`, { credentials: 'include' });
+        const res = await apiClient.fetch(`/api/faculty/pulse-sessions/${id}/summary`, { credentials: 'include' });
         if (res.ok) {
           const json = await res.json();
           setSessionData(json.data);

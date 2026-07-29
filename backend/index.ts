@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
+import facultyRoutes from './src/routes/faculty';
 
 dotenv.config();
 
@@ -14,6 +16,10 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+app.use(cookieParser());
+
+// Mount routes
+app.use('/api/faculty', facultyRoutes);
 
 // Basic health check endpoint
 app.get('/api/health', (req, res) => {

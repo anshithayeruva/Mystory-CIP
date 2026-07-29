@@ -1,4 +1,6 @@
 "use client";
+import { apiClient } from '@/lib/apiClient';
+
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
@@ -48,7 +50,7 @@ export default function PulseSessionsPage() {
 
   const fetchSummary = async () => {
     try {
-      const res = await fetch('/api/faculty/pulse-sessions/summary', { credentials: 'include' });
+      const res = await apiClient.fetch('/api/faculty/pulse-sessions/summary', { credentials: 'include' });
       if (res.ok) {
         const json = await res.json();
         setSummary(json.data);
@@ -70,7 +72,7 @@ export default function PulseSessionsPage() {
       if (status) query.append('status', status.toUpperCase());
       if (semester) query.append('semester', semester);
 
-      const res = await fetch(`/api/faculty/pulse-sessions?${query.toString()}`, { credentials: 'include' });
+      const res = await apiClient.fetch(`/api/faculty/pulse-sessions?${query.toString()}`, { credentials: 'include' });
       if (res.ok) {
         const json = await res.json();
         setSessions(json.data?.sessions || []);
@@ -85,7 +87,7 @@ export default function PulseSessionsPage() {
 
   const fetchActiveLiveSession = async () => {
     try {
-      const res = await fetch('/api/faculty/pulse-sessions?status=LIVE&limit=1', { credentials: 'include' });
+      const res = await apiClient.fetch('/api/faculty/pulse-sessions?status=LIVE&limit=1', { credentials: 'include' });
       if (res.ok) {
         const json = await res.json();
         if (json.data?.sessions && json.data.sessions.length > 0) {
@@ -146,9 +148,9 @@ export default function PulseSessionsPage() {
     try {
       if (action === 'DELETE') {
         if (!confirm('Are you sure you want to delete this session?')) return;
-        await fetch(`/api/faculty/pulse-sessions/${id}`, { method: 'DELETE', credentials: 'include' });
+        await apiClient.fetch(`/api/faculty/pulse-sessions/${id}`, { method: 'DELETE', credentials: 'include' });
       } else {
-        await fetch(`/api/faculty/pulse-sessions/${id}/${action}`, { method: 'POST', credentials: 'include' });
+        await apiClient.fetch(`/api/faculty/pulse-sessions/${id}/${action}`, { method: 'POST', credentials: 'include' });
       }
       if (action === 'start') {
         setShowStartDialog(null);

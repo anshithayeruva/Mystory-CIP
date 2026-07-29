@@ -1,4 +1,6 @@
 "use client";
+import { apiClient } from '@/lib/apiClient';
+
 
 import React, { useState, useEffect } from 'react';
 import { 
@@ -42,12 +44,12 @@ export default function FacultyDashboard() {
           subjectsRes, 
           sessionsRes
         ] = await Promise.all([
-          fetch('/api/faculty/analytics/dashboard-summary'),
-          fetch('/api/faculty/pulse-sessions?limit=10'),
-          fetch('/api/faculty/analytics/charts/session-count-per-subject'),
-          fetch('/api/faculty/analytics/concept-gaps'),
-          fetch('/api/faculty/profile/subjects?limit=4'),
-          fetch('/api/faculty/analytics/sessions?limit=5')
+          apiClient.fetch('/api/faculty/analytics/dashboard-summary'),
+          apiClient.fetch('/api/faculty/pulse-sessions?limit=10'),
+          apiClient.fetch('/api/faculty/analytics/charts/session-count-per-subject'),
+          apiClient.fetch('/api/faculty/analytics/concept-gaps'),
+          apiClient.fetch('/api/faculty/profile/subjects?limit=4'),
+          apiClient.fetch('/api/faculty/analytics/sessions?limit=5')
         ]);
 
         if (summaryRes.ok) {

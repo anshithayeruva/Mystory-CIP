@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import { apiClient } from '@/lib/apiClient';
+
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
@@ -22,7 +24,7 @@ export default function SubjectDetailsPage() {
   const fetchSubjectDetails = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/faculty/subjects/${id}`, {
+      const res = await apiClient.fetch(`/api/faculty/subjects/${id}`, {
         credentials: 'include'
       });
       if (res.ok) {
@@ -45,7 +47,7 @@ export default function SubjectDetailsPage() {
   const handleDeleteSubject = async () => {
     if (confirm('Are you sure you want to delete this subject entirely?')) {
       try {
-        const res = await fetch(`/api/faculty/subjects/${id}`, { 
+        const res = await apiClient.fetch(`/api/faculty/subjects/${id}`, { 
           method: 'DELETE',
           credentials: 'include'
         });

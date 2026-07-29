@@ -1,4 +1,6 @@
 "use client";
+import { apiClient } from '@/lib/apiClient';
+
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -31,7 +33,7 @@ export default function LiveSessionPage({ params }: LiveSessionPageProps) {
 
   const fetchLiveData = async () => {
     try {
-      const res = await fetch(`/api/faculty/pulse-sessions/${id}/live`, { credentials: 'include' });
+      const res = await apiClient.fetch(`/api/faculty/pulse-sessions/${id}/live`, { credentials: 'include' });
       if (res.ok) {
         const json = await res.json();
         setSessionData(json.data);
@@ -59,7 +61,7 @@ export default function LiveSessionPage({ params }: LiveSessionPageProps) {
   const handleEndSession = async () => {
     setEnding(true);
     try {
-      const res = await fetch(`/api/faculty/pulse-sessions/${id}/close`, {
+      const res = await apiClient.fetch(`/api/faculty/pulse-sessions/${id}/close`, {
         method: 'POST',
         credentials: 'include'
       });
