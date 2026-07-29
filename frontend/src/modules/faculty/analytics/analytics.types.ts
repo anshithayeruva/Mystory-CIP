@@ -195,3 +195,21 @@ export interface ReportQuery {
   dateFrom?: string;
   dateTo?: string;
 }
+
+export interface ConceptGapDashboardResponse {
+  overallClassMastery: number;
+  strongConceptsCount: number;
+  needsImprovementCount: number;
+  criticalGapsCount: number;
+  conceptMasteryOverview: { conceptName: string; masteryPercentage: number; category: 'Strong' | 'Needs Improvement' | 'Critical' }[];
+  studentPerformanceDistribution: { category: string; count: number; percentage: number; color: string }[];
+  totalStudents: number;
+}
+
+export interface ConceptMasteryTrendResponse {
+  trends: { conceptName: string; dataPoints: { date: string; masteryPercentage: number }[] }[];
+}
+
+export interface ConceptGapInsightsResponse {
+  insights: string[];
+}

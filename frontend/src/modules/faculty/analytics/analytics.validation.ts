@@ -19,6 +19,14 @@ export const reportQuerySchema = z.object({
   dateFrom: z.string().refine((val) => !val || !isNaN(Date.parse(val)), 'Invalid dateFrom format').optional(),
   dateTo: z.string().refine((val) => !val || !isNaN(Date.parse(val)), 'Invalid dateTo format').optional(),
 });
+export const conceptGapQuerySchema = z.object({
+  courseId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid course ID format').optional(),
+  sessionId: z.string().regex(/^[0-9a-fA-F]{24}$/, 'Invalid session ID format').optional(),
+  semester: z.coerce.number().int().min(1).max(8).optional(),
+  section: z.string().optional(),
+  dateFrom: z.string().refine((val) => !val || !isNaN(Date.parse(val)), 'Invalid dateFrom format').optional(),
+  dateTo: z.string().refine((val) => !val || !isNaN(Date.parse(val)), 'Invalid dateTo format').optional(),
+});
 
 export const chartTypeSchema = z.enum([
   'attendance-trend',
@@ -31,3 +39,4 @@ export const chartTypeSchema = z.enum([
 export type ValidatedSessionSummaryQuery = z.infer<typeof sessionSummaryQuerySchema>;
 export type ValidatedReportQuery = z.infer<typeof reportQuerySchema>;
 export type ValidatedChartType = z.infer<typeof chartTypeSchema>;
+export type ValidatedConceptGapQuery = z.infer<typeof conceptGapQuerySchema>;
