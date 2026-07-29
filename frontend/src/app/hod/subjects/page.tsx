@@ -637,9 +637,9 @@ export default function HodSubjectsPage() {
                             <div 
                               key={idx} 
                               className={styles.stackedAvatar} 
-                              title={`${staff.name} (${fac.role || "Instructor"})`}
+                              title={`${staff.name} (${staff.role || "Instructor"})`}
                             >
-                              {fac.avatar}
+                              {staff.avatar}
                             </div>
                           ))}
                         </div>
@@ -727,8 +727,8 @@ export default function HodSubjectsPage() {
                         <div className={styles.staffStackWrapper} title={`Instructors: ${allStaffNames}`}>
                           <div className={styles.avatarStack}>
                             {item.staffList.map((staff, idx) => (
-                              <div key={idx} className={styles.stackedAvatar} title={`${staff.name} (${fac.role || "Instructor"})`}>
-                                {fac.avatar}
+                              <div key={idx} className={styles.stackedAvatar} title={`${staff.name} (${staff.role || "Instructor"})`}>
+                                {staff.avatar}
                               </div>
                             ))}
                           </div>
@@ -885,7 +885,7 @@ export default function HodSubjectsPage() {
                       Assigned Staff Members ({formData.selectedStaffNames.length} Selected) *
                     </label>
                     <div className={styles.staffCheckboxGrid}>
-                      {availableStaffList.map((fac) => {
+                      {availableStaffList.map((staff) => {
                         const isChecked = formData.selectedStaffNames.includes(staff.name);
                         return (
                           <label key={staff.name} className={styles.checkboxLabel}>
