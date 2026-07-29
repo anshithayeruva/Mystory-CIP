@@ -202,9 +202,6 @@ export default function CreatePulseSessionPage() {
       {/* Header */}
       <div className="page-header">
         <div className="page-title-section">
-          <div className="breadcrumb">
-            <Link href="/faculty/pulse-sessions" style={{ color: '#667085', textDecoration: 'none' }}>Faculty &gt; Pulse Sessions</Link> &gt; Create Pulse Session
-          </div>
           <h1 className="page-title" style={{ marginTop: '4px' }}>Create Pulse Session</h1>
           <div className="page-tags">
             <span style={{ color: '#667085', fontSize: '0.85rem' }}>
