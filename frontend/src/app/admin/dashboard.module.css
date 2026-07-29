@@ -104,7 +104,7 @@
   gap: 6px;
   font-size: 0.65rem;
   font-weight: 700;
-  color: #00522E; /* Green */
+  color: var(--success);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -112,7 +112,7 @@
 .statusDot {
   width: 8px;
   height: 8px;
-  background-color: #00522E;
+  background-color: var(--success);
   border-radius: 50%;
 }
 
@@ -293,7 +293,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 12px;
-  background-color: #f8fafc;
+  background-color: var(--background);
+  border: 1px solid var(--surface-border);
   border-radius: var(--radius-sm);
 }
 
@@ -317,7 +318,7 @@
 }
 
 .summaryValue.danger {
-  color: #1F3A5F;
+  color: #ef4444;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -327,7 +328,7 @@
   content: '';
   width: 6px;
   height: 6px;
-  background-color: #1F3A5F;
+  background-color: #ef4444;
   border-radius: 50%;
 }
 
@@ -373,7 +374,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   border-bottom: 1px solid var(--surface-border);
-  background-color: #f8fafc;
+  background-color: var(--background);
 }
 
 .table td {
@@ -396,8 +397,8 @@
 }
 
 .statusLive {
-  background-color: #e9f2ee;
-  color: #00522E;
+  background-color: var(--success-light);
+  color: var(--success);
   padding: 4px 10px;
   border-radius: var(--radius-full);
   font-size: 0.65rem;
@@ -410,13 +411,13 @@
   content: '';
   width: 4px;
   height: 4px;
-  background-color: #00522E;
+  background-color: var(--success);
   border-radius: 50%;
 }
 
 .statusScheduled {
-  background-color: #eef1f5;
-  color: #1F3A5F;
+  background-color: var(--primary-light);
+  color: var(--primary);
   padding: 4px 10px;
   border-radius: var(--radius-full);
   font-size: 0.65rem;
@@ -424,8 +425,8 @@
 }
 
 .statusCompleted {
-  background-color: #f1f5f9;
-  color: #475569;
+  background-color: var(--surface-border);
+  color: var(--text-muted);
   padding: 4px 10px;
   border-radius: var(--radius-full);
   font-size: 0.65rem;
@@ -437,7 +438,7 @@
 }
 
 .actionButton {
-  color: #00522E;
+  color: var(--primary);
   background: none;
   border: none;
   cursor: pointer;
@@ -450,7 +451,7 @@
 }
 
 .actionButton:hover {
-  background-color: #e9f2ee;
+  background-color: var(--primary-light);
 }
 
 /* Responsive adjustments */
@@ -492,7 +493,7 @@
   gap: 16px;
 }
 .metricBox {
-  background-color: #f8fafc;
+  background-color: var(--background);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-md);
   padding: 12px 16px;

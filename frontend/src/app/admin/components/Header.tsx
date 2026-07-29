@@ -31,7 +31,7 @@ export default function Header() {
 
   return (
     <header className={styles.header}>
-      <h1 className={styles.headerTitle} style={{ color: "black" }}>{getHeaderTitle()}</h1>
+      <h1 className={styles.headerTitle} style={{ color: "var(--text-main)" }}>{getHeaderTitle()}</h1>
       
       <div className={styles.headerActions}>
         <div ref={dropdownRef} style={{ position: "relative" }}>

@@ -1,0 +1,628 @@
+.dashboardContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Top Metrics Row (4 Cards) */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.metricCard {
+  background-color: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.metricCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.metricCardHighlighted {
+  border: 2px solid #00522E;
+  box-shadow: 0 4px 12px rgba(0, 82, 46, 0.08);
+}
+
+.metricHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.metricLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.metricIcon {
+  color: var(--text-main);
+  opacity: 0.8;
+}
+
+.metricValue {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.metricSubtext {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.subtextPositive {
+  color: #00522E;
+  font-weight: 600;
+}
+
+.subtextNegative {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.subtextAlert {
+  color: #475569;
+  font-weight: 500;
+}
+
+/* Main Layout Grid */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  align-items: start;
+}
+
+.leftColumn, .rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Base Section Card */
+.sectionCard {
+  background-color: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.sectionHeader {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--surface-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sectionTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.liveDot {
+  width: 8px;
+  height: 8px;
+  background-color: #00522E;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(0, 82, 46, 0.2);
+}
+
+.sectionTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.liveBadge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #00522E;
+  background-color: #e9f2ee;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+.viewAllLink {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #00522E;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  transition: opacity 0.2s;
+}
+
+.viewAllLink:hover {
+  opacity: 0.8;
+}
+
+.iconActionBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.iconActionBtn:hover {
+  color: var(--text-main);
+  background-color: var(--background);
+}
+
+/* Live Session Table */
+.tableContainer {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: 12px 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: #f8fafc;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.table td {
+  padding: 16px 20px;
+  font-size: 0.875rem;
+  border-bottom: 1px solid var(--surface-border);
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.subjectTitle {
+  font-weight: 700;
+  color: var(--text-main);
+  font-size: 0.875rem;
+}
+
+.subjectRoom {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.facultyName {
+  font-weight: 500;
+  color: #334155;
+  font-size: 0.875rem;
+}
+
+.attendanceCol {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progressTrack {
+  flex: 1;
+  max-width: 100px;
+  height: 6px;
+  background-color: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: #00522E;
+  border-radius: 3px;
+}
+
+.attendancePct {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-main);
+  min-width: 32px;
+}
+
+.eyeBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.eyeBtn:hover {
+  color: #00522E;
+  background-color: #e9f2ee;
+}
+
+.cardFooterLink {
+  padding: 14px 20px;
+  text-align: center;
+  background-color: #f8fafc;
+  border-top: 1px solid var(--surface-border);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #00522E;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: block;
+}
+
+.cardFooterLink:hover {
+  background-color: #e9f2ee;
+}
+
+/* Recent Activity List */
+.activityList {
+  display: flex;
+  flex-direction: column;
+}
+
+.activityItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.activityItem:last-child {
+  border-bottom: none;
+}
+
+.activityIconBox {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #334155;
+  flex-shrink: 0;
+}
+
+.activityContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.activityText {
+  font-size: 0.85rem;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.activityText strong {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.activityMeta {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Upcoming Events (Right Column) */
+.eventsList {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  gap: 12px;
+}
+
+.eventItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  transition: background-color 0.2s;
+}
+
+.eventItem:hover {
+  background-color: #f8fafc;
+}
+
+.dateBoxDark {
+  width: 48px;
+  height: 48px;
+  background-color: #0f172a;
+  color: white;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dateBoxLight {
+  width: 48px;
+  height: 48px;
+  background-color: var(--surface);
+  border: 1px solid var(--surface-border);
+  color: var(--text-main);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dateNum {
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.dateMonth {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  margin-top: 2px;
+}
+
+.eventContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.eventTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.eventMeta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Quick Actions Grid */
+.quickActionsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 16px;
+}
+
+.actionCardBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 12px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  color: #0f172a;
+  font-size: 0.725rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.actionCardBtn svg {
+  color: #00522e;
+  transition: transform 0.2s ease;
+}
+
+.actionCardBtn:hover {
+  border-color: #00522e;
+  background-color: #e6f4ea;
+  color: #00522e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 82, 46, 0.1);
+}
+
+.actionCardBtn:hover svg {
+  transform: scale(1.1);
+}
+
+/* Overall Dept. Index Card (Dark Green Banner) */
+.deptIndexCard {
+  background: linear-gradient(135deg, #00522e 0%, #00361d 100%);
+  color: #ffffff;
+  border-radius: 14px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 20px -4px rgba(0, 82, 46, 0.2);
+}
+
+.deptIndexHeader {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #a7f3d0;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.deptIndexValueContainer {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.deptIndexBigNum {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+}
+
+.deptIndexMax {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.deptProgressBar {
+  width: 100%;
+  height: 5px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.deptProgressFill {
+  width: 94%;
+  height: 100%;
+  background-color: #a7f3d0;
+  border-radius: 3px;
+}
+
+.deptIndexBannerText {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Background diagonal arrow vector for dept index */
+.deptIndexCard::after {
+  content: '↗';
+  position: absolute;
+  right: -10px;
+  bottom: -20px;
+  font-size: 9rem;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .metricsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .metricsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Modal Overlay for New Session */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.modalCard {
+  background-color: #ffffff;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 480px;
+  padding: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.modalTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.modalCloseBtn {
+  border: none;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background-color 0.15s;
+}
+
+.modalCloseBtn:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}

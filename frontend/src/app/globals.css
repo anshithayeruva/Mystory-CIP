@@ -49,23 +49,7 @@
   --sidebar-width: 260px;
 }
 
-/* Dark Mode Palette overrides */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f172a;
-    --surface: #1e293b;
-    --surface-border: #334155;
-    
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-    --text-light: #64748b;
-    
-    --primary-light: #1e3a8a;
-    --success-light: #00522E;
-    --warning-light: #78350f;
-    --danger-light: #334155;
-  }
-}
+/* Ensure consistent light theme across all OS color preferences */
 
 /* Reset and Core Layout */
 * {

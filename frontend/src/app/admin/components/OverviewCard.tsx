@@ -9,7 +9,7 @@ export default function OverviewCard() {
         <div className={styles.universityInfo}>
           <div className={styles.universityLogo}>
             <div style={{
-              width: "100%", height: "100%", backgroundColor: "#f1f5f9", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b", fontSize: "0.65rem", fontWeight: 600
+              width: "100%", height: "100%", backgroundColor: "var(--background)", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-muted)", fontSize: "0.65rem", fontWeight: 600
             }}>Logo</div>
           </div>
           <div className={styles.universityDetails}>

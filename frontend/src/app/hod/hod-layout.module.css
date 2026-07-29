@@ -1,4 +1,4 @@
-.adminContainer {
+.hodContainer {
   display: flex;
   min-height: 100vh;
   background-color: var(--background);
@@ -7,7 +7,7 @@
 /* Sidebar Styles */
 .sidebar {
   width: 240px;
-  background-color: #EAECE7; /* Light greyish */
+  background-color: #EAECE7; /* Matching light greyish sidebar from wireframe */
   border-right: 1px solid var(--surface-border);
   display: flex;
   flex-direction: column;
@@ -15,6 +15,7 @@
   top: 0;
   height: 100vh;
   transition: width 0.3s ease;
+  z-index: 20;
 }
 
 .sidebarCollapsed {
@@ -56,7 +57,7 @@
 .logoIcon {
   width: 28px;
   height: 28px;
-  background-color: #00522E; /* Dark green from wireframe */
+  background-color: #00522E; /* Dark green theme color */
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -116,8 +117,8 @@
 }
 
 .navItemActive {
-  background-color: #e9f2ee; /* Light green from wireframe */
-  color: #00522E; /* Darker green text */
+  background-color: #e9f2ee; /* Light green active item */
+  color: #00522E; /* Dark green text */
   border-left: 4px solid #00522E;
   font-weight: 700;
 }
@@ -126,52 +127,39 @@
   background-color: #c9e0d3;
 }
 
-/* Override nav active icon color specifically */
 .navItemActive svg {
   color: #00522E;
 }
 
-.userProfile {
-  padding: 12px;
-  border-top: 1px solid var(--surface-border);
-  background-color: #f1f5f9;
-  margin: 16px;
-  border-radius: var(--radius-md);
+.sidebarFooter {
+  padding: 16px 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.helpBtn {
+  width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-}
-
-.sidebarCollapsed .userProfile {
-  margin: 16px 8px;
-  justify-content: center;
-  padding: 12px 0;
-}
-
-.userInfo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-  background-color: var(--surface-border);
-}
-
-.userName {
-  font-size: 0.875rem;
+  gap: 10px;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  color: #475569;
   font-weight: 600;
-  color: var(--text-main);
+  font-size: 0.875rem;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background-color 0.2s, color 0.2s;
 }
 
-.userRole {
-  font-size: 0.75rem;
-  color: var(--text-muted);
+.helpBtn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #0f172a;
+}
+
+.sidebarCollapsed .helpBtn {
+  justify-content: center;
+  padding: 10px 0;
 }
 
 /* Main Content Area */
@@ -184,7 +172,7 @@
 
 /* Header Styles */
 .header {
-  height: 48px;
+  height: 56px;
   padding: 0 24px;
   background-color: var(--surface);
   border-bottom: 1px solid var(--surface-border);
@@ -197,15 +185,15 @@
 }
 
 .headerTitle {
-  font-size: 1.125rem;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 700;
   color: var(--text-main);
 }
 
 .headerActions {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
 }
 
 .iconButton {
@@ -216,10 +204,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color var(--transition-fast);
+  padding: 6px;
+  border-radius: 50%;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
 .iconButton:hover {
+  background-color: var(--background);
   color: var(--text-main);
 }
 
@@ -229,24 +220,130 @@
   background-color: var(--surface-border);
 }
 
-.profileDropdown {
+.userProfile {
   display: flex;
   align-items: center;
-  gap: 8px;
-  cursor: pointer;
+  gap: 12px;
 }
 
-.initialsAvatar {
-  width: 32px;
-  height: 32px;
+.profileWrapper {
+  position: relative;
+}
+
+.avatarBtn {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background-color: #eef1f5; /* light indigo */
-  color: #1F3A5F;
+  background-color: #e2e8f0;
+  color: #334155;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.875rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.avatarBtn:hover {
+  background-color: #00522e;
+  color: #ffffff;
+}
+
+/* User Popover Dropdown */
+.profilePopover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 260px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  padding: 16px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeInPopover 0.15s ease-out;
+}
+
+@keyframes fadeInPopover {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.popoverHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.popoverAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #cbd5e1;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.popoverMeta {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.popoverName {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.popoverEmail {
+  font-size: 0.75rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.popoverDivider {
+  height: 1px;
+  background-color: #f1f5f9;
+  margin: 4px 0;
+}
+
+.popoverItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  font-size: 0.85rem;
   font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  width: 100%;
+  text-align: left;
+  text-decoration: none;
+}
+
+.popoverItem:hover {
+  background-color: #f8fafc;
+  color: #00522e;
 }
 
 .mainContent {
