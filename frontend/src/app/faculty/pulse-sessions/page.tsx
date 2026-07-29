@@ -151,9 +151,9 @@ export default function PulseSessionsPage() {
           </div>
         </div>
         <div className="page-actions">
-          <button className="btn btn-primary">
+          <Link href="/faculty/pulse-sessions/create" className="btn btn-primary" style={{ textDecoration: 'none' }}>
             <PlusCircle size={18} /> Create Pulse Session
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -354,9 +354,9 @@ export default function PulseSessionsPage() {
                       <p className={styles.emptyStateDesc}>
                         Create your first classroom pulse session to begin collecting student understanding and live feedback.
                       </p>
-                      <button className="btn btn-primary">
+                      <Link href="/faculty/pulse-sessions/create" className="btn btn-primary" style={{ textDecoration: 'none' }}>
                         <PlusCircle size={18} /> Create Pulse Session
-                      </button>
+                      </Link>
                     </div>
                   </td>
                 </tr>

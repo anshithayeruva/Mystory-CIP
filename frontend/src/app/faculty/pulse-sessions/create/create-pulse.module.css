@@ -1,0 +1,409 @@
+.container {
+  padding: 24px 32px;
+  background-color: #FAF9F6;
+  min-height: calc(100vh - 64px);
+  color: #17223B;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow-y: auto;
+}
+
+/* Two Column Layout */
+.layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.mainColumn {
+  flex: 3; /* ~75% */
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sideColumn {
+  flex: 1; /* ~25% */
+  position: sticky;
+  top: 24px;
+}
+
+/* Cards */
+.card {
+  background-color: #FFFFFF;
+  border: 1px solid #E7E3DB;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stepNumber {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: #10633B;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #17223B;
+  margin: 0 0 4px 0;
+}
+
+.cardSubtitle {
+  font-size: 13px;
+  color: #667085;
+  margin: 0;
+}
+
+/* Form Grid */
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.formGrid2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: #17223B;
+}
+
+.required {
+  color: #DC2626;
+  margin-left: 2px;
+}
+
+.input, .select {
+  padding: 10px 12px;
+  border: 1px solid #E7E3DB;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #17223B;
+  background-color: #FFFFFF;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input:focus, .select:focus {
+  border-color: #10633B;
+  box-shadow: 0 0 0 3px rgba(16, 99, 59, 0.1);
+}
+
+.input[disabled], .select[disabled] {
+  background-color: #F5F1EA;
+  color: #667085;
+  cursor: not-allowed;
+}
+
+/* Radio Cards */
+.radioGroup {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.radioCard {
+  border: 1px solid #E7E3DB;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.radioCard.active {
+  border-color: #10633B;
+  background-color: #EEF7F1;
+}
+
+.radioCircle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #E7E3DB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radioCard.active .radioCircle {
+  border-color: #10633B;
+}
+
+.radioCard.active .radioCircle::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #10633B;
+}
+
+/* Session Settings specific */
+.settingsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.qrContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.qrBox {
+  width: 120px;
+  height: 120px;
+  background-color: #F5F1EA;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #E7E3DB;
+  overflow: hidden;
+}
+
+.toggleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.toggleItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.toggleSwitch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background-color: #E7E3DB;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggleSwitch.active {
+  background-color: #10633B;
+}
+
+.toggleKnob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: #FFFFFF;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.toggleSwitch.active .toggleKnob {
+  transform: translateX(20px);
+}
+
+/* Summary Box */
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.summaryItem {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.summaryIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: #EEF7F1;
+  color: #10633B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.summaryContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.summaryLabel {
+  font-size: 12px;
+  color: #667085;
+}
+
+.summaryValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: #17223B;
+  word-break: break-word;
+}
+
+/* Timeline (Right Sidebar) */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.timelineItem {
+  display: flex;
+  gap: 12px;
+  position: relative;
+}
+
+.timelineItem:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 24px;
+  bottom: -16px;
+  width: 2px;
+  background-color: #E7E3DB;
+}
+
+.timelineIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #10633B;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.timelineContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 8px;
+}
+
+.timelineTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #17223B;
+}
+
+.timelineDesc {
+  font-size: 12px;
+  color: #667085;
+  line-height: 1.4;
+}
+
+/* Action Bar */
+.actionBar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.hintText {
+  font-size: 12px;
+  color: #667085;
+}
+
+.errorText {
+  font-size: 12px;
+  color: #DC2626;
+}
+
+/* Helpers */
+.flexRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #E7E3DB;
+  border-radius: 8px;
+  background-color: #FFFFFF;
+  color: #10633B;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.iconButton:hover {
+  background-color: #EEF7F1;
+}
+
+.iconButton:disabled {
+  background-color: #F5F1EA;
+  color: #667085;
+  cursor: not-allowed;
+}
+
+/* Loading Overlay */
+.loadingOverlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  z-index: 10;
+}
