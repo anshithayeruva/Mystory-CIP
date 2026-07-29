@@ -18,7 +18,13 @@ import {
   ValidatedSessionSummaryQuery,
   ValidatedReportQuery,
   ValidatedChartType,
+  ValidatedConceptGapQuery,
 } from './analytics.validation';
+import {
+  ConceptGapDashboardResponse,
+  ConceptMasteryTrendResponse,
+  ConceptGapInsightsResponse,
+} from './analytics.types';
 
 export class AnalyticsService {
   /**
@@ -722,5 +728,221 @@ export class AnalyticsService {
         return trend;
       }
     }
+  }
+
+  // --- CONCEPT GAP DASHBOARD (BI ANALYTICS) --- //
+
+  private static buildConceptGapWhereClause(facultyId: string, query: ValidatedConceptGapQuery): Prisma.PulseSessionWhereInput {
+    const where: Prisma.PulseSessionWhereInput = {
+      facultyId,
+      status: {
+        in: [PulseSessionStatus.COMPLETED, PulseSessionStatus.CLOSED, PulseSessionStatus.ARCHIVED],
+      },
+    };
+
+    if (query.courseId) where.courseId = query.courseId;
+    if (query.sessionId) where.id = query.sessionId;
+    if (query.semester) where.semester = query.semester;
+    if (query.section) where.section = query.section;
+
+    if (query.dateFrom || query.dateTo) {
+      where.date = {};
+      if (query.dateFrom) where.date.gte = new Date(query.dateFrom);
+      if (query.dateTo) where.date.lte = new Date(query.dateTo);
+    }
+    return where;
+  }
+
+  static async getConceptGapDashboard(userId: string, query: ValidatedConceptGapQuery): Promise<ConceptGapDashboardResponse> {
+    const profile = await this.getFacultyProfile(userId);
+    const where = this.buildConceptGapWhereClause(profile.id, query);
+
+    const sessions = await db.pulseSession.findMany({
+      where,
+      include: {
+        topic: true,
+        participations: true,
+      },
+    });
+
+    const conceptStats = new Map<string, { topicName: string; totalPercentage: number; count: number }>();
+    const allStudentIds = new Set<string>();
+    const studentPerformanceMap = new Map<string, { sum: number; count: number }>();
+
+    for (const session of sessions) {
+      const topicId = session.topicId;
+      const topicName = session.topic.topicName;
+      
+      const attemptedParts = session.participations.filter(p => p.hasAttempted && p.percentage !== null);
+      for (const part of attemptedParts) {
+        allStudentIds.add(part.studentId);
+        const pct = part.percentage!;
+        
+        // Accumulate concept stats
+        const currentStats = conceptStats.get(topicId) || { topicName, totalPercentage: 0, count: 0 };
+        currentStats.totalPercentage += pct;
+        currentStats.count += 1;
+        conceptStats.set(topicId, currentStats);
+
+        // Accumulate student overall performance
+        const currentStudent = studentPerformanceMap.get(part.studentId) || { sum: 0, count: 0 };
+        currentStudent.sum += pct;
+        currentStudent.count += 1;
+        studentPerformanceMap.set(part.studentId, currentStudent);
+      }
+    }
+
+    const conceptMasteryOverview: { conceptName: string; masteryPercentage: number; category: 'Strong' | 'Needs Improvement' | 'Critical' }[] = [];
+    let strongConceptsCount = 0;
+    let needsImprovementCount = 0;
+    let criticalGapsCount = 0;
+    let totalMasterySum = 0;
+
+    conceptStats.forEach((stats) => {
+      const masteryPercentage = Math.round((stats.totalPercentage / stats.count) * 100) / 100;
+      let category: 'Strong' | 'Needs Improvement' | 'Critical' = 'Critical';
+      
+      if (masteryPercentage >= 70) {
+        category = 'Strong';
+        strongConceptsCount++;
+      } else if (masteryPercentage >= 50) {
+        category = 'Needs Improvement';
+        needsImprovementCount++;
+      } else {
+        criticalGapsCount++;
+      }
+      
+      totalMasterySum += masteryPercentage;
+      conceptMasteryOverview.push({ conceptName: stats.topicName, masteryPercentage, category });
+    });
+
+    // Sort Concepts from highest to lowest mastery
+    conceptMasteryOverview.sort((a, b) => b.masteryPercentage - a.masteryPercentage);
+
+    const overallClassMastery = conceptMasteryOverview.length > 0 ? Math.round((totalMasterySum / conceptMasteryOverview.length) * 100) / 100 : 0;
+
+    // Student Performance Distribution
+    let high = 0;
+    let average = 0;
+    let low = 0;
+    let veryLow = 0;
+
+    studentPerformanceMap.forEach((stats) => {
+      const avg = stats.sum / stats.count;
+      if (avg >= 80) high++;
+      else if (avg >= 50) average++;
+      else if (avg >= 30) low++;
+      else veryLow++;
+    });
+
+    const totalStudents = allStudentIds.size;
+    const getPct = (val: number) => totalStudents > 0 ? Math.round((val / totalStudents) * 100) : 0;
+
+    const studentPerformanceDistribution = [
+      { category: 'High (≥ 80%)', count: high, percentage: getPct(high), color: '#16A34A' },
+      { category: 'Average (50-79%)', count: average, percentage: getPct(average), color: '#F59E0B' },
+      { category: 'Low (30-49%)', count: low, percentage: getPct(low), color: '#EF4444' },
+      { category: 'Very Low (< 30%)', count: veryLow, percentage: getPct(veryLow), color: '#8B5CF6' }
+    ];
+
+    return {
+      overallClassMastery,
+      strongConceptsCount,
+      needsImprovementCount,
+      criticalGapsCount,
+      conceptMasteryOverview,
+      studentPerformanceDistribution,
+      totalStudents
+    };
+  }
+
+  static async getConceptGapTrend(userId: string, query: ValidatedConceptGapQuery): Promise<ConceptMasteryTrendResponse> {
+    const profile = await this.getFacultyProfile(userId);
+    const where = this.buildConceptGapWhereClause(profile.id, query);
+
+    const sessions = await db.pulseSession.findMany({
+      where,
+      include: {
+        topic: true,
+        participations: true,
+      },
+      orderBy: { date: 'asc' }
+    });
+
+    // Map: ConceptName -> Map<DateString, { sum: number, count: number }>
+    const conceptTrendMap = new Map<string, Map<string, { sum: number; count: number }>>();
+
+    for (const session of sessions) {
+      const conceptName = session.topic.topicName;
+      const dateStr = session.date.toISOString().split('T')[0];
+
+      const attemptedParts = session.participations.filter(p => p.hasAttempted && p.percentage !== null);
+      if (attemptedParts.length === 0) continue;
+
+      let sessionPctSum = 0;
+      for (const part of attemptedParts) {
+        sessionPctSum += part.percentage!;
+      }
+      
+      const currentConceptMap = conceptTrendMap.get(conceptName) || new Map<string, { sum: number, count: number }>();
+      const currentDateStats = currentConceptMap.get(dateStr) || { sum: 0, count: 0 };
+      
+      currentDateStats.sum += sessionPctSum;
+      currentDateStats.count += attemptedParts.length;
+      
+      currentConceptMap.set(dateStr, currentDateStats);
+      conceptTrendMap.set(conceptName, currentConceptMap);
+    }
+
+    const trends = Array.from(conceptTrendMap.entries()).map(([conceptName, dateMap]) => {
+      const dataPoints = Array.from(dateMap.entries()).map(([date, stats]) => ({
+        date,
+        masteryPercentage: Math.round((stats.sum / stats.count) * 100) / 100
+      }));
+      // Sort by date just in case
+      dataPoints.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      
+      return { conceptName, dataPoints };
+    });
+
+    return { trends };
+  }
+
+  static async getConceptGapInsights(userId: string, query: ValidatedConceptGapQuery): Promise<ConceptGapInsightsResponse> {
+    const profile = await this.getFacultyProfile(userId);
+    const dashboardData = await this.getConceptGapDashboard(userId, query);
+    
+    const insights: string[] = [];
+
+    if (dashboardData.conceptMasteryOverview.length > 0) {
+      const lowestConcept = dashboardData.conceptMasteryOverview[dashboardData.conceptMasteryOverview.length - 1];
+      insights.push(`"${lowestConcept.conceptName}" consistently has the lowest mastery at ${lowestConcept.masteryPercentage}%.`);
+      
+      const highestConcept = dashboardData.conceptMasteryOverview[0];
+      insights.push(`Students demonstrate strong understanding in "${highestConcept.conceptName}" with ${highestConcept.masteryPercentage}% mastery.`);
+    }
+
+    const strugglingStudents = dashboardData.studentPerformanceDistribution.find(d => d.category.includes('Very Low'))?.count || 0;
+    const lowStudents = dashboardData.studentPerformanceDistribution.find(d => d.category.includes('Low (30'))?.count || 0;
+    const totalStruggling = strugglingStudents + lowStudents;
+    
+    if (totalStruggling > 0) {
+      insights.push(`${totalStruggling} students are struggling significantly across multiple concepts and require immediate intervention.`);
+    }
+
+    insights.push(`Overall class mastery stands at ${dashboardData.overallClassMastery}%.`);
+
+    return { insights };
+  }
+
+  static async exportConceptGapCSV(userId: string, query: ValidatedConceptGapQuery): Promise<string> {
+    const dashboardData = await this.getConceptGapDashboard(userId, query);
+    
+    let csv = 'Concept Name,Mastery Percentage,Category\n';
+    dashboardData.conceptMasteryOverview.forEach(c => {
+      csv += `"${c.conceptName}",${c.masteryPercentage},${c.category}\n`;
+    });
+    
+    return csv;
   }
 }
