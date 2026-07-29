@@ -286,152 +286,20 @@
   transform: translateX(20px);
 }
 
-/* Summary Review Dashboard */
-.summaryOverviewCard {
-  background-color: #F5F1EA;
-  border-radius: 12px;
-  padding: 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 32px;
-}
-
-.summaryOverviewLeft {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.summaryOverviewTitle {
-  font-size: 24px;
-  font-weight: 700;
-  color: #17223B;
-  margin: 0;
-}
-
-.summaryOverviewTags {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.summaryTag {
+.stickyActionBar {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
   background-color: #FFFFFF;
-  border: 1px solid #E7E3DB;
-  color: #475569;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.readinessPanel {
-  background-color: #FFFFFF;
-  border: 1px solid #E7E3DB;
-  border-radius: 12px;
-  padding: 16px;
-  width: 280px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.readinessPanel.success {
-  border-top: 4px solid #10633B;
-}
-
-.readinessPanel.warning {
-  border-top: 4px solid #F59E0B;
-}
-
-.readinessHeader {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 700;
-  font-size: 14px;
-}
-
-.readinessHeader.success { color: #10633B; }
-.readinessHeader.warning { color: #D97706; }
-
-.readinessList {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin: 0;
-  padding-left: 20px;
-  font-size: 13px;
-  color: #475569;
-}
-
-.summaryDetailsGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-bottom: 32px;
-}
-
-@media (max-width: 1024px) {
-  .summaryDetailsGrid { grid-template-columns: repeat(2, 1fr); }
-  .summaryOverviewCard { flex-direction: column; gap: 24px; }
-  .readinessPanel { width: 100%; }
-}
-
-@media (max-width: 768px) {
-  .summaryDetailsGrid { grid-template-columns: 1fr; }
-}
-
-.detailCard {
-  border: 1px solid #E7E3DB;
-  border-radius: 12px;
-  padding: 16px;
-  background-color: #FDFCFB;
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-}
-
-.detailIconBox {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background-color: #EEF7F1;
-  color: #10633B;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.detailContent {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.detailLabel {
-  font-size: 12px;
-  color: #667085;
-  font-weight: 500;
-}
-
-.detailValue {
-  font-size: 15px;
-  font-weight: 600;
-  color: #17223B;
-}
-
-.finalActionBar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 24px;
   border-top: 1px solid #E7E3DB;
+  padding: 16px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+  z-index: 100;
+  margin: 0 -32px -24px -32px;
 }
 
 .actionBarLeft {
@@ -447,10 +315,12 @@
 }
 
 @media (max-width: 768px) {
-  .finalActionBar {
+  .stickyActionBar {
     flex-direction: column;
     align-items: stretch;
     gap: 16px;
+    padding: 16px 24px;
+    margin: 0 -24px -24px -24px;
   }
   .actionBarRight {
     flex-direction: column;
