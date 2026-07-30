@@ -6,15 +6,6 @@ import styles from '@/modules/faculty/styles/faculty.module.css';
 export default function SubjectsPage() {
   return (
     <div className={styles.pageContainer}>
-      {/* Breadcrumb */}
-      <div className={styles.breadcrumb} style={{ marginBottom: 24 }}>
-        <span>Dashboard</span>
-        <span>{'>'}</span>
-        <span>Faculty</span>
-        <span>{'>'}</span>
-        <span className={styles.breadcrumbCurrent} style={{ color: '#10633B' }}>Subjects</span>
-      </div>
-
       {/* Page Header */}
       <div className={styles.pageHeader}>
         <div className={styles.pageHeaderLeft}>

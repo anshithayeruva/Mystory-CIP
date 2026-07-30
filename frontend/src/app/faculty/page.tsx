@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, FileText, Settings, BookOpen } from 'lucide-react';
+import { PlusCircle, FileText, Settings, BookOpen } from 'lucide-react';
 import styles from '@/modules/faculty/styles/faculty.module.css';
 import { mockKPIs } from '@/modules/faculty/constants/mockData';
 import { StatCard } from '@/modules/faculty/components/shared/StatCard';
@@ -22,12 +22,12 @@ export default function FacultyDashboard() {
           </div>
         </div>
         <div style={{ display: 'flex', gap: '16px' }}>
-          <button className={styles.primaryButton} style={{ backgroundColor: '#FFFFFF', color: '#111827', border: '1px solid #E5E7EB' }}>
+          <button className={styles.primaryButton} style={{ backgroundColor: '#FFFFFF', color: '#10633B', border: '1px solid #10633B' }}>
             <FileText size={18} color="#10633B" />
-            <span style={{ color: '#10633B' }}>View Reports</span>
+            <span>View Reports</span>
           </button>
           <button className={styles.primaryButton}>
-            <Plus size={18} />
+            <PlusCircle size={18} />
             Create Pulse Session
           </button>
         </div>
