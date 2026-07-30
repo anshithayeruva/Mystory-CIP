@@ -1,22 +1,25 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { FacultyReportService } from '../services/faculty.report.service';
+import { sendSuccess } from '../utils/response';
+import { ReportExportSchema } from '../validators/faculty.validator';
 
 export class FacultyReportController {
-  static async getReports(req: Request, res: Response) {
+  static async getReports(req: Request, res: Response, next: NextFunction) {
     try {
-      const reports = await FacultyReportService.getReports(req.user?.id!);
-      res.json(reports);
+      const reports = await FacultyReportService.getReports((req.user as any)?.id);
+      return sendSuccess(res, reports, 'Reports fetched successfully');
     } catch (error) {
-      res.status(500).json({ error: 'Internal server error' });
+      next(error);
     }
   }
 
-  static async generateReport(req: Request, res: Response) {
+  static async exportReport(req: Request, res: Response, next: NextFunction) {
     try {
-      const report = await FacultyReportService.generateReport(req.user?.id!, req.body);
-      res.status(201).json(report);
+      const data = ReportExportSchema.parse(req.body);
+      const report = await FacultyReportService.exportReport((req.user as any)?.id, data);
+      return sendSuccess(res, report, 'Report exported successfully');
     } catch (error) {
-      res.status(500).json({ error: 'Internal server error' });
+      next(error);
     }
   }
 }

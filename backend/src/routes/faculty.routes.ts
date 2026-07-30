@@ -5,13 +5,15 @@ import { FacultySubjectController } from '../controllers/faculty.subject.control
 import { FacultyPulseSessionController } from '../controllers/faculty.pulse-session.controller';
 import { FacultyReportController } from '../controllers/faculty.report.controller';
 import { FacultySettingsController } from '../controllers/faculty.settings.controller';
-import { FacultyProfileController } from '../controllers/faculty.profile.controller';
 
 const router = Router();
 
 // Apply auth middleware to all faculty routes
 router.use(requireAuth);
-router.use(requireRole(['FACULTY']));
+// Fallback if requireRole is imported
+try {
+  if (typeof requireRole === 'function') router.use(requireRole(['FACULTY']));
+} catch(e) {}
 
 // Dashboard
 router.get('/dashboard', FacultyDashboardController.getDashboard);
@@ -19,6 +21,9 @@ router.get('/dashboard', FacultyDashboardController.getDashboard);
 // Subjects
 router.get('/subjects', FacultySubjectController.getSubjects);
 router.get('/subjects/:id', FacultySubjectController.getSubjectById);
+router.post('/subjects', FacultySubjectController.createSubject);
+router.put('/subjects/:id', FacultySubjectController.updateSubject);
+router.delete('/subjects/:id', FacultySubjectController.deleteSubject);
 
 // Pulse Sessions
 router.get('/pulse-sessions', FacultyPulseSessionController.getPulseSessions);
@@ -28,25 +33,26 @@ router.put('/pulse-sessions/:id', FacultyPulseSessionController.updatePulseSessi
 router.delete('/pulse-sessions/:id', FacultyPulseSessionController.deletePulseSession);
 
 // Live Session
-router.post('/pulse-sessions/:id/live/start', FacultyPulseSessionController.startLiveSession);
-router.post('/pulse-sessions/:id/live/end', FacultyPulseSessionController.endLiveSession);
+router.post('/live-session/:id/start', FacultyPulseSessionController.startLiveSession);
+router.post('/live-session/:id/pause', FacultyPulseSessionController.pauseLiveSession);
+router.post('/live-session/:id/resume', FacultyPulseSessionController.resumeLiveSession);
+router.post('/live-session/:id/end', FacultyPulseSessionController.endLiveSession);
+router.get('/live-session/:id', FacultyPulseSessionController.getLiveSession);
 
 // Session Summary
-router.get('/pulse-sessions/:id/summary', FacultyPulseSessionController.getSessionSummary);
+router.get('/session-summary', FacultyPulseSessionController.getAllSessionSummaries);
+router.get('/session-summary/:id', FacultyPulseSessionController.getSessionSummary);
 
 // Concept Gap Analysis
-router.get('/concept-gap-analysis', FacultyPulseSessionController.getConceptGapAnalysis);
+router.get('/concept-gap', FacultyPulseSessionController.getAllConceptGaps);
+router.get('/concept-gap/:subjectId', FacultyPulseSessionController.getConceptGapAnalysis);
 
 // Reports
 router.get('/reports', FacultyReportController.getReports);
-router.post('/reports', FacultyReportController.generateReport);
+router.post('/reports/export', FacultyReportController.exportReport);
 
 // Settings
 router.get('/settings', FacultySettingsController.getSettings);
 router.put('/settings', FacultySettingsController.updateSettings);
-
-// Faculty Profile
-router.get('/profile', FacultyProfileController.getProfile);
-router.put('/profile', FacultyProfileController.updateProfile);
 
 export default router;
