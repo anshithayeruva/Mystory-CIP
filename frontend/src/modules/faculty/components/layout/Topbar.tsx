@@ -2,14 +2,30 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { User, LogOut } from "lucide-react";
 import styles from "../../styles/faculty-layout.module.css";
+
+const getPageTitle = (pathname: string) => {
+  if (pathname === '/faculty') return 'Dashboard';
+  if (pathname.includes('/subjects')) return 'Subjects';
+  if (pathname.includes('/pulse-sessions/create')) return 'Create Pulse Session';
+  if (pathname.includes('/live')) return 'Live Session';
+  if (pathname.includes('/summary')) return 'Session Summary';
+  if (pathname.includes('/pulse-sessions')) return 'Pulse Sessions';
+  if (pathname.includes('/concept-gap-analysis')) return 'Concept Gap Analysis';
+  if (pathname.includes('/reports')) return 'Reports';
+  if (pathname.includes('/settings')) return 'Settings';
+  if (pathname.includes('/profile')) return 'Profile';
+  if (pathname.includes('/help')) return 'Help Center';
+  return '';
+};
 
 export default function Topbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const pathname = usePathname();
 
   // Close popover when clicking outside
   useEffect(() => {
@@ -29,8 +45,7 @@ export default function Topbar() {
 
   return (
     <header className={styles.header}>
-      {/* Empty div to push actions to the right */}
-      <div></div>
+      <h1 className={styles.headerTitle}>{getPageTitle(pathname)}</h1>
       
       <div className={styles.headerActions}>
 
