@@ -9,8 +9,8 @@ import { mockRecentSessions } from "../../constants/mockData";
 export default function FacultyRecentSessions() {
   return (
     <div className={styles.sectionCard}>
-      <div className={styles.cardHeader}>
-        <h2 className={styles.cardTitle}>Recent Sessions</h2>
+      <div className={styles.sectionHeader}>
+        <h2 className={styles.sectionTitle}>Recent Sessions</h2>
         <Link href="/faculty/pulse-sessions" style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#10633B', textDecoration: 'none' }}>
           VIEW ALL SESSIONS
         </Link>

@@ -1,0 +1,339 @@
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Header Area */
+.headerCard {
+  background-color: #FFFFFF;
+  border: 1px solid var(--surface-border, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--surface-border, #e2e8f0);
+  padding-bottom: 16px;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.badgeCompleted {
+  background-color: #f1f5f9;
+  color: #475569;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.metadataGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+@media (min-width: 768px) {
+  .metadataGrid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.metadataItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metaLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.metaValue {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* KPI Cards */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+@media (min-width: 768px) {
+  .kpiGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .kpiGrid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+.kpiCard {
+  background-color: #FFFFFF;
+  border: 1px solid var(--surface-border, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.kpiLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.kpiValue {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.kpiHighlight {
+  color: #10633B;
+}
+
+/* Layout Grid for Main Content */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+@media (min-width: 1024px) {
+  .mainGrid {
+    grid-template-columns: 1fr 320px;
+  }
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Base Card */
+.card {
+  background-color: #FFFFFF;
+  border: 1px solid var(--surface-border, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+.cardHeader {
+  padding: 20px;
+  border-bottom: 1px solid var(--surface-border, #e2e8f0);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-main);
+  background-color: #FFFFFF;
+}
+
+.cardBody {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Chart Placeholder */
+.chartPlaceholder {
+  height: 200px;
+  background-color: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Concept Gap Box */
+.gapBox {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.gapBoxTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #991b1b;
+  margin-bottom: 8px;
+}
+
+.gapList {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 0.875rem;
+  color: #b91c1c;
+}
+
+.strongBox {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.strongBoxTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #166534;
+  margin-bottom: 8px;
+}
+
+.strongList {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 0.875rem;
+  color: #15803d;
+}
+
+/* Table Area */
+.tableContainer {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  background-color: #fafafa;
+  border-bottom: 1px solid var(--surface-border, #e2e8f0);
+}
+
+.table td {
+  padding: 12px 16px;
+  font-size: 0.875rem;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--surface-border, #e2e8f0);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Buttons */
+.primaryButton {
+  background-color: #004b28;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.primaryButton:hover {
+  background-color: #00331b;
+}
+
+.secondaryButton {
+  background-color: #FFFFFF;
+  color: var(--text-main);
+  border: 1px solid var(--surface-border, #cbd5e1);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.secondaryButton:hover {
+  background-color: #f8fafc;
+}
+
+/* Progress Bar in Table */
+.progressWrapper {
+  width: 100%;
+  min-width: 100px;
+  height: 8px;
+  background-color: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: #10633B;
+}
+
+.statusBadge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.statusSuccess {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.statusWarning {
+  background-color: #fef9c3;
+  color: #854d0e;
+}

@@ -1,36 +1,36 @@
 import { KPI, Session, Subject } from '../types';
 
-import { GraduationCap, Users, CalendarCheck, FileWarning } from 'lucide-react';
+import { Presentation, PlayCircle, CheckCircle, BookOpen, Users, BrainCircuit } from 'lucide-react';
 
 export const mockKPIs: KPI[] = [
   { 
-    title: 'Total Staff', 
-    value: '42', 
-    icon: GraduationCap,
-    subtext: '100% Active status',
+    title: 'Total Sessions', 
+    value: '124', 
+    icon: Presentation,
+    subtext: '+12 this semester',
     subtextType: 'positive'
   },
   { 
-    title: 'Total Students', 
-    value: '1,102', 
-    icon: Users,
-    subtext: '+12 from last month',
-    subtextType: 'positive'
+    title: 'Active Sessions', 
+    value: '2', 
+    icon: PlayCircle,
+    subtext: 'Currently live',
+    subtextType: 'positive',
+    isHighlighted: true
   },
   { 
     title: 'Avg. Attendance', 
-    value: '88%', 
-    icon: CalendarCheck,
-    subtext: '-2% weekly trend',
-    subtextType: 'negative'
+    value: '92%', 
+    icon: Users,
+    subtext: '+5% from last week',
+    subtextType: 'positive'
   },
   { 
-    title: 'Pending Tasks', 
-    value: '03', 
-    icon: FileWarning,
-    subtext: 'Requires immediate attention',
-    subtextType: 'neutral',
-    isHighlighted: true
+    title: 'Avg. Understanding', 
+    value: '78%', 
+    icon: BrainCircuit,
+    subtext: 'Requires improvement',
+    subtextType: 'negative'
   },
 ];
 

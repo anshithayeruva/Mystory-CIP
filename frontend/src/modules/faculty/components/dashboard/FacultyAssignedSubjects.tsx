@@ -9,9 +9,9 @@ import { mockAssignedSubjects } from "../../constants/mockData";
 export default function FacultyAssignedSubjects() {
   return (
     <div className={styles.sectionCard}>
-      <div className={styles.cardHeader}>
-        <h2 className={styles.cardTitle}>Assigned Subjects</h2>
-        <button className={styles.iconButton}>
+      <div className={styles.sectionHeader}>
+        <h2 className={styles.sectionTitle}>Assigned Subjects</h2>
+        <button className={styles.iconActionBtn}>
           <MoreHorizontal size={20} />
         </button>
       </div>

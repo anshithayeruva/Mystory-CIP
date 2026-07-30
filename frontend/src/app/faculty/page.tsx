@@ -1,10 +1,10 @@
 import React from 'react';
 
 import FacultyMetricsRow from '@/modules/faculty/components/dashboard/FacultyMetricsRow';
-import FacultyDistributionChart from '@/modules/faculty/components/dashboard/FacultyDistributionChart';
-import FacultyConceptGap from '@/modules/faculty/components/dashboard/FacultyConceptGap';
 import FacultyRecentSessions from '@/modules/faculty/components/dashboard/FacultyRecentSessions';
 import FacultyAssignedSubjects from '@/modules/faculty/components/dashboard/FacultyAssignedSubjects';
+import FacultyConceptGapSummary from '@/modules/faculty/components/dashboard/FacultyConceptGapSummary';
+import FacultyQuickActions from '@/modules/faculty/components/dashboard/FacultyQuickActions';
 import styles from '@/modules/faculty/styles/faculty-dashboard.module.css';
 
 export default function FacultyDashboard() {
@@ -13,18 +13,23 @@ export default function FacultyDashboard() {
       {/* 6 compact KPI cards */}
       <FacultyMetricsRow />
 
-      {/* Main Two-Column Layout */}
+      {/* Main Two-Column Layout (Middle) */}
       <div className={styles.mainGrid}>
-        {/* Left Column (flex: 1) */}
         <div className={styles.leftColumn}>
-          <FacultyDistributionChart />
-          <FacultyConceptGap />
           <FacultyRecentSessions />
         </div>
-
-        {/* Right Column (340px) */}
         <div className={styles.rightColumn}>
           <FacultyAssignedSubjects />
+        </div>
+      </div>
+
+      {/* Main Two-Column Layout (Bottom) */}
+      <div className={styles.bottomGrid}>
+        <div className={styles.leftColumn}>
+          <FacultyConceptGapSummary />
+        </div>
+        <div className={styles.rightColumn}>
+          <FacultyQuickActions />
         </div>
       </div>
     </div>

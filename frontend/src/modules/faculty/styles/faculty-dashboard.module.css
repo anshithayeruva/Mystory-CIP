@@ -90,6 +90,13 @@
   align-items: start;
 }
 
+.bottomGrid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  align-items: start;
+}
+
 .leftColumn, .rightColumn {
   display: flex;
   flex-direction: column;
@@ -556,12 +563,18 @@
 }
 
 /* Responsive Styles */
+@media (max-width: 1200px) {
+  .metricsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 1024px) {
   .metricsGrid {
     grid-template-columns: repeat(2, 1fr);
   }
   
-  .mainGrid {
+  .mainGrid, .bottomGrid {
     grid-template-columns: 1fr;
   }
 }
