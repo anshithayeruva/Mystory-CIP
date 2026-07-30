@@ -24,7 +24,6 @@ const navItems = [
   { label: "Subjects", href: "/faculty/subjects", icon: BookOpen },
   { label: "Pulse Sessions", href: "/faculty/pulse-sessions", icon: Radio },
   { label: "Concept Gap Analysis", href: "/faculty/concept-gap-analysis", icon: ActivitySquare },
-  { label: "Reports", href: "/faculty/reports", icon: BarChart3 },
   { label: "Settings", href: "/faculty/settings", icon: Settings },
 ];
 

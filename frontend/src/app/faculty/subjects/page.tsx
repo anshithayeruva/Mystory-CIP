@@ -92,8 +92,8 @@ export default function FacultySubjectsPage() {
           </p>
         </div>
         <Link href="/faculty/subjects/create" className={styles.primaryButton}>
-          <Plus size={18} />
-          Create Subject
+          <Plus size={16} />
+          Add New Subject
         </Link>
       </div>
 
