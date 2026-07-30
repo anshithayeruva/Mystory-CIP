@@ -12,7 +12,7 @@ const MOCK_DATA = [
     credits: 4,
     department: "Computer Science",
     program: "B.Sc. CS",
-    faculty: "Dr. Alan Turing",
+    staff: "Dr. Alan Turing",
     status: "ACTIVE"
   },
   {
@@ -23,7 +23,7 @@ const MOCK_DATA = [
     credits: 3,
     department: "Business Admin",
     program: "MBA",
-    faculty: "Prof. Warren B.",
+    staff: "Prof. Warren B.",
     status: "ACTIVE"
   },
   {
@@ -34,7 +34,7 @@ const MOCK_DATA = [
     credits: 4,
     department: "Engineering",
     program: "M.Tech AI",
-    faculty: "Dr. Grace Hopper",
+    staff: "Dr. Grace Hopper",
     status: "DRAFT"
   },
   {
@@ -45,7 +45,7 @@ const MOCK_DATA = [
     credits: 3,
     department: "Engineering",
     program: "B.Eng Mech",
-    faculty: "Prof. Kelvin N.",
+    staff: "Prof. Kelvin N.",
     status: "ARCHIVED"
   }
 ];
@@ -62,7 +62,7 @@ export default function SubjectTable() {
               <th>CREDITS</th>
               <th>DEPARTMENT</th>
               <th>PROGRAM</th>
-              <th>FACULTY</th>
+              <th>STAFF</th>
               <th>STATUS</th>
               <th style={{ textAlign: "right" }}>ACTIONS</th>
             </tr>
@@ -78,7 +78,7 @@ export default function SubjectTable() {
                 <td className={styles.creditsValue}>{row.credits}</td>
                 <td>{row.department}</td>
                 <td>{row.program}</td>
-                <td>{row.faculty}</td>
+                <td>{row.staff}</td>
                 <td>
                   {row.status === "ACTIVE" && <span className={styles.statusActive}>ACTIVE</span>}
                   {row.status === "DRAFT" && <span className={styles.statusDraft}>DRAFT</span>}

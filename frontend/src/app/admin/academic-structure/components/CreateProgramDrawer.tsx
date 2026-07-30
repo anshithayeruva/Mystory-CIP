@@ -1,24 +1,46 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import styles from "../academic.module.css";
 import { Department } from "./DepartmentTable";
+import { Program } from "./ProgramTable";
 
 interface CreateProgramDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   departments: Department[];
-  onSubmit: (programName: string, department: string, degreeLevel: string, duration: string) => void;
+  onSubmit: (programName: string, department: string, degreeLevel: string, duration: string, intake?: string, description?: string, id?: string) => void;
+  initialData?: Program | null;
 }
 
-export default function CreateProgramDrawer({ isOpen, onClose, departments, onSubmit }: CreateProgramDrawerProps) {
+export default function CreateProgramDrawer({ isOpen, onClose, departments, onSubmit, initialData }: CreateProgramDrawerProps) {
   const [programName, setProgramName] = useState("");
   const [department, setDepartment] = useState("");
   const [degreeLevel, setDegreeLevel] = useState("");
   const [duration, setDuration] = useState("");
   const [intake, setIntake] = useState("");
   const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    if (isOpen) {
+      if (initialData) {
+        setProgramName(initialData.name);
+        setDepartment(initialData.department);
+        setDegreeLevel(initialData.degreeLevel || "");
+        setDuration(initialData.duration);
+        setIntake("");
+        setDescription("");
+      } else {
+        setProgramName("");
+        setDepartment("");
+        setDegreeLevel("");
+        setDuration("");
+        setIntake("");
+        setDescription("");
+      }
+    }
+  }, [isOpen, initialData]);
 
   if (!isOpen) return null;
 
@@ -28,24 +50,18 @@ export default function CreateProgramDrawer({ isOpen, onClose, departments, onSu
     e.preventDefault();
     if (!isFormValid) return;
 
-    onSubmit(programName.trim(), department, degreeLevel, duration);
-    
-    // Reset form
-    setProgramName("");
-    setDepartment("");
-    setDegreeLevel("");
-    setDuration("");
-    setIntake("");
-    setDescription("");
+    onSubmit(programName.trim(), department, degreeLevel, duration, intake, description, initialData ? (initialData.id as string) : undefined);
   };
+
+  const isEdit = !!initialData;
 
   return (
     <div className={styles.drawerOverlay}>
       <div className={styles.drawerContainer}>
         <div className={styles.drawerHeader}>
           <div className={styles.drawerTitleArea}>
-            <h2 className={styles.drawerTitle}>Create Academic Program</h2>
-            <p className={styles.drawerSubtitle}>Add a new academic program under an existing department.</p>
+            <h2 className={styles.drawerTitle}>{isEdit ? "Edit Academic Program" : "Create Academic Program"}</h2>
+            <p className={styles.drawerSubtitle}>{isEdit ? "Update academic program details." : "Add a new academic program under an existing department."}</p>
           </div>
           <button className={styles.drawerCloseBtn} onClick={onClose} aria-label="Close">
             <X size={20} />
@@ -155,7 +171,7 @@ export default function CreateProgramDrawer({ isOpen, onClose, departments, onSu
             onClick={handleSubmit}
             disabled={!isFormValid}
           >
-            Create Program
+            {isEdit ? "Save Changes" : "Create Program"}
           </button>
         </div>
       </div>

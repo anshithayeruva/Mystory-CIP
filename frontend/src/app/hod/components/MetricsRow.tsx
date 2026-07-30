@@ -6,8 +6,8 @@ import styles from "../dashboard.module.css";
 
 const metrics = [
   {
-    id: "faculty",
-    label: "TOTAL FACULTY",
+    id: "staff",
+    label: "TOTAL STAFF",
     value: "42",
     subtext: "100% Active status",
     subtextStyle: styles.subtextPositive,

@@ -13,8 +13,6 @@ import {
   Save, 
   Check, 
   Lock, 
-  Link2,
-  RefreshCw,
   Eye,
   EyeOff,
   RotateCcw,

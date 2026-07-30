@@ -1,7 +1,6 @@
 export enum Role {
   ADMIN = 'ADMIN',
   HOD = 'HOD',
-  FACULTY = 'FACULTY',
   STUDENT = 'STUDENT',
 }
 
@@ -12,7 +11,6 @@ export enum Role {
 export const ROLE_WEIGHTS: Record<Role, number> = {
   [Role.ADMIN]: 40,
   [Role.HOD]: 30,
-  [Role.FACULTY]: 20,
   [Role.STUDENT]: 10,
 };
 

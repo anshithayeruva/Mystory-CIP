@@ -9,8 +9,10 @@ export default function DirectoryHeader() {
     <div>
       <div className={styles.headerRow}>
         <div>
-          <h1 className={styles.pageTitle}>Directory</h1>
-          <p className={styles.subtitle}>Create, manage, and monitor all institution users from a single workspace.</p>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+            <h1 className={styles.pageTitle} style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-main)' }}>Directory</h1>
+          </div>
+          <p className={styles.subtitle}>Manage faculty, students, HoDs, and administrators across the institution.</p>
         </div>
         
         <Link href="/admin/user-management/create" className={styles.primaryButton} style={{ textDecoration: "none" }}>

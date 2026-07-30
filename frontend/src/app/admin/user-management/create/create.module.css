@@ -6,7 +6,7 @@
 
 .scrollArea {
   flex: 1;
-  padding: 24px 24px 80px 24px; /* extra bottom padding for the fixed footer */
+  padding-bottom: 80px; /* extra bottom padding for the fixed footer */
   overflow-y: auto;
 }
 

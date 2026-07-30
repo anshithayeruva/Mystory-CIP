@@ -1,18 +1,27 @@
 "use client";
 
-import { Search } from "lucide-react";
 import styles from "../academic.module.css";
 
 export default function ProgramFilterBar() {
   return (
-    <div className={styles.searchBarContainer}>
-      <div className={styles.searchInputWrapper}>
-        <Search size={18} className={styles.searchIcon} />
+    <div className={styles.filterBar}>
+      <div className={styles.searchWrapper}>
+        <span className={styles.searchIcon}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </span>
         <input 
           type="text" 
-          placeholder="Search Program..." 
-          className={styles.wideSearchInput}
+          placeholder="Search programs..." 
+          className={styles.searchInput} 
         />
+      </div>
+
+      <div className={styles.filterGroup}>
+        <select className={styles.selectInput} defaultValue="All Programs">
+          <option>All Programs</option>
+          <option>Active</option>
+          <option>Draft</option>
+        </select>
       </div>
     </div>
   );

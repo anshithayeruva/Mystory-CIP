@@ -1,19 +1,35 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import styles from "../academic.module.css";
+import { Department } from "./DepartmentTable";
 
 interface CreateDepartmentDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (departmentName: string, hodName: string) => void;
+  onSubmit: (departmentName: string, hodName: string, description?: string, id?: string) => void;
+  initialData?: Department | null;
 }
 
-export default function CreateDepartmentDrawer({ isOpen, onClose, onSubmit }: CreateDepartmentDrawerProps) {
+export default function CreateDepartmentDrawer({ isOpen, onClose, onSubmit, initialData }: CreateDepartmentDrawerProps) {
   const [departmentName, setDepartmentName] = useState("");
   const [hod, setHod] = useState("");
   const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    if (isOpen) {
+      if (initialData) {
+        setDepartmentName(initialData.name);
+        setHod(initialData.hodName !== 'Not Assigned' ? initialData.hodName : "");
+        setDescription(initialData.description || "");
+      } else {
+        setDepartmentName("");
+        setHod("");
+        setDescription("");
+      }
+    }
+  }, [isOpen, initialData]);
 
   if (!isOpen) return null;
 
@@ -21,21 +37,18 @@ export default function CreateDepartmentDrawer({ isOpen, onClose, onSubmit }: Cr
     e.preventDefault();
     if (!departmentName.trim()) return;
 
-    onSubmit(departmentName.trim(), hod || "Not Assigned");
-    
-    // Reset form
-    setDepartmentName("");
-    setHod("");
-    setDescription("");
+    onSubmit(departmentName.trim(), hod || "Not Assigned", description, initialData ? (initialData.id as string) : undefined);
   };
+
+  const isEdit = !!initialData;
 
   return (
     <div className={styles.drawerOverlay}>
       <div className={styles.drawerContainer}>
         <div className={styles.drawerHeader}>
           <div className={styles.drawerTitleArea}>
-            <h2 className={styles.drawerTitle}>Create Department</h2>
-            <p className={styles.drawerSubtitle}>Add a new academic department to your institution.</p>
+            <h2 className={styles.drawerTitle}>{isEdit ? "Edit Department" : "Create Department"}</h2>
+            <p className={styles.drawerSubtitle}>{isEdit ? "Update academic department details." : "Add a new academic department to your institution."}</p>
           </div>
           <button className={styles.drawerCloseBtn} onClick={onClose} aria-label="Close">
             <X size={20} />
@@ -98,7 +111,7 @@ export default function CreateDepartmentDrawer({ isOpen, onClose, onSubmit }: Cr
             onClick={handleSubmit}
             disabled={!departmentName.trim()}
           >
-            Create Department
+            {isEdit ? "Save Changes" : "Create Department"}
           </button>
         </div>
       </div>

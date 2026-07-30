@@ -1,0 +1,425 @@
+/* Sign In Page Module - Academic Analytics Portal Design System */
+
+.container {
+  min-height: 100vh;
+  background-color: var(--background);
+  display: flex;
+  flex-direction: column;
+  color: var(--text-main);
+  font-family: var(--font-sans);
+}
+
+/* Header Navbar */
+.navbar {
+  height: 70px;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--surface-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logoIcon {
+  width: 36px;
+  height: 36px;
+  background-color: #00522E;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 82, 46, 0.2);
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+}
+
+.brandTitle {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.brandSubtitle {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.demoBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #e9f2ee;
+  color: #00522E;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(0, 82, 46, 0.15);
+}
+
+.demoDot {
+  width: 6px;
+  height: 6px;
+  background-color: #00522E;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+
+/* Main Auth Layout */
+.mainContent {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.authWrapper {
+  width: 100%;
+  max-width: 960px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.headerSection {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+/* 4 Role Selector Cards */
+.rolesGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 860px) {
+  .rolesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .rolesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.roleCard {
+  background-color: var(--surface);
+  border: 2px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  transition: all var(--transition-normal);
+  user-select: none;
+}
+
+.roleCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 82, 46, 0.4);
+  box-shadow: var(--shadow-md);
+}
+
+.roleCardActive {
+  background-color: #ffffff;
+  border-color: #00522E;
+  box-shadow: 0 4px 12px rgba(0, 82, 46, 0.12);
+}
+
+.roleIconWrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #f1f5f9;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  transition: all var(--transition-fast);
+}
+
+.roleCardActive .roleIconWrapper {
+  background-color: #e9f2ee;
+  color: #00522E;
+}
+
+.roleTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+
+.roleBadge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background-color: #f1f5f9;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.roleCardActive .roleBadge {
+  background-color: #e9f2ee;
+  color: #00522E;
+}
+
+.roleDescription {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.checkIndicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #00522E;
+}
+
+/* Auth Card Form */
+.formCard {
+  background-color: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  max-width: 520px;
+  width: 100%;
+  margin: 0 auto;
+  box-shadow: var(--shadow-md);
+}
+
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--surface-border);
+  margin-bottom: 24px;
+}
+
+.formHeaderTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.selectedRolePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #e9f2ee;
+  color: #00522E;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  background-color: #f8fafc;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  transition: all var(--transition-fast);
+}
+
+.input:focus {
+  outline: none;
+  border-color: #00522E;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(0, 82, 46, 0.1);
+}
+
+.togglePasswordBtn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.togglePasswordBtn:hover {
+  color: var(--text-main);
+}
+
+.formOptions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  font-size: 0.825rem;
+}
+
+.rememberMe {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.checkbox {
+  accent-color: #00522E;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.forgotLink {
+  color: #00522E;
+  font-weight: 600;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.forgotLink:hover {
+  text-decoration: underline;
+}
+
+.submitBtn {
+  width: 100%;
+  background-color: #00522E;
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 6px rgba(0, 82, 46, 0.25);
+}
+
+.submitBtn:hover {
+  background-color: #003d22;
+  box-shadow: 0 4px 10px rgba(0, 82, 46, 0.35);
+}
+
+.submitBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.quickFillBox {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--surface-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.quickFillNotice {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.footer {
+  text-align: center;
+  padding: 24px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--surface-border);
+  background-color: var(--surface);
+}
+
+/* Success notification message */
+.successBanner {
+  background-color: #e9f2ee;
+  border: 1px solid rgba(0, 82, 46, 0.2);
+  color: #00522E;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}

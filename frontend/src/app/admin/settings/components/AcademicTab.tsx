@@ -1,5 +1,5 @@
 import React from "react";
-import { Info, Check } from "lucide-react";
+import { Info } from "lucide-react";
 import styles from "../settings.module.css";
 
 export default function AcademicTab() {
@@ -16,7 +16,7 @@ export default function AcademicTab() {
               <label className={styles.label}>Attendance Model</label>
               <select className={styles.select} defaultValue="Activity Based (Auto-tracked)">
                 <option>Activity Based (Auto-tracked)</option>
-                <option>Manual (Faculty)</option>
+                <option>Manual (Staff)</option>
               </select>
             </div>
             <div className={styles.formGroup}>
@@ -162,7 +162,7 @@ export default function AcademicTab() {
             </div>
             <div className={styles.toggleRow} style={{ borderBottom: 'none', padding: '12px 0 0' }}>
               <div className={styles.toggleInfo}>
-                <div className={styles.toggleTitle}>Faculty Override</div>
+                <div className={styles.toggleTitle}>Staff Override</div>
                 <div className={styles.toggleDesc}>Allow teachers to manually adjust finalized scores.</div>
               </div>
               <label className={styles.switch}>

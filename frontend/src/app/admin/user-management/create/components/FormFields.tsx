@@ -6,9 +6,21 @@ import styles from "../create.module.css";
 interface FormFieldsProps {
   userType: "student" | "faculty" | "hod";
   setUserType: (type: "student" | "faculty" | "hod") => void;
+  formData: any;
+  setFormData: (data: any) => void;
 }
 
-export default function FormFields({ userType, setUserType }: FormFieldsProps) {
+export default function FormFields({ userType, setUserType, formData, setFormData }: FormFieldsProps) {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setFormData({ ...formData, [name]: checked });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
       
@@ -60,18 +72,18 @@ export default function FormFields({ userType, setUserType }: FormFieldsProps) {
         <div className={styles.inputGrid2}>
           <div className={styles.inputGroup}>
             <label className={styles.label}>FIRST NAME <span className={styles.required}>*</span></label>
-            <input type="text" className={styles.input} placeholder="e.g. Jonathan" />
+            <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} className={styles.input} placeholder="e.g. Jonathan" />
           </div>
           <div className={styles.inputGroup}>
             <label className={styles.label}>LAST NAME <span className={styles.required}>*</span></label>
-            <input type="text" className={styles.input} placeholder="e.g. Doe" />
+            <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} className={styles.input} placeholder="e.g. Doe" />
           </div>
         </div>
         <div className={styles.inputGroup} style={{ width: "50%" }}>
           <label className={styles.label}>PHONE NUMBER (OPTIONAL)</label>
           <div style={{ display: "flex" }}>
             <span style={{ padding: "10px", border: "1px solid var(--surface-border)", borderRight: "none", borderRadius: "var(--radius-sm) 0 0 var(--radius-sm)", backgroundColor: "#f8fafc", color: "var(--text-muted)", fontSize: "0.875rem" }}>+1</span>
-            <input type="text" className={styles.input} placeholder="555-0123" style={{ flex: 1, borderRadius: "0 var(--radius-sm) var(--radius-sm) 0" }} />
+            <input type="text" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} className={styles.input} placeholder="555-0123" style={{ flex: 1, borderRadius: "0 var(--radius-sm) var(--radius-sm) 0" }} />
           </div>
         </div>
       </div>
@@ -92,21 +104,23 @@ export default function FormFields({ userType, setUserType }: FormFieldsProps) {
             <div className={styles.inputGrid3}>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>DEPARTMENT <span className={styles.required}>*</span></label>
-                <select className={styles.select} defaultValue="Computer Science">
+                <select name="department" value={formData.department} onChange={handleChange} className={styles.select}>
                   <option>Computer Science</option>
                   <option>Engineering</option>
+                  <option>Mathematics</option>
+                  <option>Bio-Engineering</option>
                 </select>
               </div>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>PROGRAM <span className={styles.required}>*</span></label>
-                <select className={styles.select} defaultValue="BS in Information Technology">
+                <select name="program" value={formData.program} onChange={handleChange} className={styles.select}>
                   <option>BS in Information Technology</option>
                   <option>B.Sc Computer Science</option>
                 </select>
               </div>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>SEMESTER <span className={styles.required}>*</span></label>
-                <select className={styles.select} defaultValue="Semester 1">
+                <select name="semester" value={formData.semester} onChange={handleChange} className={styles.select}>
                   <option>Semester 1</option>
                   <option>Semester 2</option>
                 </select>
@@ -115,15 +129,15 @@ export default function FormFields({ userType, setUserType }: FormFieldsProps) {
             <div className={styles.inputGrid3}>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>SECTION <span className={styles.required}>*</span></label>
-                <input type="text" className={styles.input} placeholder="e.g. A" />
+                <input type="text" name="section" value={formData.section} onChange={handleChange} className={styles.input} placeholder="e.g. A" />
               </div>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>ROLL NUMBER <span className={styles.required}>*</span></label>
-                <input type="text" className={styles.input} placeholder="e.g. CS-24-001" />
+                <input type="text" name="rollNumber" value={formData.rollNumber} onChange={handleChange} className={styles.input} placeholder="e.g. CS-24-001" />
               </div>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>ADMISSION YEAR <span className={styles.required}>*</span></label>
-                <select className={styles.select} defaultValue="2024">
+                <select name="admissionYear" value={formData.admissionYear} onChange={handleChange} className={styles.select}>
                   <option>2024</option>
                   <option>2023</option>
                 </select>
@@ -135,18 +149,20 @@ export default function FormFields({ userType, setUserType }: FormFieldsProps) {
             <div className={styles.inputGrid3}>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>DEPARTMENT <span className={styles.required}>*</span></label>
-                <select className={styles.select} defaultValue="Computer Science">
+                <select name="department" value={formData.department} onChange={handleChange} className={styles.select}>
                   <option>Computer Science</option>
                   <option>Engineering</option>
+                  <option>Mathematics</option>
+                  <option>Bio-Engineering</option>
                 </select>
               </div>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>DESIGNATION <span className={styles.required}>*</span></label>
-                <input type="text" className={styles.input} placeholder="e.g. Assistant Professor" />
+                <input type="text" name="designation" value={formData.designation} onChange={handleChange} className={styles.input} placeholder="e.g. Assistant Professor" />
               </div>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>EMPLOYMENT TYPE <span className={styles.required}>*</span></label>
-                <select className={styles.select} defaultValue="Full-time">
+                <select name="employmentType" value={formData.employmentType} onChange={handleChange} className={styles.select}>
                   <option>Full-time</option>
                   <option>Part-time</option>
                   <option>Contract</option>
@@ -156,15 +172,15 @@ export default function FormFields({ userType, setUserType }: FormFieldsProps) {
             <div className={styles.inputGrid3}>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>EMPLOYEE ID</label>
-                <input type="text" className={styles.input} placeholder="e.g. EMP-24-001" />
+                <input type="text" name="employeeId" value={formData.employeeId} onChange={handleChange} className={styles.input} placeholder="e.g. EMP-24-001" />
               </div>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>JOINING DATE <span className={styles.required}>*</span></label>
-                <input type="date" className={styles.input} />
+                <input type="date" name="joiningDate" value={formData.joiningDate} onChange={handleChange} className={styles.input} />
               </div>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>OFFICE EXTENSION (OPTIONAL)</label>
-                <input type="text" className={styles.input} placeholder="e.g. x451" />
+                <input type="text" name="officeExtension" value={formData.officeExtension} onChange={handleChange} className={styles.input} placeholder="e.g. x451" />
               </div>
             </div>
           </>
@@ -182,21 +198,21 @@ export default function FormFields({ userType, setUserType }: FormFieldsProps) {
 
         <div className={styles.settingsList}>
           <label className={styles.settingRow}>
-            <input type="checkbox" className={styles.checkbox} defaultChecked />
+            <input type="checkbox" name="sendWelcomeEmail" checked={formData.sendWelcomeEmail} onChange={handleChange} className={styles.checkbox} />
             <div className={styles.settingInfo}>
               <span className={styles.settingTitle}>Send Welcome Email</span>
               <span className={styles.settingDesc}>User will receive credentials via email immediately.</span>
             </div>
           </label>
           <label className={styles.settingRow}>
-            <input type="checkbox" className={styles.checkbox} defaultChecked />
+            <input type="checkbox" name="forcePasswordChange" checked={formData.forcePasswordChange} onChange={handleChange} className={styles.checkbox} />
             <div className={styles.settingInfo}>
               <span className={styles.settingTitle}>Force Password Change on First Login</span>
               <span className={styles.settingDesc}>Recommended for security of generated accounts.</span>
             </div>
           </label>
           <label className={styles.settingRow}>
-            <input type="checkbox" className={styles.checkbox} defaultChecked />
+            <input type="checkbox" name="isActive" checked={formData.isActive} onChange={handleChange} className={styles.checkbox} />
             <div className={styles.settingInfo}>
               <span className={styles.settingTitle}>Activate Account Immediately</span>
               <span className={styles.settingDesc}>User will be able to log in as soon as created.</span>
