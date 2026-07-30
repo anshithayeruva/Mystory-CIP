@@ -222,41 +222,45 @@
 
 .kpiCard {
   background: #FFFFFF;
-  padding: 24px;
+  padding: 16px;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   display: flex;
   flex-direction: column;
+  height: 110px;
 }
 
 .kpiLabel {
-  font-size: 14px;
+  font-size: 13px;
   color: #6B7280;
   font-weight: 500;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+}
+
+.kpiValueContainer {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
 }
 
 .kpiValue {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
   color: #111827;
-  margin-bottom: 8px;
+  line-height: 1;
+  align-self: center;
+  margin-top: 16px;
 }
 
-.kpiTrend {
-  font-size: 13px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+.kpiSecondaryLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: #9CA3AF;
+  text-transform: capitalize;
 }
 
-.trendUp {
-  color: #059669;
-}
-
-.trendDown {
-  color: #B91C1C;
+.textBlue {
+  color: #3B82F6;
 }
 
 .dashboardGrid {
