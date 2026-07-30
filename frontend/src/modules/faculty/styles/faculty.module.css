@@ -45,12 +45,13 @@
 .sidebarItem {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 14px 24px 14px 20px;
+  gap: 12px;
+  padding: 10px 24px 10px 20px;
   border-left: 4px solid transparent;
   color: #5C6B7A;
   text-decoration: none;
   font-weight: 500;
+  font-size: 15px;
   transition: all 0.2s;
 }
 
@@ -63,6 +64,7 @@
   background-color: #E6EFEA;
   color: #10633B;
   border-left: 4px solid #10633B;
+  font-weight: 600;
 }
 
 .sidebarItemActive:hover {
@@ -72,7 +74,7 @@
 .sidebarDivider {
   height: 1px;
   background-color: #E5E7EB;
-  margin: 16px 24px;
+  margin: 12px 24px;
 }
 
 .mainContent {

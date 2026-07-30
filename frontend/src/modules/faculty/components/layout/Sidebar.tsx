@@ -36,9 +36,9 @@ export const Sidebar: React.FC = () => {
 
   return (
     <aside className={styles.sidebar}>
-      <div className={styles.sidebarLogo} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 4, padding: '32px 24px' }}>
-        <div style={{ fontSize: 20, fontWeight: 700, color: '#10633B' }}>MyStory CIP</div>
-        <div style={{ fontSize: 10, fontWeight: 600, color: '#6B7280', letterSpacing: '0.05em' }}>ACADEMIC INTELLIGENCE</div>
+      <div className={styles.sidebarLogo} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 2, padding: '24px 24px 16px 24px' }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: '#10633B' }}>MyStory CIP</div>
+        <div style={{ fontSize: 9, fontWeight: 600, color: '#6B7280', letterSpacing: '0.05em' }}>ACADEMIC INTELLIGENCE</div>
       </div>
       
       <div className={styles.sidebarMenu}>
@@ -51,7 +51,7 @@ export const Sidebar: React.FC = () => {
               href={item.href} 
               className={`${styles.sidebarItem} ${isActive ? styles.sidebarItemActive : ''}`}
             >
-              <Icon size={20} />
+              <Icon size={18} />
               {item.name}
             </Link>
           );
@@ -69,7 +69,7 @@ export const Sidebar: React.FC = () => {
               href={item.href} 
               className={styles.sidebarItem}
             >
-              <Icon size={20} />
+              <Icon size={18} />
               {item.name}
             </Link>
           );
