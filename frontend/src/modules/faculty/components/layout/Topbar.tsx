@@ -58,7 +58,7 @@ export default function Topbar() {
               <div className={styles.popoverDivider} />
 
               <Link 
-                href="/faculty/profile" 
+                href="/faculty/settings" 
                 className={styles.popoverItem}
                 onClick={() => setIsProfileOpen(false)}
               >

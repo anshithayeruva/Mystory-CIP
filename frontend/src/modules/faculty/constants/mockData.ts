@@ -70,3 +70,24 @@ export const mockAssignedSubjects: Subject[] = [
   { id: '3', code: 'IT-204', name: 'Database Systems', students: 150 },
   { id: '4', code: 'CS-501', name: 'AI & Robotics', students: 60 },
 ];
+
+export const mockUpcomingEvents: import('../types').Event[] = [
+  {
+    id: '1',
+    title: 'HOD Senate Meeting',
+    location: 'Conference Hall',
+    time: '14:00 PM',
+    day: '14',
+    month: 'OCT',
+    theme: 'dark'
+  },
+  {
+    id: '2',
+    title: 'End-Term Prep Review',
+    location: 'Administrative Office',
+    time: '11:30 AM',
+    day: '18',
+    month: 'OCT',
+    theme: 'light'
+  }
+];

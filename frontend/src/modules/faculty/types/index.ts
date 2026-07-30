@@ -23,3 +23,13 @@ export interface Subject {
   name: string;
   students: number;
 }
+
+export interface Event {
+  id: string;
+  title: string;
+  location: string;
+  time: string;
+  day: string;
+  month: string;
+  theme: 'dark' | 'light';
+}
