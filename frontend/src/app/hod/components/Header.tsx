@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { User, LogOut } from "lucide-react";
 import styles from "../hod-layout.module.css";
 
@@ -10,6 +10,17 @@ export default function Header() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const pathname = usePathname();
+
+  const getHeaderTitle = () => {
+    if (pathname.includes("/hod/faculty")) return "Faculty";
+    if (pathname.includes("/hod/students")) return "Students";
+    if (pathname.includes("/hod/subjects")) return "Subjects";
+    if (pathname.includes("/hod/reports")) return "Reports & Analytics";
+    if (pathname.includes("/hod/settings")) return "Settings";
+    if (pathname.includes("/hod/account")) return "Account";
+    return "Dashboard";
+  };
 
   // Close popover when clicking outside
   useEffect(() => {
@@ -29,7 +40,7 @@ export default function Header() {
 
   return (
     <header className={styles.header}>
-      <h1 className={styles.headerTitle}>Dashboard</h1>
+      <h1 className={styles.headerTitle}>{getHeaderTitle()}</h1>
       
       <div className={styles.headerActions}>
 
@@ -57,13 +68,15 @@ export default function Header() {
               <div className={styles.popoverDivider} />
 
               <Link 
-                href="/hod/settings" 
+                href="/hod/account" 
                 className={styles.popoverItem}
                 onClick={() => setIsProfileOpen(false)}
               >
                 <User size={16} />
                 <span>Account</span>
               </Link>
+
+              <div className={styles.popoverDivider} />
 
               <button className={styles.popoverItem} onClick={handleLogout}>
                 <LogOut size={16} />
