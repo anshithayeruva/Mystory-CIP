@@ -80,6 +80,7 @@
   margin-left: 260px;
   display: flex;
   flex-direction: column;
+  background-color: #F2F4F2;
 }
 
 .topbar {
@@ -173,7 +174,9 @@
 }
 
 .pageContainer {
-  padding: 32px;
+  padding: 32px 40px;
+  background-color: #F2F4F2;
+  flex: 1;
 }
 
 /* Dashboard Specific Styles */

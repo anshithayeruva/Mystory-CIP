@@ -21,7 +21,6 @@ const menuItems = [
   { name: 'Dashboard', href: '/faculty', icon: LayoutDashboard },
   { name: 'Subjects', href: '/faculty/subjects', icon: BookOpen },
   { name: 'Pulse Sessions', href: '/faculty/pulse-sessions', icon: Radio },
-  { name: 'Session Summary', href: '/faculty/session-summary', icon: FileText },
   { name: 'Concept Gap Analysis', href: '/faculty/concept-gap-analysis', icon: ActivitySquare },
   { name: 'Reports', href: '/faculty/reports', icon: BarChart3 },
 ];
