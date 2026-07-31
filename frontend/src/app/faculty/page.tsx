@@ -5,12 +5,16 @@ import FacultyRecentSessions from '@/modules/faculty/components/dashboard/Facult
 import FacultyConceptGapSummary from '@/modules/faculty/components/dashboard/FacultyConceptGapSummary';
 import FacultyQuickActions from '@/modules/faculty/components/dashboard/FacultyQuickActions';
 import FacultyUpcomingEvents from '@/modules/faculty/components/dashboard/FacultyUpcomingEvents';
+import UniversityBanner from '@/modules/faculty/components/dashboard/UniversityBanner';
 import styles from '@/modules/faculty/styles/faculty-dashboard.module.css';
 
 export default function FacultyDashboard() {
   return (
     <div className={styles.dashboardContainer}>
-      {/* 4 compact KPI cards */}
+      {/* University Banner */}
+      <UniversityBanner />
+
+      {/* 3 compact KPI cards */}
       <FacultyMetricsRow />
 
       {/* Main Two-Column Layout */}

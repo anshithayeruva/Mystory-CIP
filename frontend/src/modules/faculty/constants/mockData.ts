@@ -1,6 +1,6 @@
 import { KPI, Session, Subject } from '../types';
 
-import { Presentation, PlayCircle, CheckCircle, BookOpen, Users, BrainCircuit } from 'lucide-react';
+import { Presentation, CheckCircle, BookOpen, Users, BrainCircuit } from 'lucide-react';
 
 export const mockKPIs: KPI[] = [
   { 
@@ -9,14 +9,6 @@ export const mockKPIs: KPI[] = [
     icon: Presentation,
     subtext: '+12 this semester',
     subtextType: 'positive'
-  },
-  { 
-    title: 'Active Sessions', 
-    value: '2', 
-    icon: PlayCircle,
-    subtext: 'Currently live',
-    subtextType: 'positive',
-    isHighlighted: true
   },
   { 
     title: 'Avg. Attendance', 

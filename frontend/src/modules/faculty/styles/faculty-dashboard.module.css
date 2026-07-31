@@ -4,10 +4,113 @@
   gap: 24px;
 }
 
-/* Top Metrics Row (4 Cards) */
+/* University Banner (mirrors admin & hod OverviewCard header) */
+.universityBanner {
+  background-color: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+}
+
+.universityInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.universityLogo {
+  width: 48px;
+  height: 48px;
+  background-color: var(--surface-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.universityLogoPlaceholder {
+  width: 100%;
+  height: 100%;
+  background-color: var(--background);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.universityDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.universityName {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--success);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--success);
+  border-radius: 50%;
+}
+
+.bannerAcademicInfo {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.bannerStatLabel {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: block;
+}
+
+.bannerStatValue {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-top: 4px;
+}
+
+.bannerDividerVertical {
+  width: 1px;
+  height: 24px;
+  background-color: var(--surface-border);
+  margin: 0 16px;
+}
+
+/* Top Metrics Row (3 Cards) */
 .metricsGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
 

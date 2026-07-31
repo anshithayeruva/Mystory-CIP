@@ -3,62 +3,57 @@
 import React, { useState, useEffect } from "react";
 import { 
   User, 
-  BookOpen,
-  Layers,
-  ClipboardList,
+  BookOpen, 
+  Layers, 
+  ClipboardList, 
   Bell, 
-  BarChart2,
   ShieldCheck, 
-  Save
+  Save, 
+  Check, 
+  Eye, 
+  EyeOff, 
+  Lock, 
+  ArrowRight,
+  Sparkles
 } from "lucide-react";
-import ProfileSettings from "./components/ProfileSettings";
-import AcademicPreferences from "./components/AcademicPreferences";
-import SubjectConfiguration from "./components/SubjectConfiguration";
-import AssessmentConfiguration from "./components/AssessmentConfiguration";
-import NotificationSettings from "./components/NotificationSettings";
-import ReportsPreferences from "./components/ReportsPreferences";
-import SecuritySettings from "./components/SecuritySettings";
 import styles from "./settings.module.css";
 
-const MENU_ITEMS = [
-  { id: "profile", label: "Personal Information", icon: User, subtitle: "Update the core details of your academic profile." },
-  { id: "academic", label: "Academic Preferences", icon: BookOpen, subtitle: "Configure your general academic preferences." },
-  { id: "subject", label: "Subject Configuration", icon: Layers, subtitle: "Manage preferences related to the subjects you teach." },
-  { id: "assessment", label: "Assessment Configuration", icon: ClipboardList, subtitle: "Configure settings for student assessments." },
-  { id: "notifications", label: "Notifications", icon: Bell, subtitle: "Manage your email and platform alerts." },
-  { id: "reports", label: "Reports Preferences", icon: BarChart2, subtitle: "Manage how and when your reports are generated." },
-  { id: "security", label: "Security & Privacy", icon: ShieldCheck, subtitle: "Manage your password and active devices." },
-];
+type TabType = "Profile" | "Academic" | "Subjects" | "Assessments" | "Notifications" | "Security";
 
 export default function FacultySettingsPage() {
-  const [activeTab, setActiveTab] = useState("profile");
-  const [showToast, setShowToast] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabType>("Profile");
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // SECTION 1: Personal Information
-  const [profileData, setProfileData] = useState({
-    profilePhoto: "/images/dr-sarah.jpg",
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // 1. Faculty Profile Form State
+  const [profileForm, setProfileForm] = useState({
     fullName: "Dr. Sarah Jenkins",
-    facultyId: "FAC-84920",
-    email: "sarah.jenkins@university.edu",
-    phone: "+1 (555) 123-4567",
-    department: "Computer Science",
+    facultyId: "FAC-CSE-84920",
+    email: "sarah.jenkins@srmap.edu.in",
+    phone: "+91 98765 12345",
+    department: "Computer Science & Engineering",
     designation: "Associate Professor",
-    officeRoom: "Building B, Room 402",
+    officeRoom: "Building B, Room 402 (Fourth Floor)",
     officeHours: "Mon/Wed 2:00 PM - 4:00 PM",
-    biography: "Passionate about AI and student outcomes."
+    biography: "Passionate about Data Structures, Artificial Intelligence, and active learning methodologies."
   });
 
-  // SECTION 2: Academic Preferences
-  const [academicPrefs, setAcademicPrefs] = useState({
-    defaultDepartment: "Computer Science",
-    defaultProgram: "BSc Computer Science",
-    defaultSemester: "Fall",
-    defaultAcademicYear: "2023-2024",
+  // 2. Academic Preferences State
+  const [academicForm, setAcademicForm] = useState({
+    defaultDepartment: "Computer Science & Engineering",
+    defaultProgram: "B.Tech Computer Science",
+    defaultSemester: "Fall 2024",
+    defaultAcademicYear: "2024 - 2025",
     defaultSection: "Section A",
-    preferredSubject: "Data Structures"
+    preferredSubject: "Data Structures & Algorithms"
   });
 
-  // SECTION 3: Subject Configuration
+  // 3. Subject Configuration State
   const [subjectConfig, setSubjectConfig] = useState({
     displayAssigned: true,
     defaultView: "card",
@@ -68,7 +63,7 @@ export default function FacultySettingsPage() {
     rememberLastOpened: true
   });
 
-  // SECTION 4: Assessment Configuration
+  // 4. Assessment Configuration State
   const [assessmentConfig, setAssessmentConfig] = useState({
     defaultSessionType: "mid-class-check",
     defaultQuestionType: "mcq",
@@ -82,183 +77,677 @@ export default function FacultySettingsPage() {
     publishImmediately: false
   });
 
-  // SECTION 5: Notifications
+  // 5. Notifications State
   const [notifications, setNotifications] = useState({
     pulseCreated: true,
     sessionReminder: true,
-    studentJoined: false,
+    studentJoined: true,
     sessionCompleted: true,
     summaryReady: true,
     gapReportReady: true,
     weeklyReport: true,
     monthlySummary: false,
     systemAnnouncements: true,
-    frequency: "instant"
   });
 
-  // SECTION 6: Reports Preferences
-  const [reportsPrefs, setReportsPrefs] = useState({
-    exportFormat: "pdf",
-    defaultPeriod: "weekly",
-    autoGenWeekly: true,
-    autoGenMonthly: false,
-    includeCharts: true,
-    downloadAutomatically: false
+  // 6. Security State
+  const [securityForm, setSecurityForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+    enable2FA: true,
+    emailAlerts: true,
   });
+  const [showPassword, setShowPassword] = useState(false);
 
-  // SECTION 7: Security & Privacy
-  const [securityPrefs, setSecurityPrefs] = useState({
-    twoFactorAuth: false,
-    emailLoginAlerts: true,
-    rememberDevice: true,
-    showEmailStudents: true,
-    showPhoneStudents: false,
-    allowStudentsContact: true
-  });
+  if (!mounted) return null;
 
-  // Generic Handlers for State Updates
-  const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setProfileData(prev => ({ ...prev, [name]: value }));
+  const triggerToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3500);
   };
 
-  const handleAcademicChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setAcademicPrefs(prev => ({ ...prev, [name]: value }));
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    setTimeout(() => {
+      setIsSaving(false);
+      triggerToast("Faculty preferences saved successfully!");
+    }, 400);
   };
 
-  const handleSubjectToggle = (key: keyof typeof subjectConfig) => {
-    setSubjectConfig(prev => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const handleSubjectSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setSubjectConfig(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleAssessmentToggle = (key: keyof typeof assessmentConfig) => {
-    setAssessmentConfig(prev => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const handleAssessmentSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setAssessmentConfig(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleNotificationToggle = (key: keyof typeof notifications) => {
-    setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const handleNotificationSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setNotifications(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleReportsToggle = (key: keyof typeof reportsPrefs) => {
-    setReportsPrefs(prev => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const handleReportsSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setReportsPrefs(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSecurityToggle = (key: keyof typeof securityPrefs) => {
-    setSecurityPrefs(prev => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const handleSave = () => {
-    setShowToast(true);
-  };
-
-  useEffect(() => {
-    if (showToast) {
-      const timer = setTimeout(() => {
-        setShowToast(false);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [showToast]);
-
-  const activeItem = MENU_ITEMS.find(item => item.id === activeTab) || MENU_ITEMS[0];
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case "profile":
-        return <ProfileSettings formData={profileData} onChange={handleProfileChange} />;
-      case "academic":
-        return <AcademicPreferences formData={academicPrefs} onChange={handleAcademicChange} />;
-      case "subject":
-        return <SubjectConfiguration formData={subjectConfig} onToggle={(key: string) => handleSubjectToggle(key as any)} onSelect={handleSubjectSelect} />;
-      case "assessment":
-        return <AssessmentConfiguration formData={assessmentConfig} onToggle={(key: string) => handleAssessmentToggle(key as any)} onSelect={handleAssessmentSelect} />;
-      case "notifications":
-        return <NotificationSettings formData={notifications} onToggle={(key: string) => handleNotificationToggle(key as any)} onSelect={handleNotificationSelect} />;
-      case "reports":
-        return <ReportsPreferences formData={reportsPrefs} onToggle={(key: string) => handleReportsToggle(key as any)} onSelect={handleReportsSelect} />;
-      case "security":
-        return <SecuritySettings formData={securityPrefs} onToggle={(key: string) => handleSecurityToggle(key as any)} />;
-      default:
-        return null;
-    }
-  };
+  const tabs: TabType[] = ["Profile", "Academic", "Subjects", "Assessments", "Notifications", "Security"];
 
   return (
-    <div className={styles.pageContainer}>
-      <div className={styles.headerRow}>
-        <h1 className={styles.title}>Settings</h1>
-        <p className={styles.subtitle}>
-          Manage your faculty preferences and account settings.
-        </p>
-      </div>
-
-      <div className={styles.layoutGrid}>
-        
-        {/* Left Column - Vertical Tabs Menu */}
-        <div className={styles.menuCard}>
-          {MENU_ITEMS.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`${styles.menuItem} ${isActive ? styles.menuItemActive : ""}`}
-              >
-                <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
-                {item.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Right Column - Active Content Card */}
-        <div className={styles.contentCard}>
-          <div className={styles.contentHeader}>
-            <h2 className={styles.contentTitle}>{activeItem.label}</h2>
-            <p className={styles.contentSubtitle}>{activeItem.subtitle}</p>
-          </div>
-          
-          {renderContent()}
-
-          <div className={styles.contentFooter}>
-            <button type="button" className={styles.secondaryButton}>
-              Cancel Changes
-            </button>
-            <button type="button" onClick={handleSave} className={styles.primaryButton}>
-              <Save size={16} />
-              Save All Changes
-            </button>
-          </div>
-        </div>
-
-      </div>
-
-      {showToast && (
-        <div className={styles.toast}>
-          Preferences successfully saved!
+    <div className={styles.container}>
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className={styles.toastSuccess}>
+          <Check size={18} />
+          <span>{toastMessage}</span>
         </div>
       )}
+
+      {/* Header with Horizontal Tabs */}
+      <div className={styles.header}>
+        <div className={styles.titleArea}>
+          <h1 className={styles.title}>Faculty Settings</h1>
+          <p className={styles.subtitle}>
+            {activeTab === "Profile" && "Manage your personal profile information, office location, and contact hours."}
+            {activeTab === "Academic" && "Configure default academic terms, department preferences, and teaching sections."}
+            {activeTab === "Subjects" && "Customize course display preferences, module expansion, and sorting order."}
+            {activeTab === "Assessments" && "Configure Pulse session parameters, question defaults, QR codes, and grading rules."}
+            {activeTab === "Notifications" && "Manage automated session alerts, low attendance notifications, and weekly summaries."}
+            {activeTab === "Security" && "Update account credentials, password policies, and multi-factor authentication."}
+          </p>
+        </div>
+        
+        <div className={styles.tabs}>
+          {tabs.map((tab) => (
+            <div 
+              key={tab}
+              className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ""}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* TAB CONTENTS */}
+      <div style={{ marginTop: 12 }}>
+
+        {/* TAB 1: Profile */}
+        {activeTab === "Profile" && (
+          <div className={styles.tabContent}>
+            <div className={styles.sectionGroup}>
+              <div className={styles.sectionInfo}>
+                <div className={styles.sectionTitle}>Faculty Profile</div>
+                <div className={styles.sectionDesc}>Public information and primary identifiers for your faculty profile.</div>
+              </div>
+              <div className={styles.sectionCard}>
+                <form onSubmit={handleSave}>
+                  <div className={styles.formGrid}>
+                    <div className={styles.formGroup} style={{ gridColumn: "span 2" }}>
+                      <label className={styles.label}>Full Name</label>
+                      <input 
+                        className={styles.input} 
+                        type="text" 
+                        value={profileForm.fullName} 
+                        onChange={(e) => setProfileForm({...profileForm, fullName: e.target.value})}
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Faculty Staff ID</label>
+                      <input 
+                        className={`${styles.input} ${styles.inputDisabled}`} 
+                        type="text" 
+                        value={profileForm.facultyId} 
+                        disabled
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Email Address</label>
+                      <input 
+                        className={styles.input} 
+                        type="email" 
+                        value={profileForm.email} 
+                        onChange={(e) => setProfileForm({...profileForm, email: e.target.value})}
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Academic Designation</label>
+                      <input 
+                        className={styles.input} 
+                        type="text" 
+                        value={profileForm.designation} 
+                        onChange={(e) => setProfileForm({...profileForm, designation: e.target.value})}
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Department</label>
+                      <input 
+                        className={`${styles.input} ${styles.inputDisabled}`} 
+                        type="text" 
+                        value={profileForm.department} 
+                        disabled
+                      />
+                    </div>
+                    <div className={styles.formGroup} style={{ gridColumn: "span 2" }}>
+                      <label className={styles.label}>Academic Biography</label>
+                      <textarea 
+                        className={styles.textarea} 
+                        value={profileForm.biography} 
+                        onChange={(e) => setProfileForm({...profileForm, biography: e.target.value})}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className={styles.btnGroup}>
+                    <button type="button" className={styles.btnCancel} onClick={() => triggerToast("Reverted to saved values.")}>Cancel</button>
+                    <button type="submit" className={styles.btnSave} disabled={isSaving}>
+                      <Save size={14} /> Save Profile Changes
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <div className={styles.sectionGroup}>
+              <div className={styles.sectionInfo}>
+                <div className={styles.sectionTitle}>Office & Availability</div>
+                <div className={styles.sectionDesc}>Set your physical office location and student consultation hours.</div>
+              </div>
+              <div className={styles.sectionCard}>
+                <form onSubmit={handleSave}>
+                  <div className={styles.formGrid}>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Phone Number</label>
+                      <input 
+                        className={styles.input} 
+                        type="text" 
+                        value={profileForm.phone} 
+                        onChange={(e) => setProfileForm({...profileForm, phone: e.target.value})}
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Office Room / Building</label>
+                      <input 
+                        className={styles.input} 
+                        type="text" 
+                        value={profileForm.officeRoom} 
+                        onChange={(e) => setProfileForm({...profileForm, officeRoom: e.target.value})}
+                      />
+                    </div>
+                    <div className={styles.formGroup} style={{ gridColumn: "span 2" }}>
+                      <label className={styles.label}>Student Office Hours</label>
+                      <input 
+                        className={styles.input} 
+                        type="text" 
+                        value={profileForm.officeHours} 
+                        onChange={(e) => setProfileForm({...profileForm, officeHours: e.target.value})}
+                      />
+                    </div>
+                  </div>
+
+                  <div className={styles.btnGroup}>
+                    <button type="button" className={styles.btnCancel} onClick={() => triggerToast("Reverted changes.")}>Cancel</button>
+                    <button type="submit" className={styles.btnSave} disabled={isSaving}>
+                      <Save size={14} /> Update Office Details
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 2: Academic */}
+        {activeTab === "Academic" && (
+          <div className={styles.tabContent}>
+            <div className={styles.sectionGroup}>
+              <div className={styles.sectionInfo}>
+                <div className={styles.sectionTitle}>Academic Preferences</div>
+                <div className={styles.sectionDesc}>Configure your default teaching department, program, and active term.</div>
+              </div>
+              <div className={styles.sectionCard}>
+                <form onSubmit={handleSave}>
+                  <div className={styles.formGrid}>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Primary Department</label>
+                      <select 
+                        className={styles.select} 
+                        value={academicForm.defaultDepartment}
+                        onChange={(e) => setAcademicForm({...academicForm, defaultDepartment: e.target.value})}
+                      >
+                        <option>Computer Science & Engineering</option>
+                        <option>Electrical Engineering</option>
+                        <option>Information Technology</option>
+                      </select>
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Default Degree Program</label>
+                      <select 
+                        className={styles.select} 
+                        value={academicForm.defaultProgram}
+                        onChange={(e) => setAcademicForm({...academicForm, defaultProgram: e.target.value})}
+                      >
+                        <option>B.Tech Computer Science</option>
+                        <option>M.Tech Software Engineering</option>
+                        <option>Ph.D. Computer Science</option>
+                      </select>
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Academic Year</label>
+                      <select 
+                        className={styles.select} 
+                        value={academicForm.defaultAcademicYear}
+                        onChange={(e) => setAcademicForm({...academicForm, defaultAcademicYear: e.target.value})}
+                      >
+                        <option>2024 - 2025</option>
+                        <option>2023 - 2024</option>
+                      </select>
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Active Semester</label>
+                      <select 
+                        className={styles.select} 
+                        value={academicForm.defaultSemester}
+                        onChange={(e) => setAcademicForm({...academicForm, defaultSemester: e.target.value})}
+                      >
+                        <option>Fall 2024</option>
+                        <option>Spring 2025</option>
+                      </select>
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Default Teaching Section</label>
+                      <select 
+                        className={styles.select} 
+                        value={academicForm.defaultSection}
+                        onChange={(e) => setAcademicForm({...academicForm, defaultSection: e.target.value})}
+                      >
+                        <option>Section A</option>
+                        <option>Section B</option>
+                        <option>Section C</option>
+                      </select>
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Primary Teaching Subject</label>
+                      <input 
+                        className={styles.input} 
+                        type="text" 
+                        value={academicForm.preferredSubject}
+                        onChange={(e) => setAcademicForm({...academicForm, preferredSubject: e.target.value})}
+                      />
+                    </div>
+                  </div>
+
+                  <div className={styles.btnGroup}>
+                    <button type="button" className={styles.btnCancel} onClick={() => triggerToast("Discarded changes.")}>Discard Changes</button>
+                    <button type="submit" className={styles.btnSave}>Save Academic Preferences</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 3: Subjects */}
+        {activeTab === "Subjects" && (
+          <div className={styles.tabContent}>
+            <div className={styles.sectionGroup}>
+              <div className={styles.sectionInfo}>
+                <div className={styles.sectionTitle}>Subject Display & View</div>
+                <div className={styles.sectionDesc}>Customize how your assigned subjects and course units are displayed.</div>
+              </div>
+              <div className={styles.sectionCard}>
+                <form onSubmit={handleSave}>
+                  <div className={styles.toggleRow}>
+                    <div className={styles.toggleInfo}>
+                      <div className={styles.toggleTitle}>Display Assigned Subjects Only</div>
+                      <div className={styles.toggleDesc}>Filter subjects list to show only courses where you are assigned as lead instructor.</div>
+                    </div>
+                    <label className={styles.switch}>
+                      <input 
+                        type="checkbox" 
+                        checked={subjectConfig.displayAssigned}
+                        onChange={(e) => setSubjectConfig({...subjectConfig, displayAssigned: e.target.checked})}
+                      />
+                      <span className={styles.slider}></span>
+                    </label>
+                  </div>
+
+                  <div className={styles.toggleRow}>
+                    <div className={styles.toggleInfo}>
+                      <div className={styles.toggleTitle}>Expand Course Units by Default</div>
+                      <div className={styles.toggleDesc}>Automatically expand syllabus topics and unit breakdowns when opening a subject.</div>
+                    </div>
+                    <label className={styles.switch}>
+                      <input 
+                        type="checkbox" 
+                        checked={subjectConfig.expandUnits}
+                        onChange={(e) => setSubjectConfig({...subjectConfig, expandUnits: e.target.checked})}
+                      />
+                      <span className={styles.slider}></span>
+                    </label>
+                  </div>
+
+                  <div className={styles.toggleRow}>
+                    <div className={styles.toggleInfo}>
+                      <div className={styles.toggleTitle}>Remember Last Opened Subject</div>
+                      <div className={styles.toggleDesc}>Automatically navigate to your last accessed subject upon login.</div>
+                    </div>
+                    <label className={styles.switch}>
+                      <input 
+                        type="checkbox" 
+                        checked={subjectConfig.rememberLastOpened}
+                        onChange={(e) => setSubjectConfig({...subjectConfig, rememberLastOpened: e.target.checked})}
+                      />
+                      <span className={styles.slider}></span>
+                    </label>
+                  </div>
+
+                  <div className={styles.btnGroup}>
+                    <button type="button" className={styles.btnCancel}>Cancel</button>
+                    <button type="submit" className={styles.btnSave}>Save Subject Rules</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 4: Assessments */}
+        {activeTab === "Assessments" && (
+          <div className={styles.tabContent}>
+            <div className={styles.sectionGroup}>
+              <div className={styles.sectionInfo}>
+                <div className={styles.sectionTitle}>Pulse Session Defaults</div>
+                <div className={styles.sectionDesc}>Set default parameters for newly created live Pulse feedback sessions.</div>
+              </div>
+              <div className={styles.sectionCard}>
+                <form onSubmit={handleSave}>
+                  <div className={styles.formGrid}>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Default Question Type</label>
+                      <select 
+                        className={styles.select} 
+                        value={assessmentConfig.defaultQuestionType}
+                        onChange={(e) => setAssessmentConfig({...assessmentConfig, defaultQuestionType: e.target.value})}
+                      >
+                        <option value="mcq">Multiple Choice (MCQ)</option>
+                        <option value="concept">Concept Check (True/False)</option>
+                        <option value="text">Short Answer Feedback</option>
+                      </select>
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Default Question Difficulty</label>
+                      <select 
+                        className={styles.select} 
+                        value={assessmentConfig.defaultDifficulty}
+                        onChange={(e) => setAssessmentConfig({...assessmentConfig, defaultDifficulty: e.target.value})}
+                      >
+                        <option value="easy">Easy (Introductory)</option>
+                        <option value="medium">Medium (Standard)</option>
+                        <option value="hard">Hard (Advanced)</option>
+                      </select>
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Session Timer Duration (Mins)</label>
+                      <select 
+                        className={styles.select} 
+                        value={assessmentConfig.defaultDuration}
+                        onChange={(e) => setAssessmentConfig({...assessmentConfig, defaultDuration: e.target.value})}
+                      >
+                        <option value="10">10 Minutes</option>
+                        <option value="15">15 Minutes</option>
+                        <option value="20">20 Minutes</option>
+                        <option value="30">30 Minutes</option>
+                      </select>
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Results Visibility</label>
+                      <select 
+                        className={styles.select} 
+                        value={assessmentConfig.resultVisibility}
+                        onChange={(e) => setAssessmentConfig({...assessmentConfig, resultVisibility: e.target.value})}
+                      >
+                        <option value="immediately">Immediately after response</option>
+                        <option value="session-end">At the end of session</option>
+                        <option value="manual">Manual Release only</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className={styles.toggleRow} style={{ marginTop: "16px" }}>
+                    <div className={styles.toggleInfo}>
+                      <div className={styles.toggleTitle}>Enable Live QR Code Attendance</div>
+                      <div className={styles.toggleDesc}>Automatically display a dynamic QR code for student check-in upon launching a session.</div>
+                    </div>
+                    <label className={styles.switch}>
+                      <input 
+                        type="checkbox" 
+                        checked={assessmentConfig.enableQrByDefault}
+                        onChange={(e) => setAssessmentConfig({...assessmentConfig, enableQrByDefault: e.target.checked})}
+                      />
+                      <span className={styles.slider}></span>
+                    </label>
+                  </div>
+
+                  <div className={styles.toggleRow}>
+                    <div className={styles.toggleInfo}>
+                      <div className={styles.toggleTitle}>Auto-Save Draft Questions</div>
+                      <div className={styles.toggleDesc}>Save Pulse session question edits continuously while typing.</div>
+                    </div>
+                    <label className={styles.switch}>
+                      <input 
+                        type="checkbox" 
+                        checked={assessmentConfig.autoSaveDrafts}
+                        onChange={(e) => setAssessmentConfig({...assessmentConfig, autoSaveDrafts: e.target.checked})}
+                      />
+                      <span className={styles.slider}></span>
+                    </label>
+                  </div>
+
+                  <div className={styles.btnGroup}>
+                    <button type="button" className={styles.btnCancel}>Cancel</button>
+                    <button type="submit" className={styles.btnSave}>Save Session Defaults</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 5: Notifications */}
+        {activeTab === "Notifications" && (
+          <div className={styles.tabContent}>
+            <div className={styles.sectionGroup}>
+              <div className={styles.sectionInfo}>
+                <div className={styles.sectionTitle}>Automated Faculty Alerts</div>
+                <div className={styles.sectionDesc}>Manage email notifications, live session reminders, and student gap alerts.</div>
+              </div>
+              <div className={styles.sectionCard}>
+                <div className={styles.toggleRow}>
+                  <div className={styles.toggleInfo}>
+                    <div className={styles.toggleTitle}>Pulse Session Launch Reminders</div>
+                    <div className={styles.toggleDesc}>Get notified 15 minutes before scheduled teaching sessions.</div>
+                  </div>
+                  <label className={styles.switch}>
+                    <input 
+                      type="checkbox" 
+                      checked={notifications.sessionReminder}
+                      onChange={(e) => {
+                        setNotifications({...notifications, sessionReminder: e.target.checked});
+                        triggerToast("Notification rule updated!");
+                      }}
+                    />
+                    <span className={styles.slider}></span>
+                  </label>
+                </div>
+
+                <div className={styles.toggleRow}>
+                  <div className={styles.toggleInfo}>
+                    <div className={styles.toggleTitle}>Student Session Completion Alerts</div>
+                    <div className={styles.toggleDesc}>Notify when all students in a section complete a Pulse assessment.</div>
+                  </div>
+                  <label className={styles.switch}>
+                    <input 
+                      type="checkbox" 
+                      checked={notifications.sessionCompleted}
+                      onChange={(e) => {
+                        setNotifications({...notifications, sessionCompleted: e.target.checked});
+                        triggerToast("Notification rule updated!");
+                      }}
+                    />
+                    <span className={styles.slider}></span>
+                  </label>
+                </div>
+
+                <div className={styles.toggleRow}>
+                  <div className={styles.toggleInfo}>
+                    <div className={styles.toggleTitle}>Concept Gap Analysis Ready</div>
+                    <div className={styles.toggleDesc}>Instant notification when AI concept gap reports are generated post-session.</div>
+                  </div>
+                  <label className={styles.switch}>
+                    <input 
+                      type="checkbox" 
+                      checked={notifications.gapReportReady}
+                      onChange={(e) => {
+                        setNotifications({...notifications, gapReportReady: e.target.checked});
+                        triggerToast("Notification rule updated!");
+                      }}
+                    />
+                    <span className={styles.slider}></span>
+                  </label>
+                </div>
+
+                <div className={styles.toggleRow}>
+                  <div className={styles.toggleInfo}>
+                    <div className={styles.toggleTitle}>Weekly Teaching Performance Summary</div>
+                    <div className={styles.toggleDesc}>Receive an aggregated email summary of class understanding scores every Monday.</div>
+                  </div>
+                  <label className={styles.switch}>
+                    <input 
+                      type="checkbox" 
+                      checked={notifications.weeklyReport}
+                      onChange={(e) => {
+                        setNotifications({...notifications, weeklyReport: e.target.checked});
+                        triggerToast("Notification rule updated!");
+                      }}
+                    />
+                    <span className={styles.slider}></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 6: Security */}
+        {activeTab === "Security" && (
+          <div className={styles.tabContent}>
+            <div className={styles.sectionGroup}>
+              <div className={styles.sectionInfo}>
+                <div className={styles.sectionTitle}>Account Password</div>
+                <div className={styles.sectionDesc}>Update your account password and security credentials.</div>
+              </div>
+              <div className={styles.sectionCard}>
+                <form onSubmit={handleSave}>
+                  <div className={styles.formGridSingle}>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Current Password</label>
+                      <div style={{ position: "relative" }}>
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          className={styles.input}
+                          style={{ width: "100%" }}
+                          placeholder="••••••••••••"
+                          value={securityForm.currentPassword}
+                          onChange={(e) => setSecurityForm({ ...securityForm, currentPassword: e.target.value })}
+                        />
+                        <button
+                          type="button"
+                          style={{ position: "absolute", right: "12px", top: "11px", border: "none", background: "none", cursor: "pointer", color: "#64748b" }}
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className={styles.formGrid}>
+                      <div className={styles.formGroup}>
+                        <label className={styles.label}>New Password</label>
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          className={styles.input}
+                          placeholder="Min 8 characters"
+                          value={securityForm.newPassword}
+                          onChange={(e) => setSecurityForm({ ...securityForm, newPassword: e.target.value })}
+                        />
+                      </div>
+
+                      <div className={styles.formGroup}>
+                        <label className={styles.label}>Confirm New Password</label>
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          className={styles.input}
+                          placeholder="Repeat new password"
+                          value={securityForm.confirmPassword}
+                          onChange={(e) => setSecurityForm({ ...securityForm, confirmPassword: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={styles.toggleRow} style={{ marginTop: "16px" }}>
+                    <div className={styles.toggleInfo}>
+                      <div className={styles.toggleTitle}>Two-Factor Authentication (2FA)</div>
+                      <div className={styles.toggleDesc}>Require a single-use passcode upon login for faculty portal security.</div>
+                    </div>
+                    <label className={styles.switch}>
+                      <input
+                        type="checkbox"
+                        checked={securityForm.enable2FA}
+                        onChange={(e) => {
+                          setSecurityForm({ ...securityForm, enable2FA: e.target.checked });
+                          triggerToast("2FA security setting updated!");
+                        }}
+                      />
+                      <span className={styles.slider}></span>
+                    </label>
+                  </div>
+
+                  <div className={styles.btnGroup}>
+                    <button type="button" className={styles.btnCancel}>Cancel</button>
+                    <button type="submit" className={styles.btnSave}>
+                      <Lock size={14} /> Update Security
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Quick Action Bottom Cards Grid */}
+      <div className={styles.quickActionGrid}>
+        <div className={styles.quickActionCard}>
+          <ShieldCheck className={styles.quickActionIcon} size={24} />
+          <div>
+            <div className={styles.quickActionTitle}>Security & Account Profile</div>
+            <div className={styles.quickActionDesc}>Manage security parameters, active sessions, and personal faculty details.</div>
+          </div>
+          <button 
+            className={styles.quickActionBtn}
+            onClick={() => setActiveTab("Security")}
+          >
+            Manage Security Settings <ArrowRight size={14} />
+          </button>
+        </div>
+
+        <div className={styles.quickActionCard}>
+          <Sparkles className={styles.quickActionIcon} size={24} />
+          <div>
+            <div className={styles.quickActionTitle}>Pulse Sessions & Live Evaluation</div>
+            <div className={styles.quickActionDesc}>Configure default question difficulty, duration timers, and live QR code check-in rules.</div>
+          </div>
+          <button 
+            className={styles.quickActionBtn}
+            onClick={() => setActiveTab("Assessments")}
+          >
+            Configure Session Defaults <ArrowRight size={14} />
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
