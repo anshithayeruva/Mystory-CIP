@@ -1,0 +1,353 @@
+.facultyContainer {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--background);
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 240px;
+  background-color: #EAECE7; /* Matching light greyish sidebar from wireframe */
+  border-right: 1px solid var(--surface-border);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  transition: width 0.3s ease;
+  z-index: 20;
+}
+
+.sidebarCollapsed {
+  width: 80px;
+}
+
+.logoContainer {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid transparent;
+  justify-content: space-between;
+}
+
+.collapseBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.collapseBtn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--text-main);
+}
+
+.sidebarCollapsed .logoContainer {
+  justify-content: center;
+  padding: 16px 0;
+}
+
+.logoIcon {
+  width: 28px;
+  height: 28px;
+  background-color: #00522E; /* Dark green theme color */
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.logoText {
+  display: flex;
+  flex-direction: column;
+}
+
+.logoTitle {
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.2;
+  color: #0f172a;
+}
+
+.logoSubtitle {
+  font-size: 0.65rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.navContainer {
+  flex: 1;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebarCollapsed .navItem {
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-left: 4px solid transparent;
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.navItem:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #0f172a;
+}
+
+.navItemActive {
+  background-color: #e9f2ee; /* Light green active item */
+  color: #00522E; /* Dark green text */
+  border-left: 4px solid #00522E;
+  font-weight: 700;
+}
+
+.navItemActive:hover {
+  background-color: #c9e0d3;
+}
+
+.navItemActive svg {
+  color: #00522E;
+}
+
+.sidebarFooter {
+  padding: 16px 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.helpBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.helpBtn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #0f172a;
+}
+
+.sidebarCollapsed .helpBtn {
+  justify-content: center;
+  padding: 10px 0;
+}
+
+/* Main Content Area */
+.mainWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Header Styles */
+.header {
+  height: 56px;
+  padding: 0 24px;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--surface-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.headerTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.iconButton {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 50%;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.iconButton:hover {
+  background-color: var(--background);
+  color: var(--text-main);
+}
+
+.headerDivider {
+  width: 1px;
+  height: 24px;
+  background-color: var(--surface-border);
+}
+
+.userProfile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profileWrapper {
+  position: relative;
+}
+
+.avatarBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #e2e8f0;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.avatarBtn:hover {
+  background-color: #00522e;
+  color: #ffffff;
+}
+
+/* User Popover Dropdown */
+.profilePopover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 260px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  padding: 16px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeInPopover 0.15s ease-out;
+}
+
+@keyframes fadeInPopover {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.popoverHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.popoverAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #cbd5e1;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.popoverMeta {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.popoverName {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.popoverEmail {
+  font-size: 0.75rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.popoverDivider {
+  height: 1px;
+  background-color: #f1f5f9;
+  margin: 4px 0;
+}
+
+.popoverItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  width: 100%;
+  text-align: left;
+  text-decoration: none;
+}
+
+.popoverItem:hover {
+  background-color: #f8fafc;
+  color: #00522e;
+}
+
+.mainContent {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}

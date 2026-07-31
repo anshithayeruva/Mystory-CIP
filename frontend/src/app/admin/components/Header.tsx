@@ -1,4 +1,5 @@
 "use client";
+import Image from 'next/image';
 
 import React, { useState, useRef, useEffect } from "react";
 import styles from "../admin-layout.module.css";
@@ -49,7 +50,7 @@ export default function Header() {
               overflow: "hidden"
             }}
           >
-            <img 
+            <Image width={40} height={40} 
               src="https://api.dicebear.com/7.x/initials/svg?seed=Nitya%20Nara&backgroundColor=e2e8f0&textColor=475569" 
               alt="Profile" 
               style={{
@@ -75,7 +76,7 @@ export default function Header() {
               overflow: "hidden"
             }}>
               <div style={{ padding: "16px", display: "flex", alignItems: "center", gap: "12px", borderBottom: "1px solid #e2e8f0" }}>
-                <img 
+                <Image width={40} height={40} 
                   src="https://api.dicebear.com/7.x/initials/svg?seed=Nitya%20Nara&backgroundColor=e2e8f0&textColor=475569" 
                   alt="Nitya Nara" 
                   style={{ width: "42px", height: "42px", borderRadius: "50%" }}

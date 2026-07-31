@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
-  Building, 
+  Building2, 
   Mail, 
   UserCheck, 
   Bell, 
@@ -13,43 +13,39 @@ import {
   Save, 
   Check, 
   Lock, 
-  Link2,
-  RefreshCw,
   Eye,
-  EyeOff
+  EyeOff,
+  RotateCcw,
+  Database,
+  ArrowRight
 } from "lucide-react";
 import styles from "./settings.module.css";
 
-type SettingsTab = 
-  | "dept" 
-  | "contact" 
-  | "hod" 
-  | "notifications" 
-  | "academic" 
-  | "security" 
-  | "integrations";
+type TabType = "Department" | "Academic" | "Security" | "Notifications" | "Integrations";
 
 export default function HodSettingsPage() {
-  const [activeTab, setActiveTab] = useState<SettingsTab>("dept");
+  const [activeTab, setActiveTab] = useState<TabType>("Department");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // 1. Department Info Form State
   const [deptForm, setDeptForm] = useState({
     name: "Computer Science & Engineering",
     code: "CSE-101",
     mission: "To provide high-quality education in computer science through a curriculum that combines fundamental concepts with hands-on practice, fostering innovation and ethical responsibility.",
-  });
-
-  // 2. Contact Details Form State
-  const [contactForm, setContactForm] = useState({
+    address: "Block B, Academic Complex, Sector 4",
     email: "cse.hod@mystory.edu",
     phone: "+91 98765 43210",
-    office: "Block B, Room 304 (Third Floor)",
+    office: "Room 304 (Third Floor)",
     portalUrl: "https://mystory-cip.edu/dept/cse",
   });
 
-  // 3. HoD Profile Form State
+  // 2. HoD Profile Form State
   const [hodForm, setHodForm] = useState({
     name: "Dr. Naveen Nair",
     designation: "Head of Department & Senior Professor",
@@ -57,7 +53,7 @@ export default function HodSettingsPage() {
     qualification: "Ph.D. in Computer Science (IIT Bombay), M.Tech",
   });
 
-  // 4. Notifications State
+  // 3. Notifications State
   const [notifications, setNotifications] = useState({
     lowAttendance: true,
     syllabusMilestones: true,
@@ -65,15 +61,18 @@ export default function HodSettingsPage() {
     weeklyDigest: false,
   });
 
-  // 5. Academic Info State
+  // 4. Academic Info State
   const [academicForm, setAcademicForm] = useState({
     academicYear: "2024 - 2025",
     termType: "Odd Semester (July - December)",
     passScore: 40,
     minAttendance: 75,
+    attendanceModel: "Activity Based (Auto-tracked)",
+    allowRetests: true,
+    facultyOverride: true,
   });
 
-  // 6. Security State
+  // 5. Security State
   const [securityForm, setSecurityForm] = useState({
     currentPassword: "",
     newPassword: "",
@@ -82,13 +81,15 @@ export default function HodSettingsPage() {
   });
   const [showPassword, setShowPassword] = useState(false);
 
-  // 7. Integrations State
+  // 6. Integrations State
   const [integrations, setIntegrations] = useState([
-    { id: "classroom", name: "Google Classroom", category: "LMS", status: "Connected" },
-    { id: "moodle", name: "Moodle LMS", category: "Courseware", status: "Connected" },
-    { id: "zoom", name: "Zoom Education", category: "Video Conferencing", status: "Disconnected" },
-    { id: "turnitin", name: "Turnitin Plagiarism", category: "Academic Audit", status: "Connected" },
+    { id: "classroom", name: "Google Classroom", category: "LMS Sync & Data Connector", status: "Connected" },
+    { id: "moodle", name: "Moodle LMS", category: "Courseware & Exam Portal", status: "Connected" },
+    { id: "zoom", name: "Zoom Education", category: "Video Conferencing & Lecture Sync", status: "Disconnected" },
+    { id: "turnitin", name: "Turnitin Plagiarism", category: "Academic Audit & Plagiarism Check", status: "Connected" },
   ]);
+
+  if (!mounted) return null;
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
@@ -106,10 +107,6 @@ export default function HodSettingsPage() {
     }, 500);
   };
 
-  const handleReset = (tab: SettingsTab) => {
-    triggerToast("Form reverted to stored department defaults.");
-  };
-
   const toggleIntegration = (id: string) => {
     setIntegrations((prev) =>
       prev.map((item) =>
@@ -121,17 +118,11 @@ export default function HodSettingsPage() {
     triggerToast("Integration status updated!");
   };
 
+  const tabs: TabType[] = ["Department", "Academic", "Security", "Notifications", "Integrations"];
+
   return (
     <div className={styles.container}>
-      {/* Page Header */}
-      <div className={styles.header}>
-        <h1 className={styles.title}>Settings</h1>
-        <p className={styles.subtitle}>
-          Manage your department&apos;s configuration, academic parameters, and personal profile.
-        </p>
-      </div>
-
-      {/* Success Toast */}
+      {/* Toast Alert */}
       {toastMessage && (
         <div className={styles.toastSuccess}>
           <Check size={18} />
@@ -139,302 +130,345 @@ export default function HodSettingsPage() {
         </div>
       )}
 
-      {/* Main Grid Layout */}
-      <div className={styles.mainGrid}>
-        {/* Left Navigation Card */}
-        <div className={styles.sidebarCard}>
-          <button
-            className={`${styles.navItem} ${activeTab === "dept" ? styles.navItemActive : ""}`}
-            onClick={() => setActiveTab("dept")}
-          >
-            <Building size={18} className={styles.navIcon} />
-            <span>Department Information</span>
-          </button>
-
-          <button
-            className={`${styles.navItem} ${activeTab === "contact" ? styles.navItemActive : ""}`}
-            onClick={() => setActiveTab("contact")}
-          >
-            <Mail size={18} className={styles.navIcon} />
-            <span>Contact Details</span>
-          </button>
-
-          <button
-            className={`${styles.navItem} ${activeTab === "hod" ? styles.navItemActive : ""}`}
-            onClick={() => setActiveTab("hod")}
-          >
-            <UserCheck size={18} className={styles.navIcon} />
-            <span>HoD Profile</span>
-          </button>
-
-          <button
-            className={`${styles.navItem} ${activeTab === "notifications" ? styles.navItemActive : ""}`}
-            onClick={() => setActiveTab("notifications")}
-          >
-            <Bell size={18} className={styles.navIcon} />
-            <span>Notifications</span>
-          </button>
-
-          <button
-            className={`${styles.navItem} ${activeTab === "academic" ? styles.navItemActive : ""}`}
-            onClick={() => setActiveTab("academic")}
-          >
-            <BookOpen size={18} className={styles.navIcon} />
-            <span>Academic Parameters</span>
-          </button>
-
-          <button
-            className={`${styles.navItem} ${activeTab === "security" ? styles.navItemActive : ""}`}
-            onClick={() => setActiveTab("security")}
-          >
-            <ShieldCheck size={18} className={styles.navIcon} />
-            <span>Security & Privacy</span>
-          </button>
-
-          <button
-            className={`${styles.navItem} ${activeTab === "integrations" ? styles.navItemActive : ""}`}
-            onClick={() => setActiveTab("integrations")}
-          >
-            <Cpu size={18} className={styles.navIcon} />
-            <span>API Integrations</span>
-          </button>
+      {/* Header */}
+      <div className={styles.header}>
+        <div className={styles.titleArea}>
+          <h1 className={styles.title}>Department Settings</h1>
+          <p className={styles.subtitle}>
+            {activeTab === "Department" && "Manage your department profile, office details, and leadership credentials."}
+            {activeTab === "Academic" && "Configure department academic parameters, attendance rules, and evaluation cutoffs."}
+            {activeTab === "Security" && "Manage department credentials, password policies, and multi-factor authentication."}
+            {activeTab === "Notifications" && "Configure automated department alerts, low-attendance warnings, and weekly digests."}
+            {activeTab === "Integrations" && "Connect the CIP portal to third-party academic LMS, video, and audit tools."}
+          </p>
         </div>
+        
+        <div className={styles.tabs}>
+          {tabs.map((tab) => (
+            <div 
+              key={tab}
+              className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ""}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab}
+            </div>
+          ))}
+        </div>
+      </div>
 
-        {/* Right Content Form Card */}
-        <div className={styles.formCard}>
-          {/* TAB 1: Department Information */}
-          {activeTab === "dept" && (
-            <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-              <div className={styles.cardHeader}>
-                <h2 className={styles.cardTitle}>Department Information</h2>
-                <p className={styles.cardSubtitle}>
-                  Update the core details of your academic department.
-                </p>
+      {/* TAB CONTENTS */}
+      <div style={{ marginTop: 12 }}>
+        {/* TAB 1: Department */}
+        {activeTab === "Department" && (
+          <div className={styles.tabContent}>
+            <div className={styles.sectionGroup}>
+              <div className={styles.sectionInfo}>
+                <div className={styles.sectionTitle}>Department Profile</div>
+                <div className={styles.sectionDesc}>Public information and primary identifiers for your academic department.</div>
               </div>
-
-              <div className={styles.formGrid}>
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Department Name *</label>
-                  <input
-                    type="text"
-                    required
-                    className={styles.input}
-                    value={deptForm.name}
-                    onChange={(e) => setDeptForm((prev) => ({ ...prev, name: e.target.value }))}
-                  />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Department Code *</label>
-                  <input
-                    type="text"
-                    required
-                    className={styles.input}
-                    value={deptForm.code}
-                    onChange={(e) => setDeptForm((prev) => ({ ...prev, code: e.target.value }))}
-                  />
-                </div>
+              <div className={styles.sectionCard}>
+                <form onSubmit={handleSave}>
+                  <div className={styles.formGrid}>
+                    <div className={styles.formGroup} style={{ gridColumn: "span 2" }}>
+                      <label className={styles.label}>Department Name</label>
+                      <input 
+                        className={styles.input} 
+                        type="text" 
+                        value={deptForm.name} 
+                        onChange={(e) => setDeptForm({...deptForm, name: e.target.value})}
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Department Code</label>
+                      <input 
+                        className={styles.input} 
+                        type="text" 
+                        value={deptForm.code} 
+                        onChange={(e) => setDeptForm({...deptForm, code: e.target.value})}
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Department Email</label>
+                      <input 
+                        className={styles.input} 
+                        type="email" 
+                        value={deptForm.email} 
+                        onChange={(e) => setDeptForm({...deptForm, email: e.target.value})}
+                      />
+                    </div>
+                    <div className={styles.formGroup} style={{ gridColumn: "span 2" }}>
+                      <label className={styles.label}>Mission Statement</label>
+                      <textarea 
+                        className={styles.textarea} 
+                        value={deptForm.mission} 
+                        onChange={(e) => setDeptForm({...deptForm, mission: e.target.value})}
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Direct Contact Phone</label>
+                      <input 
+                        className={styles.input} 
+                        type="text" 
+                        value={deptForm.phone} 
+                        onChange={(e) => setDeptForm({...deptForm, phone: e.target.value})}
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Office Location / Room</label>
+                      <input 
+                        className={styles.input} 
+                        type="text" 
+                        value={deptForm.office} 
+                        onChange={(e) => setDeptForm({...deptForm, office: e.target.value})}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className={styles.btnGroup}>
+                    <button type="button" className={styles.btnCancel} onClick={() => triggerToast("Reverted to saved values.")}>Cancel</button>
+                    <button type="submit" className={styles.btnSave} disabled={isSaving}>
+                      <Save size={14} /> Save Changes
+                    </button>
+                  </div>
+                </form>
               </div>
+            </div>
 
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Mission Statement</label>
-                <textarea
-                  className={styles.textarea}
-                  value={deptForm.mission}
-                  onChange={(e) => setDeptForm((prev) => ({ ...prev, mission: e.target.value }))}
-                />
+            <div className={styles.sectionGroup}>
+              <div className={styles.sectionInfo}>
+                <div className={styles.sectionTitle}>HoD Leadership Credentials</div>
+                <div className={styles.sectionDesc}>Identity details for the Head of Department registry.</div>
               </div>
+              <div className={styles.sectionCard}>
+                <form onSubmit={handleSave}>
+                  <div className={styles.formGrid}>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Full Name</label>
+                      <input 
+                        className={styles.input} 
+                        type="text" 
+                        value={hodForm.name} 
+                        onChange={(e) => setHodForm({...hodForm, name: e.target.value})}
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Staff Registry Code</label>
+                      <input 
+                        className={styles.input} 
+                        type="text" 
+                        value={hodForm.staffId} 
+                        onChange={(e) => setHodForm({...hodForm, staffId: e.target.value})}
+                      />
+                    </div>
+                    <div className={styles.formGroup} style={{ gridColumn: "span 2" }}>
+                      <label className={styles.label}>Designation & Role</label>
+                      <input 
+                        className={styles.input} 
+                        type="text" 
+                        value={hodForm.designation} 
+                        onChange={(e) => setHodForm({...hodForm, designation: e.target.value})}
+                      />
+                    </div>
+                  </div>
 
-              <div className={styles.infoBox}>
-                <Info size={18} className={styles.infoIcon} />
-                <span>
-                  Updating the Department Name will affect all generated certificates and official reports across the CIP system.
-                </span>
+                  <div className={styles.btnGroup}>
+                    <button type="button" className={styles.btnCancel} onClick={() => triggerToast("Reverted changes.")}>Cancel</button>
+                    <button type="submit" className={styles.btnSave} disabled={isSaving}>
+                      <Save size={14} /> Update Credentials
+                    </button>
+                  </div>
+                </form>
               </div>
+            </div>
+          </div>
+        )}
 
-              <div className={styles.btnRow}>
-                <button
-                  type="button"
-                  className={styles.cancelBtn}
-                  onClick={() => handleReset("dept")}
-                >
-                  Cancel Changes
-                </button>
-                <button type="submit" className={styles.saveBtn} disabled={isSaving}>
-                  <Save size={16} />
-                  <span>{isSaving ? "Saving..." : "Save All Changes"}</span>
-                </button>
+        {/* TAB 2: Academic */}
+        {activeTab === "Academic" && (
+          <div className={styles.tabContent}>
+            <div className={styles.sectionGroup}>
+              <div className={styles.sectionInfo}>
+                <div className={styles.sectionTitle}>Academic Calendar & Term</div>
+                <div className={styles.sectionDesc}>Define current operating academic year and semester cycles.</div>
               </div>
-            </form>
-          )}
+              <div className={styles.sectionCard}>
+                <form onSubmit={handleSave}>
+                  <div className={styles.formGrid}>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Current Academic Year</label>
+                      <select 
+                        className={styles.select} 
+                        value={academicForm.academicYear}
+                        onChange={(e) => setAcademicForm({...academicForm, academicYear: e.target.value})}
+                      >
+                        <option>2024 - 2025</option>
+                        <option>2025 - 2026</option>
+                      </select>
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Term Semester Type</label>
+                      <select 
+                        className={styles.select}
+                        value={academicForm.termType}
+                        onChange={(e) => setAcademicForm({...academicForm, termType: e.target.value})}
+                      >
+                        <option>Odd Semester (July - December)</option>
+                        <option>Even Semester (January - May)</option>
+                      </select>
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Passing Score Cutoff (%)</label>
+                      <input 
+                        className={styles.input} 
+                        type="number" 
+                        value={academicForm.passScore}
+                        onChange={(e) => setAcademicForm({...academicForm, passScore: Number(e.target.value)})}
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Min Attendance Cutoff (%)</label>
+                      <input 
+                        className={styles.input} 
+                        type="number" 
+                        value={academicForm.minAttendance}
+                        onChange={(e) => setAcademicForm({...academicForm, minAttendance: Number(e.target.value)})}
+                      />
+                    </div>
+                  </div>
 
-          {/* TAB 2: Contact Details */}
-          {activeTab === "contact" && (
-            <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-              <div className={styles.cardHeader}>
-                <h2 className={styles.cardTitle}>Contact Details</h2>
-                <p className={styles.cardSubtitle}>
-                  Manage public department email, direct extension, and office locations.
-                </p>
+                  <div className={styles.toggleRow} style={{ marginTop: "12px" }}>
+                    <div className={styles.toggleInfo}>
+                      <div className={styles.toggleTitle}>Allow Faculty Override</div>
+                      <div className={styles.toggleDesc}>Permit course lead professors to adjust calculated semester attendance scores.</div>
+                    </div>
+                    <label className={styles.switch}>
+                      <input 
+                        type="checkbox" 
+                        checked={academicForm.facultyOverride}
+                        onChange={(e) => setAcademicForm({...academicForm, facultyOverride: e.target.checked})}
+                      />
+                      <span className={styles.slider}></span>
+                    </label>
+                  </div>
+
+                  <div className={styles.btnGroup}>
+                    <button type="button" className={styles.btnCancel} onClick={() => triggerToast("Discarded changes.")}>Discard Changes</button>
+                    <button type="submit" className={styles.btnSave}>Save Academic Rules</button>
+                  </div>
+                </form>
               </div>
+            </div>
+          </div>
+        )}
 
-              <div className={styles.formGrid}>
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Department Email *</label>
-                  <input
-                    type="email"
-                    required
-                    className={styles.input}
-                    value={contactForm.email}
-                    onChange={(e) => setContactForm((prev) => ({ ...prev, email: e.target.value }))}
-                  />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Direct Contact Number *</label>
-                  <input
-                    type="text"
-                    required
-                    className={styles.input}
-                    value={contactForm.phone}
-                    onChange={(e) => setContactForm((prev) => ({ ...prev, phone: e.target.value }))}
-                  />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Office Location / Room *</label>
-                  <input
-                    type="text"
-                    required
-                    className={styles.input}
-                    value={contactForm.office}
-                    onChange={(e) => setContactForm((prev) => ({ ...prev, office: e.target.value }))}
-                  />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Department Website URL</label>
-                  <input
-                    type="url"
-                    className={styles.input}
-                    value={contactForm.portalUrl}
-                    onChange={(e) => setContactForm((prev) => ({ ...prev, portalUrl: e.target.value }))}
-                  />
-                </div>
+        {/* TAB 3: Security */}
+        {activeTab === "Security" && (
+          <div className={styles.tabContent}>
+            <div className={styles.sectionGroup}>
+              <div className={styles.sectionInfo}>
+                <div className={styles.sectionTitle}>Account Credentials</div>
+                <div className={styles.sectionDesc}>Update account password and security authorization levels.</div>
               </div>
+              <div className={styles.sectionCard}>
+                <form onSubmit={handleSave}>
+                  <div className={styles.formGridSingle}>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Current Password</label>
+                      <div style={{ position: "relative" }}>
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          className={styles.input}
+                          style={{ width: "100%" }}
+                          placeholder="••••••••••••"
+                          value={securityForm.currentPassword}
+                          onChange={(e) => setSecurityForm({ ...securityForm, currentPassword: e.target.value })}
+                        />
+                        <button
+                          type="button"
+                          style={{ position: "absolute", right: "12px", top: "11px", border: "none", background: "none", cursor: "pointer", color: "#64748b" }}
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
+                    </div>
 
-              <div className={styles.btnRow}>
-                <button
-                  type="button"
-                  className={styles.cancelBtn}
-                  onClick={() => handleReset("contact")}
-                >
-                  Cancel Changes
-                </button>
-                <button type="submit" className={styles.saveBtn} disabled={isSaving}>
-                  <Save size={16} />
-                  <span>{isSaving ? "Saving..." : "Save All Changes"}</span>
-                </button>
+                    <div className={styles.formGrid}>
+                      <div className={styles.formGroup}>
+                        <label className={styles.label}>New Password</label>
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          className={styles.input}
+                          placeholder="Min 8 characters"
+                          value={securityForm.newPassword}
+                          onChange={(e) => setSecurityForm({ ...securityForm, newPassword: e.target.value })}
+                        />
+                      </div>
+
+                      <div className={styles.formGroup}>
+                        <label className={styles.label}>Confirm New Password</label>
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          className={styles.input}
+                          placeholder="Repeat new password"
+                          value={securityForm.confirmPassword}
+                          onChange={(e) => setSecurityForm({ ...securityForm, confirmPassword: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={styles.toggleRow} style={{ marginTop: "16px" }}>
+                    <div className={styles.toggleInfo}>
+                      <div className={styles.toggleTitle}>Two-Factor Authentication (2FA)</div>
+                      <div className={styles.toggleDesc}>Require a single-use passcode upon login for department admin security.</div>
+                    </div>
+                    <label className={styles.switch}>
+                      <input
+                        type="checkbox"
+                        checked={securityForm.enable2FA}
+                        onChange={(e) => {
+                          setSecurityForm({ ...securityForm, enable2FA: e.target.checked });
+                          triggerToast("2FA security setting updated!");
+                        }}
+                      />
+                      <span className={styles.slider}></span>
+                    </label>
+                  </div>
+
+                  <div className={styles.btnGroup}>
+                    <button type="button" className={styles.btnCancel}>Cancel</button>
+                    <button type="submit" className={styles.btnSave}>
+                      <Lock size={14} /> Update Security
+                    </button>
+                  </div>
+                </form>
               </div>
-            </form>
-          )}
+            </div>
+          </div>
+        )}
 
-          {/* TAB 3: HoD Profile */}
-          {activeTab === "hod" && (
-            <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-              <div className={styles.cardHeader}>
-                <h2 className={styles.cardTitle}>HoD Personal Profile</h2>
-                <p className={styles.cardSubtitle}>
-                  Update Head of Department identity, staff registry code, and credentials.
-                </p>
+        {/* TAB 4: Notifications */}
+        {activeTab === "Notifications" && (
+          <div className={styles.tabContent}>
+            <div className={styles.sectionGroup}>
+              <div className={styles.sectionInfo}>
+                <div className={styles.sectionTitle}>Automated Department Alerts</div>
+                <div className={styles.sectionDesc}>Control automated email and system alerts for department monitoring.</div>
               </div>
-
-              <div className={styles.formGrid}>
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Full Name *</label>
-                  <input
-                    type="text"
-                    required
-                    className={styles.input}
-                    value={hodForm.name}
-                    onChange={(e) => setHodForm((prev) => ({ ...prev, name: e.target.value }))}
-                  />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Staff Registry ID *</label>
-                  <input
-                    type="text"
-                    required
-                    className={styles.input}
-                    value={hodForm.staffId}
-                    onChange={(e) => setHodForm((prev) => ({ ...prev, staffId: e.target.value }))}
-                  />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Designation *</label>
-                  <input
-                    type="text"
-                    required
-                    className={styles.input}
-                    value={hodForm.designation}
-                    onChange={(e) => setHodForm((prev) => ({ ...prev, designation: e.target.value }))}
-                  />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Qualifications</label>
-                  <input
-                    type="text"
-                    className={styles.input}
-                    value={hodForm.qualification}
-                    onChange={(e) => setHodForm((prev) => ({ ...prev, qualification: e.target.value }))}
-                  />
-                </div>
-              </div>
-
-              <div className={styles.btnRow}>
-                <button
-                  type="button"
-                  className={styles.cancelBtn}
-                  onClick={() => handleReset("hod")}
-                >
-                  Cancel Changes
-                </button>
-                <button type="submit" className={styles.saveBtn} disabled={isSaving}>
-                  <Save size={16} />
-                  <span>{isSaving ? "Saving..." : "Save All Changes"}</span>
-                </button>
-              </div>
-            </form>
-          )}
-
-          {/* TAB 4: Notifications */}
-          {activeTab === "notifications" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-              <div className={styles.cardHeader}>
-                <h2 className={styles.cardTitle}>Notifications & Alert Preferences</h2>
-                <p className={styles.cardSubtitle}>
-                  Configure automated department alerts, low-attendance thresholds, and report digests.
-                </p>
-              </div>
-
-              <div className={styles.toggleList}>
+              <div className={styles.sectionCard}>
                 <div className={styles.toggleRow}>
-                  <div className={styles.toggleMeta}>
-                    <span className={styles.toggleTitle}>Low Attendance Alerts</span>
-                    <span className={styles.toggleDesc}>
-                      Notify HoD automatically when class attendance drops below 75%.
-                    </span>
+                  <div className={styles.toggleInfo}>
+                    <div className={styles.toggleTitle}>Low Attendance Alerts</div>
+                    <div className={styles.toggleDesc}>Notify HoD automatically when class attendance drops below threshold.</div>
                   </div>
                   <label className={styles.switch}>
                     <input
                       type="checkbox"
                       checked={notifications.lowAttendance}
                       onChange={(e) => {
-                        setNotifications((prev) => ({ ...prev, lowAttendance: e.target.checked }));
-                        triggerToast("Notification preferences updated!");
+                        setNotifications({ ...notifications, lowAttendance: e.target.checked });
+                        triggerToast("Alert setting updated!");
                       }}
                     />
                     <span className={styles.slider}></span>
@@ -442,19 +476,17 @@ export default function HodSettingsPage() {
                 </div>
 
                 <div className={styles.toggleRow}>
-                  <div className={styles.toggleMeta}>
-                    <span className={styles.toggleTitle}>Syllabus Milestone Tracking</span>
-                    <span className={styles.toggleDesc}>
-                      Weekly automated tracking summary of faculty course completion rates.
-                    </span>
+                  <div className={styles.toggleInfo}>
+                    <div className={styles.toggleTitle}>Syllabus Milestone Tracking</div>
+                    <div className={styles.toggleDesc}>Weekly automated summary of faculty course completion rates.</div>
                   </div>
                   <label className={styles.switch}>
                     <input
                       type="checkbox"
                       checked={notifications.syllabusMilestones}
                       onChange={(e) => {
-                        setNotifications((prev) => ({ ...prev, syllabusMilestones: e.target.checked }));
-                        triggerToast("Notification preferences updated!");
+                        setNotifications({ ...notifications, syllabusMilestones: e.target.checked });
+                        triggerToast("Alert setting updated!");
                       }}
                     />
                     <span className={styles.slider}></span>
@@ -462,19 +494,17 @@ export default function HodSettingsPage() {
                 </div>
 
                 <div className={styles.toggleRow}>
-                  <div className={styles.toggleMeta}>
-                    <span className={styles.toggleTitle}>Student Performance Warnings</span>
-                    <span className={styles.toggleDesc}>
-                      Instant alert when a student score drops into Critical (&lt; 40%).
-                    </span>
+                  <div className={styles.toggleInfo}>
+                    <div className={styles.toggleTitle}>Student Performance Warnings</div>
+                    <div className={styles.toggleDesc}>Instant alert when a student score drops into Critical (&lt; 40%).</div>
                   </div>
                   <label className={styles.switch}>
                     <input
                       type="checkbox"
                       checked={notifications.studentWarning}
                       onChange={(e) => {
-                        setNotifications((prev) => ({ ...prev, studentWarning: e.target.checked }));
-                        triggerToast("Notification preferences updated!");
+                        setNotifications({ ...notifications, studentWarning: e.target.checked });
+                        triggerToast("Alert setting updated!");
                       }}
                     />
                     <span className={styles.slider}></span>
@@ -482,19 +512,17 @@ export default function HodSettingsPage() {
                 </div>
 
                 <div className={styles.toggleRow}>
-                  <div className={styles.toggleMeta}>
-                    <span className={styles.toggleTitle}>Weekly Email Report Digest</span>
-                    <span className={styles.toggleDesc}>
-                      Receive an aggregated PDF summary of department metrics every Monday morning.
-                    </span>
+                  <div className={styles.toggleInfo}>
+                    <div className={styles.toggleTitle}>Weekly Email Report Digest</div>
+                    <div className={styles.toggleDesc}>Receive an aggregated PDF summary of department metrics every Monday.</div>
                   </div>
                   <label className={styles.switch}>
                     <input
                       type="checkbox"
                       checked={notifications.weeklyDigest}
                       onChange={(e) => {
-                        setNotifications((prev) => ({ ...prev, weeklyDigest: e.target.checked }));
-                        triggerToast("Notification preferences updated!");
+                        setNotifications({ ...notifications, weeklyDigest: e.target.checked });
+                        triggerToast("Alert setting updated!");
                       }}
                     />
                     <span className={styles.slider}></span>
@@ -502,254 +530,78 @@ export default function HodSettingsPage() {
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* TAB 5: Academic Parameters */}
-          {activeTab === "academic" && (
-            <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-              <div className={styles.cardHeader}>
-                <h2 className={styles.cardTitle}>Academic Info & Thresholds</h2>
-                <p className={styles.cardSubtitle}>
-                  Set active academic years, semester formats, and passing grade cutoffs.
-                </p>
+        {/* TAB 5: Integrations */}
+        {activeTab === "Integrations" && (
+          <div className={styles.tabContent}>
+            <div className={styles.sectionGroup}>
+              <div className={styles.sectionInfo}>
+                <div className={styles.sectionTitle}>Connected Academic Tools</div>
+                <div className={styles.sectionDesc}>Connect the CIP portal to third-party academic tools, LMS, and video platforms.</div>
               </div>
-
-              <div className={styles.formGrid}>
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Current Academic Year *</label>
-                  <select
-                    className={styles.select}
-                    value={academicForm.academicYear}
-                    onChange={(e) => setAcademicForm((prev) => ({ ...prev, academicYear: e.target.value }))}
-                  >
-                    <option value="2024 - 2025">2024 - 2025</option>
-                    <option value="2025 - 2026">2025 - 2026</option>
-                  </select>
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Current Term Type *</label>
-                  <select
-                    className={styles.select}
-                    value={academicForm.termType}
-                    onChange={(e) => setAcademicForm((prev) => ({ ...prev, termType: e.target.value }))}
-                  >
-                    <option value="Odd Semester (July - December)">Odd Semester (July - December)</option>
-                    <option value="Even Semester (January - May)">Even Semester (January - May)</option>
-                  </select>
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Passing Score Cutoff (%)</label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    className={styles.input}
-                    value={academicForm.passScore}
-                    onChange={(e) => setAcademicForm((prev) => ({ ...prev, passScore: Number(e.target.value) }))}
-                  />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Min Attendance Cutoff (%)</label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    className={styles.input}
-                    value={academicForm.minAttendance}
-                    onChange={(e) => setAcademicForm((prev) => ({ ...prev, minAttendance: Number(e.target.value) }))}
-                  />
-                </div>
-              </div>
-
-              <div className={styles.btnRow}>
-                <button
-                  type="button"
-                  className={styles.cancelBtn}
-                  onClick={() => handleReset("academic")}
-                >
-                  Cancel Changes
-                </button>
-                <button type="submit" className={styles.saveBtn} disabled={isSaving}>
-                  <Save size={16} />
-                  <span>{isSaving ? "Saving..." : "Save All Changes"}</span>
-                </button>
-              </div>
-            </form>
-          )}
-
-          {/* TAB 6: Security & Privacy */}
-          {activeTab === "security" && (
-            <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-              <div className={styles.cardHeader}>
-                <h2 className={styles.cardTitle}>Security & Privacy</h2>
-                <p className={styles.cardSubtitle}>
-                  Update account credentials, password policies, and multi-factor authentication.
-                </p>
-              </div>
-
-              <div className={styles.formGridSingle}>
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Current Password</label>
-                  <div style={{ position: "relative" }}>
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      className={styles.input}
-                      placeholder="••••••••••••"
-                      style={{ width: "100%" }}
-                      value={securityForm.currentPassword}
-                      onChange={(e) => setSecurityForm((prev) => ({ ...prev, currentPassword: e.target.value }))}
-                    />
-                    <button
-                      type="button"
-                      style={{ position: "absolute", right: "12px", top: "12px", border: "none", background: "none", cursor: "pointer", color: "#64748b" }}
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className={styles.formGrid}>
-                  <div className={styles.formGroup}>
-                    <label className={styles.label}>New Password</label>
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      className={styles.input}
-                      placeholder="Min 8 chars, 1 number"
-                      value={securityForm.newPassword}
-                      onChange={(e) => setSecurityForm((prev) => ({ ...prev, newPassword: e.target.value }))}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label className={styles.label}>Confirm New Password</label>
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      className={styles.input}
-                      placeholder="Repeat new password"
-                      value={securityForm.confirmPassword}
-                      onChange={(e) => setSecurityForm((prev) => ({ ...prev, confirmPassword: e.target.value }))}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles.toggleRow}>
-                <div className={styles.toggleMeta}>
-                  <span className={styles.toggleTitle}>Two-Factor Authentication (2FA)</span>
-                  <span className={styles.toggleDesc}>
-                    Require a single-use passcode upon login for department admin security.
-                  </span>
-                </div>
-                <label className={styles.switch}>
-                  <input
-                    type="checkbox"
-                    checked={securityForm.enable2FA}
-                    onChange={(e) => {
-                      setSecurityForm((prev) => ({ ...prev, enable2FA: e.target.checked }));
-                      triggerToast("2FA security setting updated!");
-                    }}
-                  />
-                  <span className={styles.slider}></span>
-                </label>
-              </div>
-
-              <div className={styles.btnRow}>
-                <button
-                  type="button"
-                  className={styles.cancelBtn}
-                  onClick={() => handleReset("security")}
-                >
-                  Cancel
-                </button>
-                <button type="submit" className={styles.saveBtn} disabled={isSaving}>
-                  <Lock size={16} />
-                  <span>Update Password & Security</span>
-                </button>
-              </div>
-            </form>
-          )}
-
-          {/* TAB 7: API Integrations */}
-          {activeTab === "integrations" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-              <div className={styles.cardHeader}>
-                <h2 className={styles.cardTitle}>API Integrations</h2>
-                <p className={styles.cardSubtitle}>
-                  Connect the CIP portal to third-party academic tools, LMS, and video platforms.
-                </p>
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                {integrations.map((tool) => (
-                  <div key={tool.id} className={styles.toggleRow} style={{ backgroundColor: "#ffffff" }}>
-                    <div className={styles.toggleMeta}>
-                      <span className={styles.toggleTitle}>{tool.name}</span>
-                      <span className={styles.toggleDesc}>{tool.category} Sync & Data Connector</span>
+              <div className={styles.sectionCard}>
+                <div className={styles.integrationList}>
+                  {integrations.map((tool) => (
+                    <div key={tool.id} className={styles.integrationItem}>
+                      <div className={styles.integrationIconBox}>
+                        <Cpu size={20} />
+                      </div>
+                      <div className={styles.integrationInfo}>
+                        <span className={styles.integrationTitle}>{tool.name}</span>
+                        <span className={styles.integrationDesc}>{tool.category}</span>
+                      </div>
+                      <div>
+                        <span className={tool.status === "Connected" ? styles.badgeConnected : styles.badgeDisconnected}>
+                          {tool.status === "Connected" ? "Connected ✓" : "Disconnected"}
+                        </span>
+                      </div>
+                      <div>
+                        <button
+                          type="button"
+                          className={tool.status === "Connected" ? styles.btnCancel : styles.btnSave}
+                          onClick={() => toggleIntegration(tool.id)}
+                        >
+                          {tool.status === "Connected" ? "Disconnect" : "Connect Tool"}
+                        </button>
+                      </div>
                     </div>
-
-                    <button
-                      type="button"
-                      style={{
-                        padding: "8px 16px",
-                        borderRadius: "8px",
-                        border: tool.status === "Connected" ? "1px solid #c2e7da" : "1px solid #cbd5e1",
-                        backgroundColor: tool.status === "Connected" ? "#e6f4ea" : "#ffffff",
-                        color: tool.status === "Connected" ? "#00522e" : "#475569",
-                        fontWeight: 700,
-                        fontSize: "0.8rem",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => toggleIntegration(tool.id)}
-                    >
-                      {tool.status === "Connected" ? "Connected ✓" : "Connect Tool"}
-                    </button>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
-      {/* Quick Action Bottom Cards Grid (Matching Stitch mockup structure) */}
-      <div className={styles.bottomCardsGrid}>
-        <div className={styles.quickCard}>
-          <div className={styles.quickCardIcon}>
-            <ShieldCheck size={22} />
-          </div>
+      {/* Quick Action Bottom Cards Grid */}
+      <div className={styles.quickActionGrid}>
+        <div className={styles.quickActionCard}>
+          <ShieldCheck className={styles.quickActionIcon} size={24} />
           <div>
-            <h3 className={styles.quickCardTitle}>Security & Privacy</h3>
-            <p className={styles.quickCardDesc}>
-              Manage passwords, 2FA authentication, and department data access levels.
-            </p>
+            <div className={styles.quickActionTitle}>Security & Access Controls</div>
+            <div className={styles.quickActionDesc}>Manage security parameters, password policies, and department data permissions.</div>
           </div>
           <button 
-            className={styles.quickCardActionBtn}
-            onClick={() => setActiveTab("security")}
+            className={styles.quickActionBtn}
+            onClick={() => setActiveTab("Security")}
           >
-            Manage Security Settings →
+            Manage Security Settings <ArrowRight size={14} />
           </button>
         </div>
 
-        <div className={styles.quickCard}>
-          <div className={styles.quickCardIcon}>
-            <Cpu size={22} />
-          </div>
+        <div className={styles.quickActionCard}>
+          <Cpu className={styles.quickActionIcon} size={24} />
           <div>
-            <h3 className={styles.quickCardTitle}>API Integrations</h3>
-            <p className={styles.quickCardDesc}>
-              Connect the CIP portal to third-party academic tools like LMS & Zoom.
-            </p>
+            <div className={styles.quickActionTitle}>LMS & API Integrations</div>
+            <div className={styles.quickActionDesc}>Manage data synchronization with Google Classroom, Moodle LMS, and Turnitin audit engines.</div>
           </div>
           <button 
-            className={styles.quickCardActionBtn}
-            onClick={() => setActiveTab("integrations")}
+            className={styles.quickActionBtn}
+            onClick={() => setActiveTab("Integrations")}
           >
-            Configure Integrations →
+            Configure Integrations <ArrowRight size={14} />
           </button>
         </div>
       </div>

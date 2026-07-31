@@ -20,7 +20,7 @@ export default function DirectoryFilterBar() {
         <select className={styles.selectInput} defaultValue="All Users">
           <option>All Users</option>
           <option>Student</option>
-          <option>Faculty</option>
+          <option>Staff</option>
           <option>HoD</option>
         </select>
       </div>

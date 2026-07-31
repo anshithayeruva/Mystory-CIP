@@ -8,37 +8,41 @@ datasource db {
 }
 
 model User {
-  id             String          @id @default(auto()) @map("_id") @db.ObjectId
-  email          String          @unique
-  passwordHash   String
-  role           Role            @default(STUDENT)
-  firstName      String
-  lastName       String
-  phoneNumber    String?
-  lastLoginAt    DateTime?
-  isActive       Boolean         @default(true)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  adminProfile   AdminProfile?
-  facultyProfile FacultyProfile?
-  hodProfile     HodProfile?
-  studentProfile StudentProfile?
+  id               String            @id @default(auto()) @map("_id") @db.ObjectId
+  email            String            @unique
+  passwordHash     String
+  role             Role              @default(STUDENT)
+  firstName        String
+  lastName         String
+  phoneNumber      String?
+  lastLoginAt      DateTime?
+  isActive         Boolean           @default(true)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  adminProfile     AdminProfile?
+  facultyProfile   FacultyProfile?
+  hodProfile       HodProfile?
+  studentProfile   StudentProfile?
+  reports          Report[]
+  approvalRequests ApprovalRequest[]
 
   @@index([role])
 }
 
 model Department {
-  id        String           @id @default(auto()) @map("_id") @db.ObjectId
-  name      String           @unique
-  code      String           @unique
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
+  id            String           @id @default(auto()) @map("_id") @db.ObjectId
+  name          String           @unique
+  code          String           @unique
+  description   String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
   courses       Course[]
   faculty       FacultyProfile[]
   hod           HodProfile?
   programs      Program[]
   students      StudentProfile[]
   pulseSessions PulseSession[]
+  events        Event[]
 }
 
 model AdminProfile {
@@ -61,46 +65,51 @@ model HodProfile {
 }
 
 model FacultyProfile {
-  id           String          @id @default(auto()) @map("_id") @db.ObjectId
-  userId       String          @unique @db.ObjectId
-  employeeId   String          @unique
-  designation  String
-  departmentId String          @db.ObjectId
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-  status        FacultyStatus   @default(ACTIVE)
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String          @unique @db.ObjectId
+  employeeId     String          @unique
+  designation    String
+  departmentId   String          @db.ObjectId
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  status         FacultyStatus   @default(ACTIVE)
   profilePicture String?
   officeLocation String?
-  courses       FacultyCourse[]
-  pulseSessions PulseSession[]
-  department    Department      @relation(fields: [departmentId], references: [id])
-  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  officeHours    String?
+  bio            String?
+  specialization String?
+  contactEmail   String?
+  contactPhone   String?
+  courses        FacultyCourse[]
+  pulseSessions  PulseSession[]
+  department     Department      @relation(fields: [departmentId], references: [id])
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([departmentId])
 }
 
 model StudentProfile {
-  id                 String        @id @default(auto()) @map("_id") @db.ObjectId
-  userId             String        @unique @db.ObjectId
-  rollNumber         String        @unique
-  departmentId       String        @db.ObjectId
-  currentSemester    Int
-  batch              String
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
-  programId          String?       @db.ObjectId
-  registrationNumber String?       @unique
-  sectionId          String?       @db.ObjectId
-  semesterId         String?       @db.ObjectId
-  status             StudentStatus @default(ACTIVE)
-  attendance         Attendance[]
-  enrollments        Enrollment[]
+  id                  String               @id @default(auto()) @map("_id") @db.ObjectId
+  userId              String               @unique @db.ObjectId
+  rollNumber          String               @unique
+  departmentId        String               @db.ObjectId
+  currentSemester     Int
+  batch               String
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  programId           String?              @db.ObjectId
+  registrationNumber  String?              @unique
+  sectionId           String?              @db.ObjectId
+  semesterId          String?              @db.ObjectId
+  status              StudentStatus        @default(ACTIVE)
+  attendance          Attendance[]
+  enrollments         Enrollment[]
   pulseParticipations PulseParticipation[]
-  department         Department    @relation(fields: [departmentId], references: [id])
-  program            Program?      @relation(fields: [programId], references: [id])
-  section            Section?      @relation(fields: [sectionId], references: [id])
-  semester           Semester?     @relation(fields: [semesterId], references: [id])
-  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department          Department           @relation(fields: [departmentId], references: [id])
+  program             Program?             @relation(fields: [programId], references: [id])
+  section             Section?             @relation(fields: [sectionId], references: [id])
+  semester            Semester?            @relation(fields: [semesterId], references: [id])
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([departmentId])
   @@index([currentSemester])
@@ -110,24 +119,26 @@ model StudentProfile {
 }
 
 model Course {
-  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  id             String               @id @default(auto()) @map("_id") @db.ObjectId
   name           String
-  code           String          @unique
+  code           String               @unique
   credits        Int
-  departmentId   String          @db.ObjectId
-  programId      String?         @db.ObjectId
+  departmentId   String               @db.ObjectId
+  programId      String?              @db.ObjectId
   semester       Int?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  description    String?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
   attendance     Attendance[]
-  department     Department      @relation(fields: [departmentId], references: [id])
-  program        Program?        @relation(fields: [programId], references: [id])
+  department     Department           @relation(fields: [departmentId], references: [id])
+  program        Program?             @relation(fields: [programId], references: [id])
   enrollments    Enrollment[]
   facultyCourses FacultyCourse[]
   syllabus       Syllabus?
   courseOutcomes CourseOutcome[]
   units          Unit[]
   pulseSessions  PulseSession[]
+  conceptGaps    ConceptGapAnalysis[]
 
   @@index([departmentId])
   @@index([programId])
@@ -188,13 +199,17 @@ model FacultyCourse {
 }
 
 model Program {
-  id           String           @id @default(auto()) @map("_id") @db.ObjectId
-  name         String           @unique
-  code         String           @unique
-  departmentId String           @db.ObjectId
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
-  department   Department       @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  id            String           @id @default(auto()) @map("_id") @db.ObjectId
+  name          String           @unique
+  code          String           @unique
+  departmentId  String           @db.ObjectId
+  degreeLevel   String?
+  duration      String?
+  intake        Int?
+  description   String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  department    Department       @relation(fields: [departmentId], references: [id], onDelete: Cascade)
   semesters     Semester[]
   students      StudentProfile[]
   courses       Course[]
@@ -276,7 +291,7 @@ model Syllabus {
 model CourseOutcome {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   courseId    String   @db.ObjectId
-  coNumber    String   // e.g., "CO1", "CO2" or "1"
+  coNumber    String // e.g., "CO1", "CO2" or "1"
   title       String
   description String
   createdAt   DateTime @default(now())
@@ -290,7 +305,7 @@ model CourseOutcome {
 model Unit {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   courseId    String   @db.ObjectId
-  unitNumber  Int      // e.g., 1, 2, 3
+  unitNumber  Int // e.g., 1, 2, 3
   unitName    String
   description String?
   createdAt   DateTime @default(now())
@@ -303,14 +318,15 @@ model Unit {
 }
 
 model Topic {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  unitId      String   @db.ObjectId
-  topicName   String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  unit          Unit           @relation(fields: [unitId], references: [id], onDelete: Cascade)
-  pulseSessions PulseSession[]
+  id                 String               @id @default(auto()) @map("_id") @db.ObjectId
+  unitId             String               @db.ObjectId
+  topicName          String
+  description        String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  unit               Unit                 @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  pulseSessions      PulseSession[]
+  conceptGapAnalyses ConceptGapAnalysis[]
 
   @@index([unitId])
 }
@@ -370,25 +386,25 @@ enum PulseTimerStatus {
 }
 
 model PulseSession {
-  id               String                @id @default(auto()) @map("_id") @db.ObjectId
-  courseId         String                @db.ObjectId
-  topicId          String                @db.ObjectId
-  departmentId     String                @db.ObjectId
-  programId        String?               @db.ObjectId
-  semester         Int
-  section          String
-  facultyId        String                @db.ObjectId
-  sessionType      PulseSessionType
-  title            String
-  description      String?
-  date             DateTime
-  startTime        String
-  durationMinutes  Int
-  questionCount    Int
-  questionType     PulseQuestionType
-  difficultyLevel  PulseDifficultyLevel
-  attendanceRule   PulseAttendanceRule
-  resultVisibility PulseResultVisibility
+  id                    String                @id @default(auto()) @map("_id") @db.ObjectId
+  courseId              String                @db.ObjectId
+  topicId               String                @db.ObjectId
+  departmentId          String                @db.ObjectId
+  programId             String?               @db.ObjectId
+  semester              Int
+  section               String
+  facultyId             String                @db.ObjectId
+  sessionType           PulseSessionType
+  title                 String
+  description           String?
+  date                  DateTime
+  startTime             String
+  durationMinutes       Int
+  questionCount         Int
+  questionType          PulseQuestionType
+  difficultyLevel       PulseDifficultyLevel
+  attendanceRule        PulseAttendanceRule
+  resultVisibility      PulseResultVisibility
   status                PulseSessionStatus    @default(DRAFT)
   sessionCode           String?               @unique
   codeCreatedAt         DateTime?
@@ -400,16 +416,19 @@ model PulseSession {
   timerActualStartTime  DateTime?
   timerActualEndTime    DateTime?
   timerRemainingSeconds Int?
-  createdAt        DateTime              @default(now())
-  updatedAt        DateTime              @updatedAt
+  publishImmediately    Boolean               @default(false)
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
 
-  course     Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  topic      Topic          @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  department Department     @relation(fields: [departmentId], references: [id])
-  program    Program?       @relation(fields: [programId], references: [id])
-  faculty    FacultyProfile @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  course         Course               @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  topic          Topic                @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  department     Department           @relation(fields: [departmentId], references: [id])
+  program        Program?             @relation(fields: [programId], references: [id])
+  faculty        FacultyProfile       @relation(fields: [facultyId], references: [id], onDelete: Cascade)
   questions      PulseQuestion[]
   participations PulseParticipation[]
+  liveSession    LiveSession?
+  sessionSummary SessionSummary?
 
   @@index([courseId])
   @@index([topicId])
@@ -421,40 +440,41 @@ model PulseSession {
 }
 
 model PulseQuestion {
-  id             String          @id @default(auto()) @map("_id") @db.ObjectId
-  sessionId      String          @db.ObjectId
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionId      String   @db.ObjectId
   questionNumber Int
   questionText   String
   options        String[]
   correctAnswer  String
-  marks          Float           @default(1.0)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  marks          Float    @default(1.0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  session        PulseSession    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  answers        PulseAnswer[]
+  session      PulseSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  answers      PulseAnswer[]
+  liveSessions LiveSession[]
 
   @@unique([sessionId, questionNumber])
   @@index([sessionId])
 }
 
 model PulseParticipation {
-  id               String          @id @default(auto()) @map("_id") @db.ObjectId
-  sessionId        String          @db.ObjectId
-  studentId        String          @db.ObjectId
-  isPresent        Boolean         @default(true)
-  hasAttempted     Boolean         @default(false)
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  sessionId        String    @db.ObjectId
+  studentId        String    @db.ObjectId
+  isPresent        Boolean   @default(true)
+  hasAttempted     Boolean   @default(false)
   score            Float?
   maxScore         Float?
   percentage       Float?
   timeTakenSeconds Int?
   attemptedAt      DateTime?
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
-  session          PulseSession    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  student          StudentProfile  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  answers          PulseAnswer[]
+  session PulseSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  student StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  answers PulseAnswer[]
 
   @@unique([sessionId, studentId])
   @@index([sessionId])
@@ -462,21 +482,130 @@ model PulseParticipation {
 }
 
 model PulseAnswer {
-  id               String             @id @default(auto()) @map("_id") @db.ObjectId
-  participationId  String             @db.ObjectId
-  questionId       String             @db.ObjectId
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  participationId  String   @db.ObjectId
+  questionId       String   @db.ObjectId
   studentAnswer    String
   isCorrect        Boolean
-  marksAwarded     Float              @default(0.0)
+  marksAwarded     Float    @default(0.0)
   timeTakenSeconds Int?
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  participation    PulseParticipation @relation(fields: [participationId], references: [id], onDelete: Cascade)
-  question         PulseQuestion      @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  participation PulseParticipation @relation(fields: [participationId], references: [id], onDelete: Cascade)
+  question      PulseQuestion      @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   @@unique([participationId, questionId])
   @@index([participationId])
   @@index([questionId])
 }
 
+model Institution {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  name              String
+  logo              String?
+  academicYear      String
+  semester          String
+  operationalStatus String   @default("LIVE")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Event {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  departmentId String?  @db.ObjectId
+  date         DateTime
+  time         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  department Department? @relation(fields: [departmentId], references: [id])
+}
+
+model Report {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  type         String
+  exportFormat String?  @default("PDF")
+  generatedBy  String   @db.ObjectId
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [generatedBy], references: [id])
+}
+
+model ApprovalRequest {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  type        String
+  status      String   @default("PENDING")
+  requestedBy String   @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [requestedBy], references: [id])
+}
+
+model LiveSession {
+  id                String            @id @default(auto()) @map("_id") @db.ObjectId
+  pulseSessionId    String            @unique @db.ObjectId
+  status            LiveSessionStatus @default(NOT_STARTED)
+  startedAt         DateTime?
+  endedAt           DateTime?
+  activeStudents    Int               @default(0)
+  sessionProgress   Float             @default(0.0)
+  currentQuestionId String?           @db.ObjectId
+
+  pulseSession    PulseSession   @relation(fields: [pulseSessionId], references: [id], onDelete: Cascade)
+  currentQuestion PulseQuestion? @relation(fields: [currentQuestionId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum LiveSessionStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  PAUSED
+  ENDED
+}
+
+model SessionSummary {
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  pulseSessionId       String   @unique @db.ObjectId
+  attendanceCount      Int      @default(0)
+  averageScore         Float    @default(0.0)
+  averageUnderstanding Float    @default(0.0)
+  weakConcepts         String[]
+  strongConcepts       String[]
+  participationRate    Float    @default(0.0)
+  completionTimeAvg    Float    @default(0.0)
+  recommendations      String[]
+
+  pulseSession PulseSession @relation(fields: [pulseSessionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ConceptGapAnalysis {
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  courseId             String   @db.ObjectId
+  topicId              String   @db.ObjectId
+  averageUnderstanding Float    @default(0.0)
+  studentsAtRisk       Int      @default(0)
+  weakAreas            String[]
+  strongAreas          String[]
+  trend                String
+  recommendations      String[]
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  topic  Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
+  @@index([topicId])
+}

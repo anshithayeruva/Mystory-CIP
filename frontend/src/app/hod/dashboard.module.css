@@ -4,10 +4,115 @@
   gap: 24px;
 }
 
-/* Top Metrics Row (4 Cards) */
+/* University Banner (mirrors admin OverviewCard header) */
+.universityBanner {
+  background-color: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+}
+
+.universityInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.universityLogo {
+  width: 48px;
+  height: 48px;
+  background-color: var(--surface-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.universityLogoPlaceholder {
+  width: 100%;
+  height: 100%;
+  background-color: var(--background);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.universityDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.universityName {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--success);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--success);
+  border-radius: 50%;
+}
+
+.bannerAcademicInfo {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.bannerStatLabel {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: block;
+}
+
+.bannerStatValue {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-top: 4px;
+}
+
+.bannerDividerVertical {
+  width: 1px;
+  height: 24px;
+  background-color: var(--surface-border);
+  margin: 0 16px;
+}
+
+
+
+/* Top Metrics Row (3 Cards) */
 .metricsGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
 
@@ -73,7 +178,7 @@
 }
 
 .subtextNegative {
-  color: #dc2626;
+  color: #b91c1c;
   font-weight: 600;
 }
 
@@ -82,7 +187,129 @@
   font-weight: 500;
 }
 
+/* Programs Card */
+.programsList {
+  display: flex;
+  flex-direction: column;
+}
+
+.programItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--surface-border);
+  transition: background-color 0.15s;
+}
+
+.programItem:last-child {
+  border-bottom: none;
+}
+
+.programItem:hover {
+  background-color: #f8fafc;
+}
+
+.degreeBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.degreeBadgeBtech {
+  background-color: #e9f2ee;
+  color: #00522E;
+}
+
+.degreeBadgeMtech {
+  background-color: #eef3fb;
+  color: #1e40af;
+}
+
+.degreeBadgePhd {
+  background-color: #fdf4ff;
+  color: #7e22ce;
+}
+
+.programInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.programName {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.programMeta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.programMetaDot {
+  color: var(--surface-border);
+  font-size: 0.85rem;
+}
+
+.programStatusActive {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #00522E;
+  background-color: #e9f2ee;
+  padding: 3px 8px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+.programCount {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.programsToggleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 12px 20px;
+  border: none;
+  border-top: 1px solid var(--surface-border);
+  background-color: #f8fafc;
+  color: #00522E;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.programsToggleBtn:hover {
+  background-color: #e9f2ee;
+}
+
+
+
 /* Main Layout Grid */
+
 .mainGrid {
   display: grid;
   grid-template-columns: 1fr 340px;
@@ -222,7 +449,7 @@
   margin-top: 2px;
 }
 
-.facultyName {
+.staffName {
   font-weight: 500;
   color: #334155;
   font-size: 0.875rem;
@@ -475,24 +702,22 @@
   transform: scale(1.1);
 }
 
-/* Overall Dept. Index Card (Dark Green Banner) */
+/* Overall Dept. Index Card */
 .deptIndexCard {
-  background: linear-gradient(135deg, #00522e 0%, #00361d 100%);
-  color: #ffffff;
-  border-radius: 14px;
+  background-color: var(--surface);
+  border: 1.5px solid #b2dcc8;
+  border-radius: var(--radius-md);
   padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 8px 20px -4px rgba(0, 82, 46, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 82, 46, 0.06);
 }
 
 .deptIndexHeader {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  color: #a7f3d0;
+  color: var(--text-muted);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -508,19 +733,19 @@
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.03em;
-  color: #ffffff;
+  color: var(--text-main);
 }
 
 .deptIndexMax {
   font-size: 1.1rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--text-muted);
 }
 
 .deptProgressBar {
   width: 100%;
-  height: 5px;
-  background-color: rgba(255, 255, 255, 0.2);
+  height: 6px;
+  background-color: var(--surface-border);
   border-radius: 3px;
   overflow: hidden;
 }
@@ -528,32 +753,21 @@
 .deptProgressFill {
   width: 94%;
   height: 100%;
-  background-color: #a7f3d0;
+  background-color: #00522E;
   border-radius: 3px;
 }
 
 .deptIndexBannerText {
   font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #ffffff;
+  color: #00522E;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-/* Background diagonal arrow vector for dept index */
-.deptIndexCard::after {
-  content: '↗';
-  position: absolute;
-  right: -10px;
-  bottom: -20px;
-  font-size: 9rem;
-  font-weight: 900;
-  color: rgba(255, 255, 255, 0.05);
-  pointer-events: none;
-}
 
 /* Responsive Styles */
 @media (max-width: 1024px) {
@@ -626,3 +840,43 @@
   background-color: #f1f5f9;
   color: #0f172a;
 }
+
+/* Programs Modal */
+.programsModal {
+  background-color: #ffffff;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 560px;
+  max-height: 80vh;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.12), 0 10px 10px -5px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.programsModal .modalHeader {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  flex-shrink: 0;
+}
+
+.programsModalSubtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 4px 0 0;
+}
+
+.programsModalBody {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.programsModalBody .programItem {
+  padding: 14px 24px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+

@@ -19,17 +19,13 @@ export default function HeaderArea({ userType }: HeaderAreaProps) {
 
   return (
     <div>
-      <div className={styles.breadcrumb} style={{ fontSize: "0.75rem", color: "var(--text-muted)", display: "flex", gap: "6px", marginBottom: "8px" }}>
-        <Link href="/admin">Dashboard</Link>
-        <span>›</span>
-        <Link href="/admin/user-management">Directory</Link>
-        <span>›</span>
-        <span style={{ color: "var(--text-main)", fontWeight: 600 }}>{getTitle()}</span>
-      </div>
-      
       <div className={styles.headerRow}>
         <div>
-          <h1 className={styles.title}>{getTitle()}</h1>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px', fontSize: '0.8125rem', color: 'var(--text-main)', fontWeight: 600 }}>
+            <Link href="/admin/user-management" style={{ textDecoration: 'none', color: 'inherit' }}>Directory</Link>
+            <span style={{ margin: '0 8px', color: 'var(--text-muted)' }}>&gt;</span>
+            <h1 className={styles.title} style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-main)', display: 'inline' }}>{getTitle()}</h1>
+          </div>
           <p className={styles.subtitle}>Create a new institutional account quickly and securely.</p>
         </div>
       </div>

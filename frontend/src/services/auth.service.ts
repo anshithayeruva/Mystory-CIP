@@ -140,51 +140,7 @@ static async registerStudent(data: {
     };
   });
 }
-  /**
-   * Stub for creating new faculty.
-   */
-  static async registerFaculty(data: {
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-    employeeId: string;
-    designation: string;
-    departmentId: string;
-  }) {
-    const existing = await db.user.findUnique({
-      where: { email: data.email },
-    });
-    if (existing) {
-      throw new BadRequestError('Email already registered');
-    }
-
-    const passwordHash = await hashPassword(data.password);
-
-    return db.$transaction(async (tx) => {
-      const user = await tx.user.create({
-        data: {
-          email: data.email,
-          passwordHash,
-          role: Role.FACULTY,
-          firstName: data.firstName,
-          lastName: data.lastName,
-        },
-      });
-
-      const profile = await tx.facultyProfile.create({
-        data: {
-          userId: user.id,
-          employeeId: data.employeeId,
-          designation: data.designation,
-          departmentId: data.departmentId,
-        },
-      });
-
-      return { user, profile };
-    });
-  }
-
+  
   /**
    * Stub for creating new HODs.
    */

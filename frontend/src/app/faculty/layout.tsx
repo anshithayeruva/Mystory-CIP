@@ -1,26 +1,10 @@
 import React from 'react';
-import './faculty.css';
-import Sidebar from './components/Sidebar';
-import Header from './components/Header';
+import FacultyLayout from '@/modules/faculty/components/layout/FacultyLayout';
 
-export default function FacultyLayout({
+export default function FacultyRootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div className="faculty-layout">
-      {/* Dynamic Client-Side Sidebar */}
-      <Sidebar />
-
-      {/* Main Content */}
-      <main className="main-content">
-        {/* Dynamic Client-Side Top Header */}
-        <Header />
-
-        {/* Dynamic Page Content */}
-        {children}
-      </main>
-    </div>
-  );
+  return <FacultyLayout>{children}</FacultyLayout>;
 }

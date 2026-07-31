@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
+
 import { 
   TrendingUp, TrendingDown, GraduationCap, FileText, Calendar, Activity, 
-  Building2, Users, BookOpen, CheckCircle, BarChart, 
-  List, Download, Info, X, FileSpreadsheet, FileJson,
-  ChevronDown, Award, UserCheck, MoreVertical, Minus, ArrowRight, ChevronLeft, ChevronRight
+  Building2, Users,    
+   Download, Info, X, FileSpreadsheet, FileJson,
+   Award, UserCheck, MoreVertical,  ArrowRight, ChevronLeft, ChevronRight
 } from "lucide-react";
 import styles from "./reports.module.css";
 
@@ -15,7 +15,7 @@ const reportsData = [
   { id: 2, name: "Attendance Report", desc: "Student attendance and participation records.", date: "Oct 11, 2023", icon: Calendar },
   { id: 3, name: "Understanding Report", desc: "Student understanding and learning performance.", date: "Oct 10, 2023", icon: Activity },
   { id: 4, name: "Department Report", desc: "Department-wise academic performance.", date: "Oct 09, 2023", icon: Building2 },
-  { id: 5, name: "Faculty Report", desc: "Faculty assessment and teaching performance.", date: "Oct 08, 2023", icon: Users },
+  { id: 5, name: "Staff Report", desc: "Staff assessment and teaching performance.", date: "Oct 08, 2023", icon: Users },
   { id: 6, name: "Student Report", desc: "Individual student academic performance.", date: "Oct 07, 2023", icon: GraduationCap },
 ];
 
@@ -27,7 +27,7 @@ export default function ReportsAnalyticsPage() {
   const [selectedReport, setSelectedReport] = useState<any>(null);
   const [selectedFormat, setSelectedFormat] = useState("pdf");
 
-  const openDownloadModal = (report: any) => {
+  const openDownloadModal = (report: unknown) => {
     setSelectedReport(report);
     setDownloadModalOpen(true);
     setSelectedFormat("pdf"); // Reset to default
@@ -41,12 +41,11 @@ export default function ReportsAnalyticsPage() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <div className={styles.breadcrumbs}>
-          Dashboard &gt; <span>Reports & Analytics</span>
-        </div>
         <div className={styles.titleRow}>
           <div className={styles.titleArea}>
-            <h1 className={styles.title}>Reports & Analytics</h1>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+              <h1 className={styles.title} style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-main)' }}>Reports & Analytics</h1>
+            </div>
             <p className={styles.subtitle}>
               {activeTab === "overview" 
                 ? "Gain institution-wide insights into academic performance, student understanding, attendance, and departmental health."

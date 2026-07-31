@@ -1,70 +1,86 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CheckCircle2, CheckCircle, ShieldCheck, Copy, Send, FileText, Printer, AlertTriangle } from "lucide-react";
 import styles from "./success.module.css";
 
 export default function UserSuccessPage() {
+  const [createdUser, setCreatedUser] = useState<any>(null);
+
+  useEffect(() => {
+    const data = localStorage.getItem('createdUser');
+    if (data) {
+      setCreatedUser(JSON.parse(data));
+    }
+  }, []);
+
+  const copyPassword = () => {
+    if (createdUser?.generatedCredentials?.password) {
+      navigator.clipboard.writeText(createdUser.generatedCredentials.password);
+      alert("Password copied to clipboard!");
+    }
+  };
+
+  if (!createdUser) {
+    return <div style={{ padding: "2rem" }}>Loading... (or no user data found)</div>;
+  }
+
+  const { user, generatedCredentials } = createdUser;
+  const roleName = user.role === 'HOD' ? 'HoD' : user.role === 'FACULTY' ? 'Faculty' : 'Student';
+
   return (
     <div className={styles.pageContainer}>
       
-      {/* Breadcrumb */}
-      <div className={styles.breadcrumb}>
-        <Link href="/admin">Dashboard</Link>
-        <span>›</span>
-        <Link href="/admin/user-management">Directory</Link>
-        <span>›</span>
-        <span className={styles.active}>User Created</span>
-      </div>
-
-      <div className={styles.contentWrapper}>
-        {/* Hero Section */}
-        <div className={styles.hero}>
-        <div className={styles.successIcon}>
-          <CheckCircle size={32} />
+      {/* Header Section */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px', fontSize: '0.8125rem', color: 'var(--text-main)', fontWeight: 600 }}>
+          <Link href="/admin/user-management" style={{ textDecoration: 'none', color: 'inherit' }}>Directory</Link>
+          <span style={{ margin: '0 8px', color: 'var(--text-muted)' }}>&gt;</span>
+          <Link href="/admin/user-management/create" style={{ textDecoration: 'none', color: 'inherit' }}>Create User</Link>
+          <span style={{ margin: '0 8px', color: 'var(--text-muted)' }}>&gt;</span>
+          <h1 className={styles.heroTitle} style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-main)', display: 'inline' }}>User Successfully Created</h1>
+          <CheckCircle size={16} color="#166534" style={{ marginLeft: '6px' }} />
         </div>
-        <h1 className={styles.heroTitle}>User Successfully Created</h1>
-        <p className={styles.heroSubtitle}>
+        <p className={styles.heroSubtitle} style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '24px', marginTop: '0' }}>
           The institutional account has been created successfully and is ready for use. System emails have been dispatched to the user.
         </p>
       </div>
+
+      <div className={styles.contentWrapper}>
 
       {/* User Information Summary Card */}
       <div className={styles.card}>
         <div className={styles.cardHeader}>
           <h2 className={styles.cardTitle}>User Information Summary</h2>
           <div className={styles.badgeSuccess}>
-            <CheckCircle2 size={14} /> Verified Student
+            <CheckCircle2 size={14} /> Verified {roleName}
           </div>
         </div>
 
         <div className={styles.summaryGrid}>
           <div className={styles.infoGroup}>
             <span className={styles.infoLabel}>FULL NAME</span>
-            <span className={styles.infoValue}>John Smith</span>
-          </div>
-          <div className={styles.infoGroup}>
-            <span className={styles.infoLabel}>INSTITUTION ID</span>
-            <span className={styles.infoValue}>STU-2024-8842</span>
+            <span className={styles.infoValue}>{user.firstName} {user.lastName}</span>
           </div>
           <div className={styles.infoGroup}>
             <span className={styles.infoLabel}>USER TYPE</span>
-            <span className={styles.infoValue}>Student</span>
-          </div>
-          <div className={styles.infoGroup}>
-            <span className={styles.infoLabel}>DEPARTMENT</span>
-            <span className={styles.infoValue}>Computer Science & Engineering</span>
+            <span className={styles.infoValue}>{roleName}</span>
           </div>
           <div className={styles.infoGroup}>
             <span className={styles.infoLabel}>INSTITUTION EMAIL</span>
-            <span className={styles.infoValue}>john.smith@mystory.edu.in</span>
+            <span className={styles.infoValue}>{user.email}</span>
           </div>
           <div className={styles.infoGroup}>
             <span className={styles.infoLabel}>ACCOUNT STATUS</span>
             <div>
-              <span className={styles.statusActive}>
-                <span className={styles.statusDot}></span> ACTIVE
-              </span>
+              {user.isActive ? (
+                <span className={styles.statusActive}>
+                  <span className={styles.statusDot}></span> ACTIVE
+                </span>
+              ) : (
+                <span style={{ color: 'orange', fontSize: '0.8125rem', fontWeight: 600 }}>INACTIVE</span>
+              )}
             </div>
           </div>
         </div>
@@ -89,8 +105,8 @@ export default function UserSuccessPage() {
           </div>
           
           <div className={styles.passwordBox}>
-            <span className={styles.passwordText}>M8#qR91@Lp</span>
-            <button className={styles.copyBtn} aria-label="Copy Password">
+            <span className={styles.passwordText}>{generatedCredentials?.password}</span>
+            <button className={styles.copyBtn} aria-label="Copy Password" onClick={copyPassword}>
               <Copy size={18} />
             </button>
           </div>

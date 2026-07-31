@@ -14,7 +14,7 @@ const events = [
   },
   {
     id: 2,
-    title: "Faculty Senate Meeting",
+    title: "Staff Senate Meeting",
     meta: "Administration • Oct 15, 2:00 PM",
     icon: Users,
     iconStyle: styles.iconBlue

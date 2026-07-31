@@ -1,351 +1,231 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { 
   Users, 
-  CheckCircle, 
-  Activity, 
-  Clock, 
-  Copy,
-  Download,
-  Share2,
-  AlertCircle
-} from 'lucide-react';
-import styles from './live-pulse.module.css';
+  CheckCircle2, 
+  Play, 
+  Pause, 
+  Square,
+  QrCode,
+  Activity,
+  Clock,
+  MessageSquare
+} from "lucide-react";
+import styles from "./live.module.css";
 
-interface LiveSessionPageProps {
-  params: Promise<{ id: string }>;
-}
-
-export default function LiveSessionPage({ params }: LiveSessionPageProps) {
-  const { id } = React.use(params);
+export default function LivePulseSession() {
   const router = useRouter();
-  
-  const [sessionData, setSessionData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [showEndDialog, setShowEndDialog] = useState(false);
-  const [ending, setEnding] = useState(false);
+  const params = useParams();
+  const sessionId = params.id as string;
 
-  const fetchLiveData = async () => {
-    try {
-      const res = await fetch(`/api/faculty/pulse-sessions/${id}/live`, { credentials: 'include' });
-      if (res.ok) {
-        const json = await res.json();
-        setSessionData(json.data);
-      } else {
-        const json = await res.json();
-        if (res.status === 404 || res.status === 403) {
-          setError(json.error || 'Failed to load session');
-        }
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [isPaused, setIsPaused] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(120); // 2 minutes
 
   useEffect(() => {
-    fetchLiveData();
-    const interval = setInterval(() => {
-      fetchLiveData();
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [id]);
-
-  const handleEndSession = async () => {
-    setEnding(true);
-    try {
-      const res = await fetch(`/api/faculty/pulse-sessions/${id}/close`, {
-        method: 'POST',
-        credentials: 'include'
-      });
-      if (res.ok) {
-        router.push(`/faculty/pulse-sessions/${id}/summary`);
-      } else {
-        const json = await res.json();
-        alert(json.error || 'Failed to end session');
-        setEnding(false);
-      }
-    } catch (e) {
-      console.error(e);
-      alert('Network error while ending session.');
-      setEnding(false);
+    let interval: NodeJS.Timeout;
+    if (!isPaused) {
+      interval = setInterval(() => {
+        setElapsedTime(prev => prev + 1);
+      }, 1000);
     }
+    return () => clearInterval(interval);
+  }, [isPaused]);
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
   };
 
-  if (loading && !sessionData) {
-    return (
-      <div className={`dashboard-scroll ${styles.container}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '3px solid #E7E3DB', borderTopColor: '#10633B', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
-          <p style={{ color: '#667085' }}>Connecting to Live Session...</p>
-        </div>
-      </div>
-    );
-  }
+  const handleEndSession = () => {
+    router.push(`/faculty/pulse-sessions/${sessionId}/summary`);
+  };
 
-  if (error || !sessionData) {
-    return (
-      <div className={`dashboard-scroll ${styles.container}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center', maxWidth: '400px' }}>
-          <AlertCircle size={48} color="#D97706" style={{ margin: '0 auto 16px' }} />
-          <h2 style={{ fontSize: '1.25rem', color: '#17223B', marginBottom: '8px' }}>Session Unavailable</h2>
-          <p style={{ color: '#667085', marginBottom: '24px' }}>{error || 'The requested session could not be found or you do not have permission to view it.'}</p>
-          <Link href="/faculty/pulse-sessions" className="btn btn-primary" style={{ textDecoration: 'none' }}>
-            Return to Pulse Sessions
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  const students = [
+    { id: 1, name: "Alice Johnson", roll: "CS-2024-001", joinedAt: "10:00 AM", attendance: "Present", status: "Responded" },
+    { id: 2, name: "Bob Smith", roll: "CS-2024-002", joinedAt: "10:01 AM", attendance: "Present", status: "Thinking" },
+    { id: 3, name: "Charlie Davis", roll: "CS-2024-003", joinedAt: "10:02 AM", attendance: "Present", status: "Responded" },
+  ];
 
-  const { session, kpis, questionProgress, students } = sessionData;
-
-  const elapsedTimeString = session.timerActualStartTime 
-    ? Math.floor((Date.now() - new Date(session.timerActualStartTime).getTime()) / 60000)
-    : 0;
+  const activityFeed = [
+    { id: 1, text: "Charlie Davis submitted an answer.", time: "1 minute ago", type: "submit" },
+    { id: 2, text: "Bob Smith joined the session.", time: "2 minutes ago", type: "join" },
+    { id: 3, text: "Assessment started by Faculty.", time: "2 minutes ago", type: "start" },
+  ];
 
   return (
-    <div className={`dashboard-scroll ${styles.container}`}>
+    <div className={styles.pageContainer}>
       {/* Header */}
-      <div className="page-header" style={{ marginBottom: '24px' }}>
-        <div className="page-title-section">
-          <div style={{ fontSize: '0.85rem', color: '#667085', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Link href="/faculty" style={{ color: 'inherit', textDecoration: 'none' }}>Faculty</Link> &gt; 
-            <Link href="/faculty/pulse-sessions" style={{ color: 'inherit', textDecoration: 'none' }}>Pulse Sessions</Link> &gt; 
-            <span style={{ color: '#17223B', fontWeight: 500 }}>Live Session</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <h1 className="page-title" style={{ margin: 0 }}>{session.title}</h1>
-            <div className={styles.badge} style={{ backgroundColor: '#EEF7F1', color: '#166534', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#166534', animation: 'pulse 2s infinite' }}></div>
+      <div className={styles.headerRow}>
+        <div className={styles.headerLeft}>
+          <div className={styles.titleRow}>
+            <h1 className={styles.title}>Mid-Term Review Session</h1>
+            <span className={styles.badgeLive}>
+              <span className={styles.pulseDot} />
               LIVE
-            </div>
-          </div>
-          <div className="page-tags" style={{ marginTop: '8px' }}>
-            <span style={{ color: '#667085', fontSize: '0.9rem' }}>
-              {session.courseName} • Elapsed Time: {elapsedTimeString} min • Code: <strong style={{ letterSpacing: '1px' }}>{session.sessionCode || 'N/A'}</strong>
             </span>
           </div>
+          <p className={styles.subtitle}>Subject: Data Structures & Algorithms • Code: 489-102</p>
+        </div>
+        <div className={styles.headerRight}>
+          <p className={styles.timeLabel}>Elapsed Time</p>
+          <p className={styles.timeValue}>{formatTime(elapsedTime)}</p>
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className={styles.kpiGrid}>
-        <div className={styles.kpiCard}>
-          <div className={`${styles.kpiIcon} ${styles.blue}`}>
-            <Users size={24} />
-          </div>
-          <div>
-            <div className={styles.kpiValue}>{kpis.studentsJoined}</div>
-            <div className={styles.kpiLabel}>Students Joined</div>
-          </div>
-        </div>
-        <div className={styles.kpiCard}>
-          <div className={`${styles.kpiIcon} ${styles.green}`}>
-            <CheckCircle size={24} />
-          </div>
-          <div>
-            <div className={styles.kpiValue}>{kpis.responsesSubmitted}</div>
-            <div className={styles.kpiLabel}>Responses Submitted</div>
-          </div>
-        </div>
-        <div className={styles.kpiCard}>
-          <div className={`${styles.kpiIcon} ${styles.purple}`}>
-            <Activity size={24} />
-          </div>
-          <div>
-            <div className={styles.kpiValue}>{kpis.averageScore}%</div>
-            <div className={styles.kpiLabel}>Average Score</div>
-          </div>
-        </div>
-        <div className={styles.kpiCard}>
-          <div className={`${styles.kpiIcon} ${styles.orange}`}>
-            <Clock size={24} />
-          </div>
-          <div>
-            <div className={styles.kpiValue}>{Math.max(0, session.durationMinutes - elapsedTimeString)}m</div>
-            <div className={styles.kpiLabel}>Time Remaining</div>
-          </div>
-        </div>
-      </div>
-
-      <div className={styles.grid}>
-        {/* Left Column: Live Student Table */}
-        <div className={styles.card}>
-          <h3 className={styles.cardTitle}>Live Participants</h3>
+      <div className={styles.mainGrid}>
+        {/* Left Column */}
+        <div className={styles.leftColumn}>
           
-          <div style={{ overflowX: 'auto' }}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Student Name</th>
-                  <th>Roll Number</th>
-                  <th>Joined Time</th>
-                  <th>Score</th>
-                  <th>Time Taken</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {students.length > 0 ? students.map((student: any) => (
-                  <tr key={student.id}>
-                    <td style={{ fontWeight: 500 }}>{student.studentName}</td>
-                    <td>{student.rollNumber}</td>
-                    <td>{new Date(student.joinedAt).toLocaleTimeString()}</td>
-                    <td>{student.percentage !== null ? `${student.percentage}%` : '-'}</td>
-                    <td>{student.timeTakenSeconds ? `${Math.floor(student.timeTakenSeconds / 60)}m ${student.timeTakenSeconds % 60}s` : '-'}</td>
-                    <td>
-                      <span className={`${styles.badge} ${student.hasAttempted ? styles.submitted : styles.joined}`}>
-                        {student.status}
-                      </span>
-                    </td>
-                  </tr>
-                )) : (
-                  <tr>
-                    <td colSpan={6} style={{ textAlign: 'center', padding: '32px', color: '#667085' }}>
-                      Waiting for students to join...
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+          <div className={styles.qrCodeRow}>
+            <div className={styles.card}>
+              <div className={styles.cardHeader}>
+                <QrCode size={20} />
+                Scan to Join
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+                <div style={{ width: '150px', height: '150px', backgroundColor: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px' }}>
+                  <QrCode size={100} color="#64748b" />
+                </div>
+              </div>
+            </div>
+            
+            <div className={styles.card}>
+              <div className={styles.cardHeader}>
+                Join Code
+              </div>
+              <p className={styles.joinCodeText}>489 102</p>
+              <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.875rem' }}>Go to cip.university.edu/join</p>
+            </div>
           </div>
+
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>Live Progress KPIs</div>
+            <div className={styles.kpiGrid}>
+              <div className={styles.kpiBox}>
+                <span className={styles.kpiLabel}>Total Students</span>
+                <span className={styles.kpiValue}>45</span>
+              </div>
+              <div className={styles.kpiBox}>
+                <span className={styles.kpiLabel}>Joined</span>
+                <span className={styles.kpiValue}>42</span>
+              </div>
+              <div className={styles.kpiBox}>
+                <span className={styles.kpiLabel}>Attendance</span>
+                <span className={`${styles.kpiValue} ${styles.kpiHighlight}`}>93%</span>
+              </div>
+              <div className={styles.kpiBox}>
+                <span className={styles.kpiLabel}>Responses</span>
+                <span className={styles.kpiValue}>28/42</span>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>Live Student Status</div>
+            <div className={styles.tableContainer}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Student Name</th>
+                    <th>Roll Number</th>
+                    <th>Joined Time</th>
+                    <th>Attendance</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {students.map((student) => (
+                    <tr key={student.id}>
+                      <td style={{ fontWeight: 600 }}>{student.name}</td>
+                      <td>{student.roll}</td>
+                      <td>{student.joinedAt}</td>
+                      <td>
+                        <span className={`${styles.statusBadge} ${styles.statusSuccess}`}>
+                          {student.attendance}
+                        </span>
+                      </td>
+                      <td>
+                        <span className={styles.statusBadge} style={{ backgroundColor: student.status === 'Responded' ? '#dcfce7' : '#fef9c3', color: student.status === 'Responded' ? '#166534' : '#854d0e' }}>
+                          {student.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>Live Activity Feed</div>
+            <div className={styles.feedList}>
+              {activityFeed.map(feed => (
+                <div key={feed.id} className={styles.feedItem}>
+                  <div className={styles.feedIcon}>
+                    {feed.type === 'submit' && <CheckCircle2 size={16} color="#16a34a" />}
+                    {feed.type === 'join' && <Users size={16} color="#0284c7" />}
+                    {feed.type === 'start' && <Play size={16} color="#10633B" />}
+                  </div>
+                  <div className={styles.feedContent}>
+                    <span className={styles.feedText}>{feed.text}</span>
+                    <span className={styles.feedTime}>{feed.time}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </div>
 
         {/* Right Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          
-          {/* Analytics Card */}
+        <div className={styles.rightColumn}>
           <div className={styles.card}>
-            <h3 className={styles.cardTitle}>Session Analytics</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div className={styles.statRow}>
-                <span className={styles.statLabel}>Participation Rate</span>
-                <span className={styles.statValue}>{kpis.participationPercentage}%</span>
+            <div className={styles.cardHeader}>Session Information</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Current Question</p>
+                <p style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-main)' }}>Q3: What is the time complexity of QuickSort in the worst case?</p>
               </div>
-              <div className={styles.statRow}>
-                <span className={styles.statLabel}>Students Remaining</span>
-                <span className={styles.statValue}>{kpis.studentsRemaining}</span>
+              <div>
+                <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Session Progress</p>
+                <div style={{ width: '100%', height: '8px', backgroundColor: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
+                  <div style={{ width: '30%', height: '100%', backgroundColor: '#10633B' }} />
+                </div>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '4px', textAlign: 'right' }}>30% Completed (3/10)</p>
               </div>
-            </div>
-
-            <div style={{ marginTop: '24px' }}>
-              <h4 style={{ fontSize: '0.85rem', color: '#667085', margin: '0 0 16px 0', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Question Progress</h4>
-              
-              {questionProgress.map((qp: any) => {
-                const fillPercent = kpis.studentsJoined > 0 ? (qp.totalAnswers / kpis.studentsJoined) * 100 : 0;
-                return (
-                  <div key={qp.questionId} className={styles.questionItem}>
-                    <div className={styles.questionHeader}>
-                      <span style={{ fontWeight: 500 }}>Q{qp.questionNumber}</span>
-                      <span style={{ color: '#667085' }}>{qp.totalAnswers} answers</span>
-                    </div>
-                    <div className={styles.progressBarContainer}>
-                      <div className={styles.progressBarFill} style={{ width: `${fillPercent}%` }}></div>
-                    </div>
-                  </div>
-                );
-              })}
+              <div>
+                <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Time Remaining</p>
+                <p style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-main)' }}>13:00</p>
+              </div>
             </div>
           </div>
 
-          {/* Join Info */}
           <div className={styles.card}>
-            <h3 className={styles.cardTitle}>Join Information</h3>
-            <div className={styles.codeBox}>
-              <div style={{ fontSize: '0.85rem', color: '#667085', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Session Code</div>
-              <div className={styles.sessionCode}>{session.sessionCode || 'PENDING'}</div>
-            </div>
-            
-            <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
-              <button className="btn btn-secondary" style={{ flex: 1, padding: '8px', display: 'flex', justifyContent: 'center' }}>
-                <Copy size={16} />
-              </button>
-              <button className="btn btn-secondary" style={{ flex: 1, padding: '8px', display: 'flex', justifyContent: 'center' }}>
-                <Download size={16} />
-              </button>
-              <button className="btn btn-secondary" style={{ flex: 1, padding: '8px', display: 'flex', justifyContent: 'center' }}>
-                <Share2 size={16} />
-              </button>
-            </div>
-          </div>
-          
-        </div>
-      </div>
-
-      {/* Sticky Bottom Bar */}
-      <div className={styles.stickyActionBar}>
-        <div className={styles.actionLeft}>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontSize: '0.75rem', color: '#667085', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Live Since</span>
-            <span style={{ fontWeight: 600, color: '#17223B' }}>{new Date(session.timerActualStartTime || session.createdAt).toLocaleTimeString()}</span>
-          </div>
-          <div style={{ width: '1px', height: '24px', backgroundColor: '#E7E3DB' }}></div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontSize: '0.75rem', color: '#667085', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Participants</span>
-            <span style={{ fontWeight: 600, color: '#17223B' }}>{kpis.studentsJoined} Active</span>
-          </div>
-        </div>
-        <div className={styles.actionRight}>
-          <button className="btn btn-secondary" style={{ padding: '10px 24px' }}>
-            Pause Session
-          </button>
-          <button 
-            className="btn btn-primary" 
-            style={{ padding: '10px 24px', backgroundColor: '#DC2626', borderColor: '#DC2626' }}
-            onClick={() => setShowEndDialog(true)}
-          >
-            End Session
-          </button>
-        </div>
-      </div>
-
-      {/* End Session Confirmation Dialog */}
-      {showEndDialog && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '24px', width: '100%', maxWidth: '400px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}>
-            <h3 style={{ margin: '0 0 12px 0', fontSize: '1.25rem', color: '#17223B' }}>End Session?</h3>
-            <p style={{ color: '#667085', marginBottom: '24px', lineHeight: '1.5' }}>
-              Are you sure you want to end this session? Students will no longer be able to submit answers. This action cannot be undone.
-            </p>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+            <div className={styles.cardHeader}>Session Controls</div>
+            <div className={styles.controlsBox}>
               <button 
-                className="btn btn-secondary" 
-                onClick={() => setShowEndDialog(false)}
-                disabled={ending}
+                type="button" 
+                className={styles.secondaryButton}
+                onClick={() => setIsPaused(!isPaused)}
               >
-                Cancel
+                {isPaused ? <Play size={16} /> : <Pause size={16} />}
+                {isPaused ? "Resume Session" : "Pause Session"}
               </button>
               <button 
-                className="btn btn-primary" 
-                style={{ backgroundColor: '#DC2626', borderColor: '#DC2626' }}
+                type="button" 
+                className={styles.dangerButton}
                 onClick={handleEndSession}
-                disabled={ending}
               >
-                {ending ? 'Ending...' : 'End Session'}
+                <Square size={16} />
+                End Session
               </button>
             </div>
           </div>
         </div>
-      )}
-      
-      {/* Global CSS for animation */}
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        @keyframes pulse {
-          0% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.5; transform: scale(1.2); }
-          100% { opacity: 1; transform: scale(1); }
-        }
-      `}} />
+      </div>
     </div>
   );
 }

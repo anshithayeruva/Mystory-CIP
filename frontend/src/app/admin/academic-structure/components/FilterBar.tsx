@@ -35,7 +35,7 @@ export default function FilterBar() {
       </div>
 
       <div className={styles.filterGroup}>
-        <span className={styles.filterLabel}>FACULTY</span>
+        <span className={styles.filterLabel}>STAFF</span>
         <select className={styles.selectInput} defaultValue="All Faculties">
           <option>All Faculties</option>
           <option>Dr. Alan Turing</option>

@@ -1,412 +1,259 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import React from "react";
+import { useRouter } from "next/navigation";
 import { 
-  Users, 
-  CheckCircle, 
-  Activity, 
-  Clock, 
-  Download,
-  Share2,
-  AlertCircle,
-  FileText,
-  ChevronRight,
-  TrendingUp,
-  BrainCircuit,
-  Eye
-} from 'lucide-react';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-import styles from './summary-pulse.module.css';
+  Download, 
+  FileSpreadsheet, 
+  Printer, 
+  ArrowLeft, 
+  Plus,
+  BarChart2
+} from "lucide-react";
+import styles from "./summary.module.css";
 
-interface SummaryPageProps {
-  params: Promise<{ id: string }>;
-}
+export default function SessionSummary() {
+  const router = useRouter();
 
-export default function SessionSummaryPage({ params }: SummaryPageProps) {
-  const { id } = React.use(params);
-  
-  const [sessionData, setSessionData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const handleConceptGapNav = () => {
+    router.push('/faculty/concept-gap-analysis');
+  };
 
-  useEffect(() => {
-    const fetchSummaryData = async () => {
-      try {
-        const res = await fetch(`/api/faculty/pulse-sessions/${id}/summary`, { credentials: 'include' });
-        if (res.ok) {
-          const json = await res.json();
-          setSessionData(json.data);
-        } else {
-          const json = await res.json();
-          setError(json.error || 'Failed to load session summary');
-        }
-      } catch (e) {
-        console.error(e);
-        setError('Network error while loading summary.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSummaryData();
-  }, [id]);
+  const handleBackToPulse = () => {
+    router.push('/faculty/pulse-sessions');
+  };
 
-  if (loading) {
-    return (
-      <div className={`dashboard-scroll ${styles.container}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '3px solid #E7E3DB', borderTopColor: '#10633B', animation: 'spin 1s linear infinite', margin: '0 auto 16px' }} />
-          <p style={{ color: '#667085' }}>Generating Session Summary...</p>
-        </div>
-        <style dangerouslySetInnerHTML={{__html: `
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}} />
-      </div>
-    );
-  }
+  const handleCreateNew = () => {
+    router.push('/faculty/pulse-sessions/create');
+  };
 
-  if (error || !sessionData) {
-    return (
-      <div className={`dashboard-scroll ${styles.container}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center', maxWidth: '400px' }}>
-          <AlertCircle size={48} color="#D97706" style={{ margin: '0 auto 16px' }} />
-          <h2 style={{ fontSize: '1.25rem', color: '#17223B', margin: '0 0 8px 0' }}>Summary Unavailable</h2>
-          <p style={{ color: '#667085', margin: '0 0 24px 0' }}>{error}</p>
-          <Link href="/faculty/pulse-sessions" className="btn btn-primary" style={{ textDecoration: 'none' }}>
-            Return to Pulse Sessions
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  const kpis = [
+    { label: "Total Students", value: "45" },
+    { label: "Attendance", value: "93%", highlight: true },
+    { label: "Avg Score", value: "76%" },
+    { label: "Avg Understanding", value: "High", highlight: true },
+    { label: "Questions Asked", value: "10" },
+    { label: "Participation Rate", value: "98%" }
+  ];
 
-  const { session, kpis, questionProgress, students } = sessionData;
+  const questionAnalysis = [
+    { id: "Q1", text: "What is the primary function of a hash table?", correct: "85%", incorrect: "15%", skipped: "0", difficulty: "Easy" },
+    { id: "Q2", text: "Describe the time complexity of a binary search tree.", correct: "60%", incorrect: "35%", skipped: "5%", difficulty: "Medium" },
+    { id: "Q3", text: "What is the time complexity of QuickSort in the worst case?", correct: "40%", incorrect: "50%", skipped: "10%", difficulty: "Hard" },
+  ];
 
-  // Compute Score Distribution for Doughnut Chart
-  let needsRemedial = 0; // < 40%
-  let reviewTopic = 0;   // 40% - 75%
-  let excellent = 0;     // > 75%
+  const studentPerformance = [
+    { name: "Alice Johnson", attendance: "Present", score: "90%", understanding: 90, status: "Excellent" },
+    { name: "Bob Smith", attendance: "Present", score: "60%", understanding: 60, status: "Needs Review" },
+    { name: "Charlie Davis", attendance: "Present", score: "80%", understanding: 80, status: "Good" },
+    { name: "Diana Prince", attendance: "Absent", score: "-", understanding: 0, status: "Missed" },
+  ];
 
-  const studentsWithScore = students.filter((s: any) => s.hasAttempted);
-  
-  studentsWithScore.forEach((s: any) => {
-    const p = s.percentage || 0;
-    if (p < 40) needsRemedial++;
-    else if (p <= 75) reviewTopic++;
-    else excellent++;
-  });
-
-  const chartData = [
-    { name: 'Needs Remedial (<40%)', value: needsRemedial, color: '#DC2626' },
-    { name: 'Review Topic (40-75%)', value: reviewTopic, color: '#D97706' },
-    { name: 'Excellent (>75%)', value: excellent, color: '#166534' },
-  ].filter(d => d.value > 0);
-
-  // Computed Insights
-  let lowestQuestion: any = null;
-  let lowestAccuracy = 100;
-  
-  questionProgress.forEach((qp: any) => {
-    const accuracy = qp.totalAnswers > 0 ? (qp.correctAnswers / qp.totalAnswers) * 100 : 0;
-    if (accuracy < lowestAccuracy) {
-      lowestAccuracy = accuracy;
-      lowestQuestion = qp;
-    }
-  });
-
-  const durationMin = session.durationMinutes || 0;
-  
   return (
-    <div className={`dashboard-scroll ${styles.container}`}>
+    <div className={styles.pageContainer}>
       {/* Header */}
-      <div className="page-header" style={{ marginBottom: '24px' }}>
-        <div className="page-title-section">
-          <div style={{ fontSize: '0.85rem', color: '#667085', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Link href="/faculty" style={{ color: 'inherit', textDecoration: 'none' }}>Faculty</Link> <ChevronRight size={14} /> 
-            <Link href="/faculty/pulse-sessions" style={{ color: 'inherit', textDecoration: 'none' }}>Pulse Sessions</Link> <ChevronRight size={14} /> 
-            <span style={{ color: '#17223B', fontWeight: 500 }}>Session Summary</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <h1 className="page-title" style={{ margin: 0 }}>{session.title}</h1>
-            <div className={`${styles.badge} ${styles.blue}`}>COMPLETED</div>
-          </div>
-          <div className="page-tags" style={{ marginTop: '8px' }}>
-            <span style={{ color: '#667085', fontSize: '0.9rem' }}>
-              Completed on {new Date(session.createdAt).toLocaleDateString()}
-            </span>
-          </div>
+      <div className={styles.headerCard}>
+        <div className={styles.titleRow}>
+          <h1 className={styles.title}>Session Summary: Mid-Term Review</h1>
+          <span className={styles.badgeCompleted}>Completed</span>
         </div>
-        <div className="page-actions">
-          <button className="btn btn-secondary">
-            <Download size={18} /> Download Report
-          </button>
+        <div className={styles.metadataGrid}>
+          <div className={styles.metadataItem}>
+            <span className={styles.metaLabel}>Subject</span>
+            <span className={styles.metaValue}>Data Structures</span>
+          </div>
+          <div className={styles.metadataItem}>
+            <span className={styles.metaLabel}>Faculty</span>
+            <span className={styles.metaValue}>Dr. Sarah Jenkins</span>
+          </div>
+          <div className={styles.metadataItem}>
+            <span className={styles.metaLabel}>Date</span>
+            <span className={styles.metaValue}>Oct 15, 2024</span>
+          </div>
+          <div className={styles.metadataItem}>
+            <span className={styles.metaLabel}>Duration</span>
+            <span className={styles.metaValue}>15 Minutes</span>
+          </div>
+          <div className={styles.metadataItem}>
+            <span className={styles.metaLabel}>Type</span>
+            <span className={styles.metaValue}>Mid-Class Check</span>
+          </div>
         </div>
       </div>
 
       {/* KPI Cards */}
       <div className={styles.kpiGrid}>
-        <div className={styles.kpiCard}>
-          <div className={`${styles.kpiIcon} ${styles.blue}`}>
-            <Activity size={24} />
+        {kpis.map((kpi, idx) => (
+          <div key={idx} className={styles.kpiCard}>
+            <span className={styles.kpiLabel}>{kpi.label}</span>
+            <span className={`${styles.kpiValue} ${kpi.highlight ? styles.kpiHighlight : ''}`}>{kpi.value}</span>
           </div>
-          <div>
-            <div className={styles.kpiValue}>{kpis.participationPercentage}%</div>
-            <div className={styles.kpiLabel}>Participation</div>
-          </div>
-        </div>
-        <div className={styles.kpiCard}>
-          <div className={`${styles.kpiIcon} ${styles.green}`}>
-            <CheckCircle size={24} />
-          </div>
-          <div>
-            <div className={styles.kpiValue}>{kpis.responsesSubmitted}</div>
-            <div className={styles.kpiLabel}>Participated</div>
-          </div>
-        </div>
-        <div className={styles.kpiCard}>
-          <div className={`${styles.kpiIcon} ${styles.teal}`}>
-            <Activity size={24} />
-          </div>
-          <div>
-            <div className={styles.kpiValue}>{kpis.participationPercentage}%</div>
-            <div className={styles.kpiLabel}>Participation Rate</div>
-          </div>
-        </div>
-        <div className={styles.kpiCard}>
-          <div className={`${styles.kpiIcon} ${styles.purple}`}>
-            <TrendingUp size={24} />
-          </div>
-          <div>
-            <div className={styles.kpiValue}>{kpis.averageScore}%</div>
-            <div className={styles.kpiLabel}>Average Score</div>
-          </div>
-        </div>
-        <div className={styles.kpiCard}>
-          <div className={`${styles.kpiIcon} ${styles.orange}`}>
-            <Clock size={24} />
-          </div>
-          <div>
-            <div className={styles.kpiValue}>{durationMin}m</div>
-            <div className={styles.kpiLabel}>Average Completion Time</div>
-          </div>
-        </div>
-        <div className={styles.kpiCard}>
-          <div className={`${styles.kpiIcon} ${styles.red}`}>
-            <AlertCircle size={24} />
-          </div>
-          <div>
-            <div className={styles.kpiValue}>{needsRemedial}</div>
-            <div className={styles.kpiLabel}>Students Requiring Attention</div>
-          </div>
-        </div>
+        ))}
       </div>
 
-      <div className={styles.grid}>
+      <div className={styles.mainGrid}>
         {/* Left Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div className={styles.leftColumn}>
           
-          {/* Overview */}
           <div className={styles.card}>
-            <h3 className={styles.cardTitle}>Session Overview</h3>
-            <div className={styles.overviewGrid}>
-              <div className={styles.overviewItem}>
-                <span className={styles.overviewLabel}>Subject</span>
-                <span className={styles.overviewValue}>{session.courseName}</span>
-              </div>
-              <div className={styles.overviewItem}>
-                <span className={styles.overviewLabel}>Status</span>
-                <span className={styles.overviewValue}>{session.status}</span>
-              </div>
-              <div className={styles.overviewItem}>
-                <span className={styles.overviewLabel}>Session Code</span>
-                <span className={styles.overviewValue} style={{ fontFamily: 'monospace' }}>{session.sessionCode || 'N/A'}</span>
-              </div>
-              <div className={styles.overviewItem}>
-                <span className={styles.overviewLabel}>Total Questions</span>
-                <span className={styles.overviewValue}>{session.questionCount}</span>
+            <div className={styles.cardHeader}>Performance Overview</div>
+            <div className={styles.cardBody}>
+              <div className={styles.chartPlaceholder}>
+                <BarChart2 size={32} style={{ marginRight: '12px' }} />
+                [ Average Understanding Chart Placeholder ]
               </div>
             </div>
           </div>
 
-          {/* Score Distribution Chart */}
           <div className={styles.card}>
-            <h3 className={styles.cardTitle}>Score Distribution</h3>
-            {chartData.length > 0 ? (
-              <div style={{ height: '240px', width: '100%', display: 'flex', alignItems: 'center' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={chartData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {chartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip 
-                      formatter={(value: any, name: any) => [`${value} Students`, name]}
-                      contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {chartData.map((d, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: d.color }}></div>
-                      <span style={{ fontSize: '0.85rem', color: '#667085' }}>{d.name}: <strong>{d.value}</strong></span>
-                    </div>
+            <div className={styles.cardHeader}>Question Analysis</div>
+            <div className={styles.tableContainer}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Question</th>
+                    <th>Correct %</th>
+                    <th>Incorrect %</th>
+                    <th>Skipped</th>
+                    <th>Difficulty</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {questionAnalysis.map((q, i) => (
+                    <tr key={i}>
+                      <td style={{ fontWeight: 600 }}>{q.id}: {q.text}</td>
+                      <td style={{ color: '#16a34a', fontWeight: 600 }}>{q.correct}</td>
+                      <td style={{ color: '#dc2626', fontWeight: 600 }}>{q.incorrect}</td>
+                      <td>{q.skipped}</td>
+                      <td>
+                        <span className={styles.statusBadge} style={{ 
+                          backgroundColor: q.difficulty === 'Hard' ? '#fef2f2' : q.difficulty === 'Medium' ? '#fef9c3' : '#dcfce7',
+                          color: q.difficulty === 'Hard' ? '#991b1b' : q.difficulty === 'Medium' ? '#854d0e' : '#166534'
+                        }}>
+                          {q.difficulty}
+                        </span>
+                      </td>
+                    </tr>
                   ))}
-                </div>
-              </div>
-            ) : (
-              <div style={{ padding: '32px', textAlign: 'center', color: '#667085' }}>No score data available.</div>
-            )}
+                </tbody>
+              </table>
+            </div>
           </div>
 
-          {/* Question Performance */}
           <div className={styles.card}>
-            <h3 className={styles.cardTitle}>Question Performance</h3>
-            <div style={{ marginTop: '16px' }}>
-              {questionProgress.map((qp: any) => {
-                const accuracy = qp.totalAnswers > 0 ? (qp.correctAnswers / qp.totalAnswers) * 100 : 0;
-                let barClass = '';
-                if (accuracy < 40) barClass = styles.danger;
-                else if (accuracy <= 70) barClass = styles.warning;
-
-                return (
-                  <div key={qp.questionId} className={styles.questionItem}>
-                    <div className={styles.questionHeader}>
-                      <span style={{ fontWeight: 500, color: '#17223B' }}>Question {qp.questionNumber}</span>
-                      <span style={{ color: '#667085', fontSize: '0.8rem' }}>Accuracy: <strong style={{ color: '#17223B' }}>{accuracy.toFixed(0)}%</strong> ({qp.correctAnswers}/{qp.totalAnswers})</span>
-                    </div>
-                    <div className={styles.progressBarContainer}>
-                      <div className={`${styles.progressBarFill} ${barClass}`} style={{ width: `${accuracy}%` }}></div>
-                    </div>
-                  </div>
-                );
-              })}
+            <div className={styles.cardHeader}>Student Performance</div>
+            <div className={styles.tableContainer}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Student Name</th>
+                    <th>Attendance</th>
+                    <th>Score</th>
+                    <th>Understanding</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {studentPerformance.map((s, i) => (
+                    <tr key={i}>
+                      <td style={{ fontWeight: 600 }}>{s.name}</td>
+                      <td>
+                        <span className={`${styles.statusBadge} ${s.attendance === 'Present' ? styles.statusSuccess : styles.statusWarning}`}>
+                          {s.attendance}
+                        </span>
+                      </td>
+                      <td style={{ fontWeight: 600 }}>{s.score}</td>
+                      <td>
+                        {s.attendance === 'Present' ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div className={styles.progressWrapper}>
+                              <div className={styles.progressFill} style={{ width: `${s.understanding}%`, backgroundColor: s.understanding >= 80 ? '#10633B' : s.understanding >= 60 ? '#eab308' : '#dc2626' }} />
+                            </div>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>{s.understanding}%</span>
+                          </div>
+                        ) : (
+                          <span style={{ color: 'var(--text-muted)' }}>-</span>
+                        )}
+                      </td>
+                      <td>
+                        <span className={styles.statusBadge} style={{
+                          backgroundColor: s.status === 'Excellent' || s.status === 'Good' ? '#dcfce7' : s.status === 'Missed' ? '#f1f5f9' : '#fef2f2',
+                          color: s.status === 'Excellent' || s.status === 'Good' ? '#166534' : s.status === 'Missed' ? '#475569' : '#991b1b'
+                        }}>
+                          {s.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
 
         </div>
 
         {/* Right Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div className={styles.rightColumn}>
           
-          {/* Insights */}
           <div className={styles.card}>
-            <h3 className={styles.cardTitle}><BrainCircuit size={20} color="#10633B" /> Session Insights</h3>
-            
-            <div className={styles.insightBox} style={{ borderLeftColor: '#10633B', marginTop: '16px' }}>
-              <div className={styles.insightDesc} style={{ lineHeight: '1.6' }}>
-                Students achieved a participation rate of <strong>{kpis.participationPercentage}%</strong> and an average score of <strong>{kpis.averageScore}%</strong>.
-                {lowestQuestion && (
-                  <span> <strong>Question {lowestQuestion.questionNumber}</strong> had the lowest accuracy at <strong>{lowestAccuracy.toFixed(0)}%</strong>.</span>
-                )}
-                {needsRemedial > 0 && (
-                  <span> <strong>{needsRemedial}</strong> students struggled significantly with the concepts presented.</span>
-                )}
-                <br /><br />
-                <span style={{ color: '#17223B', fontWeight: 600 }}>Recommended Action: </span>
-                {lowestQuestion ? `Spend 10-15 minutes revising the concepts from Question ${lowestQuestion.questionNumber} before introducing new topics.` : `Great job! Review any minor gaps and proceed with the syllabus.`}
+            <div className={styles.cardHeader}>Concept Gap Summary</div>
+            <div className={styles.cardBody}>
+              <div className={styles.gapBox}>
+                <div className={styles.gapBoxTitle}>Weak Concepts</div>
+                <ul className={styles.gapList}>
+                  <li>QuickSort Time Complexity</li>
+                  <li>Dynamic Programming Memoization</li>
+                </ul>
               </div>
+              <div className={styles.strongBox}>
+                <div className={styles.strongBoxTitle}>Strong Concepts</div>
+                <ul className={styles.strongList}>
+                  <li>Hash Tables</li>
+                  <li>Binary Search Trees</li>
+                </ul>
+              </div>
+              <div>
+                <p style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '8px' }}>Recommendations:</p>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Spend 10 minutes reviewing worst-case scenarios for sorting algorithms in the next lecture.</p>
+              </div>
+              <button type="button" className={styles.primaryButton} onClick={handleConceptGapNav} style={{ marginTop: '16px' }}>
+                View Concept Gap Analysis
+              </button>
             </div>
           </div>
-          
-        </div>
-      </div>
 
-      {/* Full Width Table for Students */}
-      <div className={styles.card} style={{ marginTop: '24px' }}>
-        <h3 className={styles.cardTitle}>Students Requiring Attention</h3>
-        <p style={{ color: '#667085', fontSize: '0.85rem', marginBottom: '16px' }}>Showing students who scored below 75% or missed the session.</p>
-        
-        <div style={{ overflowX: 'auto' }}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Roll Number</th>
-                <th>Score</th>
-                <th>Time Taken</th>
-                <th>Recommendation</th>
-                <th style={{ textAlign: 'right' }}>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {students.filter((s: any) => !s.hasAttempted || (s.percentage !== null && s.percentage <= 75)).length > 0 ? (
-                students.filter((s: any) => !s.hasAttempted || (s.percentage !== null && s.percentage <= 75)).slice(0, 5).map((student: any) => {
-                  
-                  let rec = 'Review Topic';
-                  let recClass = styles.yellow;
-                  
-                  if (!student.hasAttempted) {
-                    rec = 'Missed Session';
-                    recClass = styles.blue;
-                  } else if (student.percentage < 40) {
-                    rec = 'Needs Remedial';
-                    recClass = styles.red;
-                  }
-
-                  return (
-                    <tr key={student.id}>
-                      <td style={{ fontWeight: 500 }}>{student.studentName}</td>
-                      <td>{student.rollNumber}</td>
-                      <td>{student.percentage !== null ? `${student.percentage}%` : '-'}</td>
-                      <td>{student.timeTakenSeconds ? `${Math.floor(student.timeTakenSeconds / 60)}m ${student.timeTakenSeconds % 60}s` : '-'}</td>
-                      <td>
-                        <span className={`${styles.badge} ${recClass}`}>{rec}</span>
-                      </td>
-                      <td style={{ textAlign: 'right' }}>
-                        <button className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                          <Eye size={14} /> View Student
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                })
-              ) : (
-                <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', padding: '32px', color: '#667085' }}>
-                    Great job! No students scored below 75%.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-        {students.filter((s: any) => !s.hasAttempted || (s.percentage !== null && s.percentage <= 75)).length > 5 && (
-          <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
-            <button className="btn btn-secondary" style={{ padding: '8px 24px' }}>
-              View All Students
-            </button>
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>Export Actions</div>
+            <div className={styles.cardBody} style={{ gap: '12px' }}>
+              <button type="button" className={styles.secondaryButton}>
+                <Download size={16} />
+                Download PDF
+              </button>
+              <button type="button" className={styles.secondaryButton}>
+                <FileSpreadsheet size={16} />
+                Export Excel
+              </button>
+              <button type="button" className={styles.secondaryButton}>
+                <Printer size={16} />
+                Print Summary
+              </button>
+            </div>
           </div>
-        )}
-      </div>
 
-      {/* Sticky Bottom Bar */}
-      <div className={styles.stickyActionBar}>
-        <div className={styles.actionLeft}>
-          <Link href="/faculty/pulse-sessions" className="btn btn-secondary">
-            Back to Pulse Sessions
-          </Link>
-        </div>
-        <div className={styles.actionRight}>
-          <Link href="/faculty/concept-gap-analysis" className="btn btn-primary" style={{ textDecoration: 'none' }}>
-            <FileText size={18} style={{ marginRight: '8px' }} /> View Concept Gap Analysis
-          </Link>
-          <button className="btn btn-secondary">
-            <Download size={18} style={{ marginRight: '8px' }} /> Download Report
-          </button>
+          <div className={styles.card}>
+            <div className={styles.cardHeader}>Navigation</div>
+            <div className={styles.cardBody} style={{ gap: '12px' }}>
+              <button type="button" className={styles.secondaryButton} onClick={handleBackToPulse}>
+                <ArrowLeft size={16} />
+                Back to Pulse Sessions
+              </button>
+              <button type="button" className={styles.primaryButton} onClick={handleCreateNew}>
+                <Plus size={16} />
+                Create Another Session
+              </button>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
