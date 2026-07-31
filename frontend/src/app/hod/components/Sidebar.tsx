@@ -16,6 +16,7 @@ import styles from "../hod-layout.module.css";
 
 const navItems = [
   { label: "Dashboard", href: "/hod", icon: LayoutDashboard },
+  { label: "Faculty", href: "/hod/faculty", icon: GraduationCap },
   { label: "Students", href: "/hod/students", icon: Users },
   { label: "Subjects", href: "/hod/subjects", icon: BookOpen },
   { label: "Reports & Analytics", href: "/hod/reports", icon: BarChart3 },
