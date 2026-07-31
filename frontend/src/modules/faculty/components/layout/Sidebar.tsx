@@ -1,8 +1,8 @@
 "use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import React, { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { 
   LayoutDashboard, 
   BookOpen, 
@@ -10,77 +10,68 @@ import {
   FileText, 
   ActivitySquare, 
   BarChart3, 
-  UserCircle, 
-  HelpCircle, 
+  PanelLeftClose, 
+  PanelLeftOpen,
+  UserCircle,
+  HelpCircle,
   LogOut,
-  Zap
-} from 'lucide-react';
-import styles from '../../styles/faculty.module.css';
+  Settings
+} from "lucide-react";
+import styles from "../../styles/faculty-layout.module.css";
 
-const menuItems = [
-  { name: 'Dashboard', href: '/faculty', icon: LayoutDashboard },
-  { name: 'Subjects', href: '/faculty/subjects', icon: BookOpen },
-  { name: 'Pulse Sessions', href: '/faculty/pulse-sessions', icon: Radio },
-  { name: 'Concept Gap Analysis', href: '/faculty/concept-gap-analysis', icon: ActivitySquare },
-  { name: 'Reports', href: '/faculty/reports', icon: BarChart3 },
+const navItems = [
+  { label: "Dashboard", href: "/faculty", icon: LayoutDashboard },
+  { label: "Subjects", href: "/faculty/subjects", icon: BookOpen },
+  { label: "Pulse Sessions", href: "/faculty/pulse-sessions", icon: Radio },
+  { label: "Concept Gap Analysis", href: "/faculty/concept-gap-analysis", icon: ActivitySquare },
+  { label: "Settings", href: "/faculty/settings", icon: Settings },
 ];
 
-const bottomItems = [
-  { name: 'Profile', href: '/faculty/profile', icon: UserCircle },
-  { name: 'Help Center', href: '/faculty/help', icon: HelpCircle },
-  { name: 'Sign Out', href: '/signin', icon: LogOut },
-];
-
-export const Sidebar: React.FC = () => {
+export default function Sidebar() {
   const pathname = usePathname();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <aside className={styles.sidebar}>
-      <div className={styles.sidebarLogo} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 2, padding: '24px 24px 16px 24px' }}>
-        <div style={{ fontSize: 18, fontWeight: 700, color: '#10633B' }}>MyStory CIP</div>
-        <div style={{ fontSize: 9, fontWeight: 600, color: '#6B7280', letterSpacing: '0.05em' }}>ACADEMIC INTELLIGENCE</div>
-      </div>
-      
-      <div className={styles.sidebarMenu}>
-        {menuItems.map((item) => {
-          const isActive = pathname === item.href;
-          const Icon = item.icon;
-          return (
-            <Link 
-              key={item.name} 
-              href={item.href} 
-              className={`${styles.sidebarItem} ${isActive ? styles.sidebarItemActive : ''}`}
-            >
-              <Icon size={18} />
-              {item.name}
-            </Link>
-          );
-        })}
-      </div>
-
-      <div className={styles.sidebarDivider}></div>
-
-      <div className={styles.sidebarMenu} style={{ flex: 'none', paddingBottom: 24 }}>
-        {bottomItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <Link 
-              key={item.name} 
-              href={item.href} 
-              className={styles.sidebarItem}
-            >
-              <Icon size={18} />
-              {item.name}
-            </Link>
-          );
-        })}
-      </div>
-      
-      <div style={{ padding: '24px' }}>
-        <div style={{ width: 32, height: 32, backgroundColor: '#111827', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-          <Zap size={16} fill="white" />
+    <aside className={`${styles.sidebar} ${isCollapsed ? styles.sidebarCollapsed : ""}`}>
+      <div className={styles.logoContainer}>
+        <div className={styles.logoIcon}>
+          <BookOpen size={18} />
         </div>
+        {!isCollapsed && (
+          <div className={styles.logoText}>
+            <span className={styles.logoTitle}>MyStory CIP</span>
+            <span className={styles.logoSubtitle}>FACULTY PORTAL</span>
+          </div>
+        )}
+        <button 
+          suppressHydrationWarning 
+          onClick={() => setIsCollapsed(!isCollapsed)} 
+          className={styles.collapseBtn}
+          title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+        >
+          {isCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+        </button>
       </div>
+
+      <nav className={styles.navContainer}>
+        {navItems.map((item) => {
+          const isActive = pathname === item.href || (item.href !== "/faculty" && pathname.startsWith(item.href));
+          const Icon = item.icon;
+          
+          return (
+            <Link 
+              key={item.href} 
+              href={item.href}
+              className={`${styles.navItem} ${isActive ? styles.navItemActive : ""}`}
+              title={isCollapsed ? item.label : undefined}
+            >
+              <Icon size={20} strokeWidth={isActive ? 2.5 : 2} style={{ minWidth: "20px" }} />
+              {!isCollapsed && <span>{item.label}</span>}
+            </Link>
+          );
+        })}
+      </nav>
+
     </aside>
   );
-};
+}

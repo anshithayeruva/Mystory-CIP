@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { GraduationCap, Users, CalendarCheck, FileWarning } from "lucide-react";
+import { GraduationCap, Users, CalendarCheck } from "lucide-react";
 import styles from "../dashboard.module.css";
 
 const metrics = [
@@ -31,15 +31,6 @@ const metrics = [
     subtextStyle: styles.subtextNegative,
     icon: CalendarCheck,
     isHighlighted: false,
-  },
-  {
-    id: "pending",
-    label: "PENDING TASKS",
-    value: "03",
-    subtext: "Requires immediate attention",
-    subtextStyle: styles.subtextAlert,
-    icon: FileWarning,
-    isHighlighted: true,
   },
 ];
 

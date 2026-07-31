@@ -1,68 +1,29 @@
 import React from 'react';
-import { PlusCircle, FileText, Settings, BookOpen } from 'lucide-react';
-import styles from '@/modules/faculty/styles/faculty.module.css';
-import { mockKPIs } from '@/modules/faculty/constants/mockData';
-import { StatCard } from '@/modules/faculty/components/shared/StatCard';
-import { RecentSessionsTable } from '@/modules/faculty/components/dashboard/RecentSessionsTable';
-import { ConceptGapCard } from '@/modules/faculty/components/dashboard/ConceptGapCard';
+
+import FacultyMetricsRow from '@/modules/faculty/components/dashboard/FacultyMetricsRow';
+import FacultyRecentSessions from '@/modules/faculty/components/dashboard/FacultyRecentSessions';
+import FacultyConceptGapSummary from '@/modules/faculty/components/dashboard/FacultyConceptGapSummary';
+import FacultyQuickActions from '@/modules/faculty/components/dashboard/FacultyQuickActions';
+import FacultyUpcomingEvents from '@/modules/faculty/components/dashboard/FacultyUpcomingEvents';
+import styles from '@/modules/faculty/styles/faculty-dashboard.module.css';
 
 export default function FacultyDashboard() {
   return (
-    <>
-      <div className={styles.dashboardHeader} style={{ alignItems: 'flex-start' }}>
-        <div>
-          <h1 className={styles.pageTitle}>Faculty Dashboard</h1>
-          <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-            <div style={{ backgroundColor: '#F9FAFB', border: '1px solid #E5E7EB', color: '#6B7280', padding: '6px 16px', borderRadius: '9999px', fontSize: 13, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <Settings size={14} /> Department: Computer Science Engineering
-            </div>
-            <div style={{ backgroundColor: '#F9FAFB', border: '1px solid #E5E7EB', color: '#6B7280', padding: '6px 16px', borderRadius: '9999px', fontSize: 13, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <BookOpen size={14} /> Assigned Subjects: 00
-            </div>
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: '16px' }}>
-          <button className={styles.primaryButton} style={{ backgroundColor: '#FFFFFF', color: '#10633B', border: '1px solid #10633B' }}>
-            <FileText size={18} color="#10633B" />
-            <span>View Reports</span>
-          </button>
-          <button className={styles.primaryButton}>
-            <PlusCircle size={18} />
-            Create Pulse Session
-          </button>
-        </div>
-      </div>
+    <div className={styles.dashboardContainer}>
+      {/* 4 compact KPI cards */}
+      <FacultyMetricsRow />
 
-      <div className={styles.kpiGrid}>
-        {mockKPIs.map((kpi, index) => (
-          <StatCard key={index} data={kpi} />
-        ))}
-      </div>
-
-      <div className={styles.dashboardGrid}>
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <h2 className={styles.cardTitle}>Distribution by Subject</h2>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', color: '#6B7280', fontSize: 14 }}>
-            No data
-          </div>
+      {/* Main Two-Column Layout */}
+      <div className={styles.mainGrid}>
+        <div className={styles.leftColumn}>
+          <FacultyRecentSessions />
+          <FacultyConceptGapSummary />
         </div>
-        <ConceptGapCard />
-      </div>
-
-      <div style={{ marginTop: 24 }}>
-        <RecentSessionsTable />
-      </div>
-
-      <div className={styles.card} style={{ marginTop: 24 }}>
-        <div className={styles.cardHeader} style={{ marginBottom: 16 }}>
-          <h2 className={styles.cardTitle}>Assigned Subjects</h2>
-        </div>
-        <div style={{ color: '#6B7280', fontSize: 14 }}>
-          No subjects assigned.
+        <div className={styles.rightColumn}>
+          <FacultyUpcomingEvents />
+          <FacultyQuickActions />
         </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import styles from "./academic.module.css";
 import PageHeader from "./components/PageHeader";
@@ -20,7 +20,7 @@ import ProgramInsights from "./components/ProgramInsights";
 import CreateProgramDrawer from "./components/CreateProgramDrawer";
 import { BookOpen } from "lucide-react";
 
-export default function AcademicStructurePage() {
+function AcademicStructureContent() {
   const searchParams = useSearchParams();
   const initialTab = searchParams.get("tab") || "departments";
   
@@ -265,5 +265,13 @@ export default function AcademicStructurePage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AcademicStructurePage() {
+  return (
+    <Suspense fallback={<div style={{ padding: 24 }}>Loading academic structure...</div>}>
+      <AcademicStructureContent />
+    </Suspense>
   );
 }

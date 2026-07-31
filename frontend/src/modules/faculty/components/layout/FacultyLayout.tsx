@@ -1,22 +1,22 @@
-import React from 'react';
-import { Sidebar } from './Sidebar';
-import { Topbar } from './Topbar';
-import styles from '../../styles/faculty.module.css';
+import React from "react";
+import Sidebar from "./Sidebar";
+import Topbar from "./Topbar";
+import styles from "../../styles/faculty-layout.module.css";
 
 interface FacultyLayoutProps {
   children: React.ReactNode;
 }
 
-export const FacultyLayout: React.FC<FacultyLayoutProps> = ({ children }) => {
+export default function FacultyLayout({ children }: FacultyLayoutProps) {
   return (
-    <div className={styles.facultyLayout}>
+    <div className={styles.facultyContainer}>
       <Sidebar />
-      <div className={styles.mainContent}>
+      <div className={styles.mainWrapper}>
         <Topbar />
-        <main className={styles.pageContainer}>
+        <main style={{ flex: 1, padding: "24px 32px", overflowY: "auto", minWidth: 0, backgroundColor: "var(--background)" }}>
           {children}
         </main>
       </div>
     </div>
   );
-};
+}

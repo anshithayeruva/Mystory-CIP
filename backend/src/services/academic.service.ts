@@ -30,15 +30,15 @@ export class AcademicService {
       orderBy: { createdAt: 'desc' }
     });
 
-    return departments.map(dept => ({
+    return departments.map((dept: any) => ({
       id: dept.id,
       name: dept.name,
       code: dept.code,
       description: dept.description,
       hodName: dept.hod?.user ? `${dept.hod.user.firstName} ${dept.hod.user.lastName}` : 'Not Assigned',
-      faculty: dept._count.faculty,
-      students: dept._count.students,
-      programs: dept._count.programs,
+      faculty: dept._count?.faculty || 0,
+      students: dept._count?.students || 0,
+      programs: dept._count?.programs || 0,
       createdAt: dept.createdAt
     }));
   }
@@ -61,7 +61,7 @@ export class AcademicService {
         name: data.name,
         code,
         description: data.description,
-      }
+      } as any
     });
 
     return department;
@@ -81,14 +81,14 @@ export class AcademicService {
       orderBy: { createdAt: 'desc' }
     });
 
-    return programs.map(prog => ({
+    return programs.map((prog: any) => ({
       id: prog.id,
       name: prog.name,
       code: prog.code,
-      department: prog.department.name,
+      department: prog.department?.name || '',
       duration: prog.duration || 'N/A',
       degreeLevel: prog.degreeLevel || 'N/A',
-      students: prog._count.students,
+      students: prog._count?.students || 0,
       curriculum: "Assigned", // Always show 'View Curriculum' for now since frontend uses dummy data
       createdAt: prog.createdAt
     }));
@@ -120,14 +120,14 @@ export class AcademicService {
         duration: data.duration,
         intake: parsedIntake,
         description: data.description
-      }
+      } as any
     });
 
     return program;
   }
 
   static async getProgramById(id: string) {
-    const program = await prisma.program.findUnique({
+    const program: any = await prisma.program.findUnique({
       where: { id },
       include: {
         department: true,
@@ -145,10 +145,10 @@ export class AcademicService {
       id: program.id,
       name: program.name,
       code: program.code,
-      department: program.department.name,
+      department: program.department?.name || '',
       duration: program.duration || 'N/A',
       degreeLevel: program.degreeLevel || 'N/A',
-      students: program._count.students,
+      students: program._count?.students || 0,
       createdAt: program.createdAt
     };
   }

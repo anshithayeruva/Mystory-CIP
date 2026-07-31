@@ -452,16 +452,17 @@ export default function HodSubjectsPage() {
             All Courses
           </button>
           <button
-            className={`${styles.tabBtn} ${activeTab === "MULTI_STAFF" ? styles.tabBtnActive : ""}`}
-            onClick={() => { setActiveTab("MULTI_STAFF"); setCurrentPage(1); }}
-          >
-            Multi-Staff ({subjectList.filter(s => s.staffList.length > 1).length})
-          </button>
-          <button
+
             className={`${styles.tabBtn} ${activeTab === "CORE" ? styles.tabBtnActive : ""}`}
             onClick={() => { setActiveTab("CORE"); setCurrentPage(1); }}
           >
             Core Subjects
+          </button>
+          <button
+            className={`${styles.tabBtn} ${activeTab === "MULTI_FACULTY" ? styles.tabBtnActive : ""}`}
+            onClick={() => { setActiveTab("MULTI_FACULTY"); setCurrentPage(1); }}
+          >
+            Multi-Faculty
           </button>
           <button
             className={`${styles.tabBtn} ${activeTab === "ELECTIVE" ? styles.tabBtnActive : ""}`}
@@ -662,18 +663,7 @@ export default function HodSubjectsPage() {
                   </div>
 
                   <div className={styles.cardBottomRow}>
-                    <div className={styles.progressGroup}>
-                      <div className={styles.progressLabelRow}>
-                        <span className={styles.progressTitle}>Syllabus Progress</span>
-                        <span className={styles.progressPercent}>{item.completionPercent}%</span>
-                      </div>
-                      <div className={styles.progressBarBg}>
-                        <div 
-                          className={styles.progressBarFill} 
-                          style={{ width: `${item.completionPercent}%` }}
-                        />
-                      </div>
-                    </div>
+                    <div />
                     <div>
                       <span className={getStatusClass(item.status)}>{item.status}</span>
                     </div>
@@ -699,7 +689,6 @@ export default function HodSubjectsPage() {
                   <th>Semester & Section</th>
                   <th>Enrolled</th>
                   <th>Credits & Hours</th>
-                  <th>Completion</th>
                   <th>Status</th>
                   <th style={{ textAlign: "right", paddingRight: "20px" }}>Actions</th>
                 </tr>
@@ -752,9 +741,6 @@ export default function HodSubjectsPage() {
                         <span style={{ fontSize: "0.8rem", color: "#334155" }}>
                           {item.credits} Cr • {item.hoursPerWeek}h/wk
                         </span>
-                      </td>
-                      <td>
-                        <span style={{ fontWeight: 700, color: "#00522E" }}>{item.completionPercent}%</span>
                       </td>
                       <td>
                         <span className={getStatusClass(item.status)}>{item.status}</span>

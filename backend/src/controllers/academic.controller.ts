@@ -44,7 +44,7 @@ export class AcademicController {
 
   static async getProgram(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
+      const { id } = req.params as { id: string };
       const program = await AcademicService.getProgramById(id);
       res.status(200).json({ success: true, data: program });
     } catch (error) {
@@ -53,7 +53,7 @@ export class AcademicController {
   }
   static async updateDepartment(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
+      const { id } = req.params as { id: string };
       const department = await AcademicService.updateDepartment(id, req.body);
       res.status(200).json({ success: true, data: department });
     } catch (error) {
@@ -63,7 +63,7 @@ export class AcademicController {
 
   static async deleteDepartment(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
+      const { id } = req.params as { id: string };
       await AcademicService.deleteDepartment(id);
       res.status(200).json({ success: true, message: 'Department deleted successfully' });
     } catch (error) {
@@ -73,7 +73,7 @@ export class AcademicController {
 
   static async updateProgram(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
+      const { id } = req.params as { id: string };
       const program = await AcademicService.updateProgram(id, req.body);
       res.status(200).json({ success: true, data: program });
     } catch (error) {
@@ -83,7 +83,7 @@ export class AcademicController {
 
   static async deleteProgram(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
+      const { id } = req.params as { id: string };
       await AcademicService.deleteProgram(id);
       res.status(200).json({ success: true, message: 'Program deleted successfully' });
     } catch (error) {
