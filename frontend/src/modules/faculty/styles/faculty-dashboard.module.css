@@ -547,6 +547,114 @@
   padding: 16px;
 }
 
+/* Vertical Timeline Card Styles for Today's Schedule / Today's Activity */
+.timelineList {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 20px 12px 20px;
+}
+
+.timelineItem {
+  display: flex;
+  gap: 16px;
+  position: relative;
+}
+
+.timelineTrack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 20px;
+}
+
+.timelineDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 2px;
+  z-index: 2;
+}
+
+.dotGreen {
+  background-color: #00522E;
+  box-shadow: 0 0 0 3px #e9f2ee;
+}
+
+.dotSlate {
+  background-color: #64748b;
+  box-shadow: 0 0 0 3px #f1f5f9;
+}
+
+.dotBlue {
+  background-color: #0284c7;
+  box-shadow: 0 0 0 3px #e0f2fe;
+}
+
+.dotGray {
+  background-color: #cbd5e1;
+  box-shadow: 0 0 0 3px #f8fafc;
+}
+
+.timelineLine {
+  width: 2px;
+  flex-grow: 1;
+  background-color: #e2e8f0;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  min-height: 28px;
+}
+
+.timelineContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 22px;
+  flex: 1;
+}
+
+.timelineItem:last-child .timelineContent {
+  padding-bottom: 8px;
+}
+
+.timelineTimeGreen {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #00522E;
+}
+
+.timelineTimeSlate {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.timelineTimeBlue {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0284c7;
+}
+
+.timelineTimeGray {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.timelineTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.timelineSubtext {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+}
+
 .actionCardBtn {
   display: flex;
   flex-direction: column;

@@ -83,3 +83,36 @@ export const mockUpcomingEvents: import('../types').Event[] = [
     theme: 'light'
   }
 ];
+
+export const mockTodaysSchedule: import('../types').ScheduleItem[] = [
+  {
+    id: '1',
+    timeSlot: '09:00 AM - 10:00 AM',
+    subjectName: 'Data Structures & Algorithms',
+    subjectCode: 'CS-302',
+    section: 'Sec A (CSE)',
+    room: 'Hall 204',
+    studentsCount: 60,
+    status: 'Completed',
+  },
+  {
+    id: '2',
+    timeSlot: '11:30 AM - 12:30 PM',
+    subjectName: 'Machine Learning Fundamentals',
+    subjectCode: 'CS-401',
+    section: 'Sec B (CSE)',
+    room: 'Lab 3 (CS Dept)',
+    studentsCount: 45,
+    status: 'Live Now',
+  },
+  {
+    id: '3',
+    timeSlot: '02:30 PM - 03:30 PM',
+    subjectName: 'Database Management Systems',
+    subjectCode: 'IT-204',
+    section: 'Sec A (IT)',
+    room: 'Hall 108',
+    studentsCount: 55,
+    status: 'Upcoming',
+  },
+];
