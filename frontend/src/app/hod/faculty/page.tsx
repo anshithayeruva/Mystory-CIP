@@ -397,7 +397,7 @@ export default function HodFacultyPage() {
             />
           </div>
 
-          <div style={{ position: "relative" }} ref={filterRef}>
+          <div className={styles.filterPopover} ref={filterRef}>
             <button 
               className={styles.filterBtn}
               onClick={() => setIsFilterOpen(!isFilterOpen)}
@@ -407,32 +407,16 @@ export default function HodFacultyPage() {
             </button>
 
             {isFilterOpen && (
-              <div 
-                style={{
-                  position: "absolute",
-                  right: 0,
-                  top: "calc(100% + 8px)",
-                  width: "260px",
-                  backgroundColor: "#ffffff",
-                  border: "1px solid var(--surface-border)",
-                  borderRadius: "10px",
-                  boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1)",
-                  padding: "16px",
-                  zIndex: 50,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "14px",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontWeight: 700, fontSize: "0.85rem", color: "#334155" }}>Filter Options</span>
+              <div className={styles.filterMenu}>
+                <div className={styles.filterHeaderRow}>
+                  <span className={styles.filterMenuTitle}>Filter Options</span>
                   <button
+                    className={styles.resetFilterBtn}
                     onClick={() => {
                       setRoleFilter("ALL");
                       setSubjectFilter("ALL");
                       setHoursFilter("ALL");
                     }}
-                    style={{ background: "none", border: "none", color: "#00522E", fontSize: "0.75rem", fontWeight: 600, cursor: "pointer" }}
                   >
                     Reset All
                   </button>

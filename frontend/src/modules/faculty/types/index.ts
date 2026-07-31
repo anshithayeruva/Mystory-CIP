@@ -33,3 +33,14 @@ export interface Event {
   month: string;
   theme: 'dark' | 'light';
 }
+
+export interface ScheduleItem {
+  id: string;
+  timeSlot: string;
+  subjectName: string;
+  subjectCode: string;
+  section: string;
+  room: string;
+  studentsCount: number;
+  status: 'Completed' | 'Live Now' | 'Upcoming';
+}

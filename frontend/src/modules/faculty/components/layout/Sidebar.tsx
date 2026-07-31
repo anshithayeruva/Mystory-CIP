@@ -15,7 +15,8 @@ import {
   UserCircle,
   HelpCircle,
   LogOut,
-  Settings
+  Settings,
+  GraduationCap
 } from "lucide-react";
 import styles from "../../styles/faculty-layout.module.css";
 
@@ -35,7 +36,7 @@ export default function Sidebar() {
     <aside className={`${styles.sidebar} ${isCollapsed ? styles.sidebarCollapsed : ""}`}>
       <div className={styles.logoContainer}>
         <div className={styles.logoIcon}>
-          <BookOpen size={18} />
+          <GraduationCap size={18} />
         </div>
         {!isCollapsed && (
           <div className={styles.logoText}>

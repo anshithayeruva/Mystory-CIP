@@ -107,6 +107,78 @@
   box-shadow: 0 4px 12px rgba(0, 82, 46, 0.15);
 }
 
+/* Filter Popover Dropdown */
+.filterPopover {
+  position: relative;
+}
+
+.filterMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  width: 280px;
+  background: #ffffff;
+  border: 1px solid var(--surface-border, #e2e8f0);
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.filterHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 4px;
+}
+
+.filterMenuTitle {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.resetFilterBtn {
+  background: none;
+  border: none;
+  color: #00522E;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filterLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.filterSelect {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  outline: none;
+  background: #f8fafc;
+  color: #0f172a;
+  transition: border-color 0.2s;
+}
+
+.filterSelect:focus {
+  border-color: #00522E;
+}
+
 .tableCard {
   background-color: var(--surface);
   border: 1px solid var(--surface-border);

@@ -4,10 +4,113 @@
   gap: 24px;
 }
 
-/* Top Metrics Row (4 Cards) */
+/* University Banner (mirrors admin & hod OverviewCard header) */
+.universityBanner {
+  background-color: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+}
+
+.universityInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.universityLogo {
+  width: 48px;
+  height: 48px;
+  background-color: var(--surface-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.universityLogoPlaceholder {
+  width: 100%;
+  height: 100%;
+  background-color: var(--background);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.universityDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.universityName {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--success);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--success);
+  border-radius: 50%;
+}
+
+.bannerAcademicInfo {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.bannerStatLabel {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: block;
+}
+
+.bannerStatValue {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-top: 4px;
+}
+
+.bannerDividerVertical {
+  width: 1px;
+  height: 24px;
+  background-color: var(--surface-border);
+  margin: 0 16px;
+}
+
+/* Top Metrics Row (3 Cards) */
 .metricsGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
 
@@ -442,6 +545,114 @@
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   padding: 16px;
+}
+
+/* Vertical Timeline Card Styles for Today's Schedule / Today's Activity */
+.timelineList {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 20px 12px 20px;
+}
+
+.timelineItem {
+  display: flex;
+  gap: 16px;
+  position: relative;
+}
+
+.timelineTrack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 20px;
+}
+
+.timelineDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 2px;
+  z-index: 2;
+}
+
+.dotGreen {
+  background-color: #00522E;
+  box-shadow: 0 0 0 3px #e9f2ee;
+}
+
+.dotSlate {
+  background-color: #64748b;
+  box-shadow: 0 0 0 3px #f1f5f9;
+}
+
+.dotBlue {
+  background-color: #0284c7;
+  box-shadow: 0 0 0 3px #e0f2fe;
+}
+
+.dotGray {
+  background-color: #cbd5e1;
+  box-shadow: 0 0 0 3px #f8fafc;
+}
+
+.timelineLine {
+  width: 2px;
+  flex-grow: 1;
+  background-color: #e2e8f0;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  min-height: 28px;
+}
+
+.timelineContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 22px;
+  flex: 1;
+}
+
+.timelineItem:last-child .timelineContent {
+  padding-bottom: 8px;
+}
+
+.timelineTimeGreen {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #00522E;
+}
+
+.timelineTimeSlate {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.timelineTimeBlue {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0284c7;
+}
+
+.timelineTimeGray {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.timelineTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.timelineSubtext {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
 }
 
 .actionCardBtn {
