@@ -8,6 +8,7 @@ import styles from "../../styles/faculty-layout.module.css";
 
 const getPageTitle = (pathname: string) => {
   if (pathname === '/faculty') return 'Dashboard';
+  if (pathname.includes('/students')) return 'Students';
   if (pathname.includes('/subjects')) return 'Subjects';
   if (pathname.includes('/pulse-sessions/create')) return 'Create Pulse Session';
   if (pathname.includes('/live')) return 'Live Session';

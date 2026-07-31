@@ -22,6 +22,7 @@ import styles from "../../styles/faculty-layout.module.css";
 
 const navItems = [
   { label: "Dashboard", href: "/faculty", icon: LayoutDashboard },
+  { label: "Students", href: "/faculty/students", icon: UserCircle },
   { label: "Subjects", href: "/faculty/subjects", icon: BookOpen },
   { label: "Pulse Sessions", href: "/faculty/pulse-sessions", icon: Radio },
   { label: "Concept Gap Analysis", href: "/faculty/concept-gap-analysis", icon: ActivitySquare },

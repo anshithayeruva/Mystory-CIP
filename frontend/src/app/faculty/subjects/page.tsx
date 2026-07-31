@@ -1,12 +1,10 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import Link from "next/link";
 import { 
   Search, 
   Filter, 
-  Plus, 
-  Eye, 
-  Edit2, 
   BookOpen, 
   Layers, 
   Users, 
@@ -27,7 +25,7 @@ export interface FacultySubjectItem {
   program: string;
   semester: string;
   programInfo: string;
-  sectionsCount: number;
+  credits: number;
   studentsCount: number;
   weeklyHours: number;
 }
@@ -42,7 +40,7 @@ const MOCK_FACULTY_SUBJECTS: FacultySubjectItem[] = [
     program: "B.Tech CSE",
     semester: "Semester 3",
     programInfo: "B.Tech CSE • Semester 3",
-    sectionsCount: 4,
+    credits: 4,
     studentsCount: 240,
     weeklyHours: 14,
   },
@@ -55,7 +53,7 @@ const MOCK_FACULTY_SUBJECTS: FacultySubjectItem[] = [
     program: "B.Tech CSE",
     semester: "Semester 7",
     programInfo: "B.Tech CSE • Semester 7",
-    sectionsCount: 2,
+    credits: 3,
     studentsCount: 115,
     weeklyHours: 10,
   },
@@ -68,7 +66,7 @@ const MOCK_FACULTY_SUBJECTS: FacultySubjectItem[] = [
     program: "B.Tech CSE",
     semester: "Semester 4",
     programInfo: "B.Tech CSE • Semester 4",
-    sectionsCount: 3,
+    credits: 4,
     studentsCount: 180,
     weeklyHours: 16,
   },
@@ -81,7 +79,7 @@ const MOCK_FACULTY_SUBJECTS: FacultySubjectItem[] = [
     program: "B.Tech CSE",
     semester: "Semester 4",
     programInfo: "B.Tech CSE • Semester 4",
-    sectionsCount: 2,
+    credits: 3,
     studentsCount: 120,
     weeklyHours: 12,
   },
@@ -94,7 +92,7 @@ const MOCK_FACULTY_SUBJECTS: FacultySubjectItem[] = [
     program: "B.Tech CSE",
     semester: "Semester 5",
     programInfo: "B.Tech CSE • Semester 5",
-    sectionsCount: 3,
+    credits: 3,
     studentsCount: 195,
     weeklyHours: 14,
   },
@@ -107,7 +105,7 @@ const MOCK_FACULTY_SUBJECTS: FacultySubjectItem[] = [
     program: "M.Tech SE",
     semester: "Semester 1",
     programInfo: "M.Tech SE • Semester 1",
-    sectionsCount: 2,
+    credits: 2,
     studentsCount: 110,
     weeklyHours: 8,
   },
@@ -347,10 +345,6 @@ export default function FacultySubjectsPage() {
             )}
           </div>
 
-          <button className={styles.addBtn} onClick={handleOpenAddModal}>
-            <Plus size={16} />
-            Add Subject
-          </button>
         </div>
       </div>
 
@@ -361,17 +355,16 @@ export default function FacultySubjectsPage() {
             <thead>
               <tr>
                 <th>SUBJECT NAME & CODE</th>
-                <th>CATEGORY</th>
-                <th>SECTIONS</th>
-                <th>STUDENTS</th>
-                <th>WEEKLY HOURS</th>
-                <th style={{ textAlign: "right" }}>ACTIONS</th>
+                <th style={{ textAlign: "center" }}>CATEGORY</th>
+                <th style={{ textAlign: "center" }}>CREDITS</th>
+                <th style={{ textAlign: "center" }}>STUDENTS</th>
+                <th style={{ textAlign: "center" }}>VIEW SYLLABUS</th>
               </tr>
             </thead>
             <tbody>
               {paginatedSubjects.length === 0 ? (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>
+                  <td colSpan={5} style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>
                     No subjects found matching your search criteria.
                   </td>
                 </tr>
@@ -388,46 +381,25 @@ export default function FacultySubjectsPage() {
                       </div>
                     </td>
 
-                    <td>
-                      <span className={`${styles.badgePill} ${
-                        item.category === "Core" ? styles.badgeCore :
-                        item.category === "Elective" ? styles.badgeElective :
-                        item.category === "Multi-Faculty" ? styles.badgeMulti : styles.badgeLab
-                      }`}>
+                    <td style={{ textAlign: "center" }}>
+                      <span className={styles.statValueText} style={{ color: item.category === "Core" ? "#00522E" : item.category === "Elective" ? "#1E40AF" : item.category === "Multi-Faculty" ? "#1F3A5F" : "#334155" }}>
                         {item.category}
                       </span>
                     </td>
 
-                    <td>
-                      <span className={styles.statValueText}>{String(item.sectionsCount).padStart(2, '0')}</span>
+                    <td style={{ textAlign: "center" }}>
+                      <span className={styles.statValueText}>{item.credits || 4}</span>
                     </td>
 
-                    <td>
+                    <td style={{ textAlign: "center" }}>
                       <span className={styles.statValueText}>{item.studentsCount}</span>
                     </td>
 
-                    <td>
-                      <span className={styles.hoursBadge}>
-                        <Clock size={12} /> {item.weeklyHours} hrs/wk
-                      </span>
-                    </td>
-
-                    <td>
-                      <div className={styles.actionsGroup}>
-                        <button 
-                          className={styles.actionCellBtn} 
-                          title="View Syllabus Details"
-                          onClick={() => triggerToast(`Viewing details for ${item.name}`)}
-                        >
-                          <Eye size={16} />
-                        </button>
-                        <button 
-                          className={styles.actionCellBtn} 
-                          title="Edit Subject"
-                          onClick={() => handleOpenEditModal(item)}
-                        >
-                          <Edit2 size={16} />
-                        </button>
+                    <td style={{ textAlign: "center" }}>
+                      <div style={{ display: "flex", justifyContent: "center" }}>
+                        <Link href={`/faculty/subjects/${item.id}`} className={styles.actionCellBtn} style={{ color: "#00522E", fontWeight: 600, display: "flex", alignItems: "center", gap: "4px", width: "fit-content", textDecoration: "none" }}>
+                          View Syllabus <ChevronRight size={16} />
+                        </Link>
                       </div>
                     </td>
                   </tr>
@@ -472,43 +444,7 @@ export default function FacultySubjectsPage() {
         </div>
       </div>
 
-      {/* Summary Analytics Cards Grid */}
-      <div className={styles.summaryGrid}>
-        <div className={styles.summaryCard}>
-          <div className={styles.iconCircleGreen}>
-            <BookOpen size={24} />
-          </div>
-          <div className={styles.summaryInfo}>
-            <span className={styles.summaryTitle}>TOTAL SUBJECTS COUNT</span>
-            <span className={styles.summaryValue}>{totalSubjectsCount}</span>
-            <span className={styles.summarySubtext}>
-              <span className={styles.subtextGreen}>100% Active</span> status across assigned term
-            </span>
-          </div>
-        </div>
 
-        <div className={styles.summaryCard}>
-          <div className={styles.iconCircleBlue}>
-            <Layers size={24} />
-          </div>
-          <div className={styles.summaryInfo}>
-            <span className={styles.summaryTitle}>ASSIGNED SECTIONS</span>
-            <span className={styles.summaryValue}>{totalSectionsCount}</span>
-            <span className={styles.summarySubtext}>Active teaching sections scheduled</span>
-          </div>
-        </div>
-
-        <div className={styles.summaryCard}>
-          <div className={styles.iconCircleDark}>
-            <Users size={24} />
-          </div>
-          <div className={styles.summaryInfo}>
-            <span className={styles.summaryTitle}>TOTAL STUDENT COVERAGE</span>
-            <span className={styles.summaryValue}>{totalStudentsCount.toLocaleString()}</span>
-            <span className={styles.summarySubtext}>Across all enrolled section rosters</span>
-          </div>
-        </div>
-      </div>
 
       {/* Add / Edit Subject Modal */}
       {isModalOpen && (
