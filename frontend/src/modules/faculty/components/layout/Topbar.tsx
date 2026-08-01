@@ -10,12 +10,13 @@ const getPageTitle = (pathname: string) => {
   if (pathname === '/faculty') return 'Dashboard';
   if (pathname.includes('/students')) return 'Students';
   if (pathname.includes('/subjects')) return 'Subjects';
-  if (pathname.includes('/pulse-sessions/create')) return 'Create Pulse Session';
+  if (pathname.includes('/pulse-sessions/create')) return 'Create AI Assessment';
   if (pathname.includes('/live')) return 'Live Session';
   if (pathname.includes('/summary')) return 'Session Summary';
-  if (pathname.includes('/pulse-sessions')) return 'Pulse Sessions';
-  if (pathname.includes('/concept-gap-analysis')) return 'Concept Gap Analysis';
+  if (pathname.includes('/pulse-sessions')) return 'AI Assessments';
+  if (pathname.includes('/concept-gap-analysis')) return 'Reports';
   if (pathname.includes('/reports')) return 'Reports';
+  if (pathname.includes('/resources')) return 'Digital Learning Resources';
   if (pathname.includes('/settings')) return 'Settings';
   if (pathname.includes('/profile')) return 'Profile';
   if (pathname.includes('/help')) return 'Help Center';

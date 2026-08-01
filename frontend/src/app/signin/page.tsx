@@ -196,7 +196,7 @@ export default function SignInPage() {
               </div>
             )}
 
-            <form onSubmit={handleSignIn}>
+            <form onSubmit={handleSignIn} suppressHydrationWarning>
               <div className={styles.formGroup}>
                 <label className={styles.label} htmlFor="email-input">
                   Institutional Email or ID
@@ -211,6 +211,7 @@ export default function SignInPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     className={styles.input}
                     placeholder="Enter email address"
+                    suppressHydrationWarning
                   />
                 </div>
               </div>
@@ -229,12 +230,14 @@ export default function SignInPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     className={styles.input}
                     placeholder="Enter password"
+                    suppressHydrationWarning
                   />
                   <button
                     type="button"
                     className={styles.togglePasswordBtn}
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    suppressHydrationWarning
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -256,6 +259,7 @@ export default function SignInPage() {
                   type="button"
                   className={styles.forgotLink}
                   onClick={() => alert('Demo Mode: Click "Sign In" to proceed to the portal.')}
+                  suppressHydrationWarning
                 >
                   Forgot Password?
                 </button>
@@ -265,6 +269,7 @@ export default function SignInPage() {
                 type="submit"
                 className={styles.submitBtn}
                 disabled={isLoading || isSuccess}
+                suppressHydrationWarning
               >
                 {isLoading ? (
                   <span>Authenticating...</span>

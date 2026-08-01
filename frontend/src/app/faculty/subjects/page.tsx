@@ -26,6 +26,7 @@ export interface FacultySubjectItem {
   semester: string;
   programInfo: string;
   credits: number;
+  sectionsCount: number;
   studentsCount: number;
   weeklyHours: number;
 }
@@ -41,6 +42,7 @@ const MOCK_FACULTY_SUBJECTS: FacultySubjectItem[] = [
     semester: "Semester 3",
     programInfo: "B.Tech CSE • Semester 3",
     credits: 4,
+    sectionsCount: 4,
     studentsCount: 240,
     weeklyHours: 14,
   },
@@ -54,6 +56,7 @@ const MOCK_FACULTY_SUBJECTS: FacultySubjectItem[] = [
     semester: "Semester 7",
     programInfo: "B.Tech CSE • Semester 7",
     credits: 3,
+    sectionsCount: 2,
     studentsCount: 115,
     weeklyHours: 10,
   },
@@ -67,6 +70,7 @@ const MOCK_FACULTY_SUBJECTS: FacultySubjectItem[] = [
     semester: "Semester 4",
     programInfo: "B.Tech CSE • Semester 4",
     credits: 4,
+    sectionsCount: 3,
     studentsCount: 180,
     weeklyHours: 16,
   },
@@ -80,6 +84,7 @@ const MOCK_FACULTY_SUBJECTS: FacultySubjectItem[] = [
     semester: "Semester 4",
     programInfo: "B.Tech CSE • Semester 4",
     credits: 3,
+    sectionsCount: 2,
     studentsCount: 120,
     weeklyHours: 12,
   },
@@ -93,6 +98,7 @@ const MOCK_FACULTY_SUBJECTS: FacultySubjectItem[] = [
     semester: "Semester 5",
     programInfo: "B.Tech CSE • Semester 5",
     credits: 3,
+    sectionsCount: 3,
     studentsCount: 195,
     weeklyHours: 14,
   },
@@ -106,6 +112,7 @@ const MOCK_FACULTY_SUBJECTS: FacultySubjectItem[] = [
     semester: "Semester 1",
     programInfo: "M.Tech SE • Semester 1",
     credits: 2,
+    sectionsCount: 2,
     studentsCount: 110,
     weeklyHours: 8,
   },
@@ -134,6 +141,7 @@ export default function FacultySubjectsPage() {
     program: "B.Tech CSE",
     semester: "Semester 3",
     programInfo: "B.Tech CSE • Semester 3",
+    credits: 4,
     sectionsCount: 2,
     studentsCount: 120,
     weeklyHours: 12,
@@ -179,6 +187,7 @@ export default function FacultySubjectsPage() {
       program: "B.Tech CSE",
       semester: "Semester 3",
       programInfo: "B.Tech CSE • Semester 3",
+      credits: 4,
       sectionsCount: 2,
       studentsCount: 120,
       weeklyHours: 12,
@@ -195,6 +204,7 @@ export default function FacultySubjectsPage() {
       program: subject.program,
       semester: subject.semester,
       programInfo: subject.programInfo,
+      credits: subject.credits,
       sectionsCount: subject.sectionsCount,
       studentsCount: subject.studentsCount,
       weeklyHours: subject.weeklyHours,
