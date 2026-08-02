@@ -20,6 +20,7 @@ node_modules/
 /build
 /dist
 /.next/
+.next/
 /out/
 
 # misc
