@@ -99,6 +99,16 @@ if (fsp && fsp.realpath) {
 
 const nextConfig: NextConfig = {
   eslint: { ignoreDuringBuilds: true },
+  async redirects() {
+    return [
+      { source: "/student/grades", destination: "/student", permanent: false },
+      { source: "/student/assignments", destination: "/student", permanent: false },
+      { source: "/student/announcements", destination: "/student", permanent: false },
+      { source: "/student/messages", destination: "/student", permanent: false },
+      { source: "/student/profile", destination: "/student/settings", permanent: false },
+      { source: "/student/attendance", destination: "/student/reports", permanent: false },
+    ];
+  },
   images: {
     remotePatterns: [
       {

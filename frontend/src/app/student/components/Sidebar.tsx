@@ -7,14 +7,10 @@ import {
   LayoutDashboard, 
   BookOpen, 
   Radio, 
-  FileCheck2, 
-  Award, 
-  CalendarCheck, 
+  BarChart3, 
   Clock, 
   FolderDown, 
-  Megaphone, 
-  MessageSquareText, 
-  User, 
+  Settings, 
   GraduationCap, 
   PanelLeftClose, 
   PanelLeftOpen 
@@ -25,14 +21,10 @@ const navItems = [
   { label: "Dashboard", href: "/student", icon: LayoutDashboard },
   { label: "My Courses", href: "/student/courses", icon: BookOpen },
   { label: "Live Classroom", href: "/student/pulse", icon: Radio },
-  { label: "Assignments", href: "/student/assignments", icon: FileCheck2 },
-  { label: "Grades & Progress", href: "/student/grades", icon: Award },
-  { label: "Attendance", href: "/student/attendance", icon: CalendarCheck },
+  { label: "Reports & Analytics", href: "/student/reports", icon: BarChart3 },
   { label: "Timetable", href: "/student/timetable", icon: Clock },
   { label: "Resources", href: "/student/resources", icon: FolderDown },
-  { label: "Announcements", href: "/student/announcements", icon: Megaphone },
-  { label: "Messages", href: "/student/messages", icon: MessageSquareText },
-  { label: "My Profile", href: "/student/profile", icon: User },
+  { label: "Settings", href: "/student/settings", icon: Settings },
 ];
 
 export default function Sidebar() {

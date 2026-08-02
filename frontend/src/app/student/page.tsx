@@ -7,13 +7,15 @@ import {
   BookOpen, 
   CalendarCheck, 
   Clock, 
-  FileCheck2, 
   FolderDown, 
   Radio, 
   Eye, 
   ChevronDown, 
   ChevronUp,
-  ArrowRight
+  ArrowRight,
+  Sparkles,
+  CheckCircle2,
+  AlertCircle
 } from "lucide-react";
 import styles from "./student.module.css";
 import { 
@@ -47,7 +49,7 @@ export default function StudentDashboard() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
       
-      {/* 1. University Banner (Mirrors HOD UniversityBanner) */}
+      {/* 1. University Banner */}
       <div style={{
         backgroundColor: "#ffffff",
         border: "1px solid #e2e8f0",
@@ -99,7 +101,7 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* 2. Top 3 Primary Metrics Row (Mirrors HOD MetricsRow) */}
+      {/* 2. Top 3 Primary Metrics Row */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
         {/* Metric 1 */}
         <div style={{
@@ -171,13 +173,13 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* 3. Main Two-Column Layout (Mirrors HOD mainGrid: 1fr 340px) */}
+      {/* 3. Main Two-Column Layout */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "24px", alignItems: "start" }}>
         
         {/* LEFT COLUMN */}
         <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
           
-          {/* Card 1: Registered Courses (Mirrors HOD ProgramsCard) */}
+          {/* Card 1: Registered Courses */}
           <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", display: "flex", flexDirection: "column", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", overflow: "hidden" }}>
             <div style={{ padding: "16px 20px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "#0f172a" }}>REGISTERED COURSES</span>
@@ -253,7 +255,7 @@ export default function StudentDashboard() {
             </button>
           </div>
 
-          {/* Card 2: Today's Schedule & Live Session Monitor (Mirrors HOD LiveSessionMonitor) */}
+          {/* Card 2: Today's Schedule & Live Session Monitor */}
           <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", display: "flex", flexDirection: "column", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", overflow: "hidden" }}>
             <div style={{ padding: "16px 20px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -314,16 +316,13 @@ export default function StudentDashboard() {
 
         </div>
 
-        {/* RIGHT COLUMN (340px width - Mirrors HOD Right Column) */}
+        {/* RIGHT COLUMN (340px width) */}
         <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
           
-          {/* Card 1: Upcoming Events & Deadlines (Mirrors HOD UpcomingEvents) */}
+          {/* Card 1: Upcoming Events & Deadlines */}
           <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", display: "flex", flexDirection: "column", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", overflow: "hidden" }}>
             <div style={{ padding: "16px 20px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "#0f172a" }}>UPCOMING DEADLINES</span>
-              <Link href="/student/assignments" style={{ fontSize: "0.75rem", fontWeight: 700, color: "#00522E", textTransform: "uppercase", textDecoration: "none" }}>
-                VIEW ALL →
-              </Link>
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", padding: "12px 16px", gap: "12px" }}>
@@ -364,128 +363,75 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Card 2: Quick Actions (Mirrors HOD QuickActions Grid) */}
-          <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", display: "flex", flexDirection: "column", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", overflow: "hidden" }}>
-            <div style={{ padding: "16px 20px", borderBottom: "1px solid #e2e8f0" }}>
-              <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "#0f172a" }}>QUICK ACTIONS</span>
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", padding: "16px" }}>
-              <Link href="/student/pulse" style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                padding: "16px 10px",
-                borderRadius: "10px",
-                border: "1px solid #e2e8f0",
-                backgroundColor: "#ffffff",
-                color: "#0f172a",
-                fontSize: "0.7rem",
-                fontWeight: 700,
-                letterSpacing: "0.04em",
-                textTransform: "uppercase",
-                textDecoration: "none"
-              }}>
-                <Radio size={20} color="#00522E" />
-                JOIN LIVE CLASS
-              </Link>
-
-              <Link href="/student/timetable" style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                padding: "16px 10px",
-                borderRadius: "10px",
-                border: "1px solid #e2e8f0",
-                backgroundColor: "#ffffff",
-                color: "#0f172a",
-                fontSize: "0.7rem",
-                fontWeight: 700,
-                letterSpacing: "0.04em",
-                textTransform: "uppercase",
-                textDecoration: "none"
-              }}>
-                <Clock size={20} color="#00522E" />
-                TIMETABLE
-              </Link>
-
-              <Link href="/student/assignments" style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                padding: "16px 10px",
-                borderRadius: "10px",
-                border: "1px solid #e2e8f0",
-                backgroundColor: "#ffffff",
-                color: "#0f172a",
-                fontSize: "0.7rem",
-                fontWeight: 700,
-                letterSpacing: "0.04em",
-                textTransform: "uppercase",
-                textDecoration: "none"
-              }}>
-                <FileCheck2 size={20} color="#00522E" />
-                SUBMIT WORK
-              </Link>
-
-              <Link href="/student/resources" style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                padding: "16px 10px",
-                borderRadius: "10px",
-                border: "1px solid #e2e8f0",
-                backgroundColor: "#ffffff",
-                color: "#0f172a",
-                fontSize: "0.7rem",
-                fontWeight: 700,
-                letterSpacing: "0.04em",
-                textTransform: "uppercase",
-                textDecoration: "none"
-              }}>
-                <FolderDown size={20} color="#00522E" />
-                RESOURCES
-              </Link>
-            </div>
-          </div>
-
-          {/* Card 3: Overall CGPA & Academic Index (Mirrors HOD OverallIndexCard) */}
+          {/* Card 2: Learning Insights (Replaces Quick Actions & Academic Index Bar) */}
           <div style={{
             backgroundColor: "#ffffff",
-            border: "1.5px solid #b2dcc8",
+            border: "1px solid #e2e8f0",
             borderRadius: "10px",
-            padding: "20px",
             display: "flex",
             flexDirection: "column",
-            gap: "14px",
-            boxShadow: "0 2px 8px rgba(0, 82, 46, 0.06)"
+            boxShadow: "0 1px 3px rgba(0,0,0,0.02)",
+            overflow: "hidden"
           }}>
-            <div style={{ fontSize: "0.7rem", fontWeight: 700, color: "#64748b", letterSpacing: "0.05em", textTransform: "uppercase" }}>
-              ACADEMIC PERFORMANCE INDEX
-            </div>
-
-            <div style={{ display: "flex", alignItems: "baseline", gap: "6px" }}>
-              <span style={{ fontSize: "2.8rem", fontWeight: 800, lineHeight: 1, letterSpacing: "-0.03em", color: "#0f172a" }}>
-                {STUDENT_INFO.cgpa}
+            <div style={{ padding: "16px 20px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "#0f172a" }}>LEARNING INSIGHTS</span>
+              <span style={{ fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "#00522E", backgroundColor: "#e9f2ee", padding: "4px 10px", borderRadius: "20px" }}>
+                AI INSIGHTS
               </span>
-              <span style={{ fontSize: "1rem", fontWeight: 600, color: "#64748b" }}>/ 10.0</span>
             </div>
 
-            <div style={{ width: "100%", height: "6px", backgroundColor: "#e2e8f0", borderRadius: "3px", overflow: "hidden" }}>
-              <div style={{ width: "89.5%", height: "100%", backgroundColor: "#00522E", borderRadius: "3px" }} />
-            </div>
+            <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: "18px" }}>
+              
+              {/* 1. Strongest Subject */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.725rem", fontWeight: 700, color: "#00522E", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  <div style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#00522E" }} />
+                  Strongest Subject
+                </div>
+                <div style={{ fontSize: "0.875rem", fontWeight: 700, color: "#0f172a" }}>
+                  Advanced Data Structures <span style={{ color: "#00522E", fontWeight: 800 }}>(91%)</span>
+                </div>
+              </div>
 
-            <div style={{ fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "#00522E", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span>ACADEMIC HONORS</span>
-              <span>DEAN'S LIST</span>
+              {/* 2. Needs Attention */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.725rem", fontWeight: 700, color: "#991b1b", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  <div style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#991b1b" }} />
+                  Needs Attention
+                </div>
+                <div style={{ fontSize: "0.875rem", fontWeight: 700, color: "#0f172a" }}>
+                  Computer Networks
+                </div>
+                <div style={{ fontSize: "0.775rem", color: "#64748b", lineHeight: 1.4 }}>
+                  Understanding dropped by 12% this week.
+                </div>
+              </div>
+
+              {/* 3. Current Streak */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.725rem", fontWeight: 700, color: "#0f172a", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  <div style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#0f172a" }} />
+                  Current Streak
+                </div>
+                <div style={{ fontSize: "0.875rem", fontWeight: 700, color: "#0f172a" }}>
+                  5 classes attended consecutively
+                </div>
+              </div>
+
+              {/* 4. AI Recommendation */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px", backgroundColor: "#f8fafc", padding: "14px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.725rem", fontWeight: 700, color: "#00522E", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  <Sparkles size={14} color="#00522E" />
+                  AI Recommendation
+                </div>
+                <div style={{ fontSize: "0.825rem", fontWeight: 600, color: "#0f172a", lineHeight: 1.4 }}>
+                  Review Binary Trees before tomorrow's quiz.
+                </div>
+                <div style={{ fontSize: "0.75rem", color: "#64748b", fontWeight: 500 }}>
+                  Estimated study time: 25 mins.
+                </div>
+              </div>
+
             </div>
           </div>
 
