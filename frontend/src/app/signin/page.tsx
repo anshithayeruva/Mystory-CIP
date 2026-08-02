@@ -70,7 +70,7 @@ const ROLE_OPTIONS: RoleOption[] = [
 ];
 
 export default function SignInPage() {
-  const router = Router();
+  const router = useRouter();
   const [selectedRole, setSelectedRole] = useState<RoleType>('ADMIN');
   const [email, setEmail] = useState<string>(ROLE_OPTIONS[0].defaultEmail);
   const [password, setPassword] = useState<string>('demo123456');
@@ -300,6 +300,4 @@ export default function SignInPage() {
   );
 }
 
-function Router() {
-  return useRouter();
-}
+

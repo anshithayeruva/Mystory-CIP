@@ -2,21 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { 
-  Building2, 
-  Mail, 
-  UserCheck, 
-  Bell, 
-  BookOpen, 
   ShieldCheck, 
   Cpu, 
-  Info, 
   Save, 
   Check, 
   Lock, 
   Eye,
   EyeOff,
-  RotateCcw,
-  Database,
   ArrowRight
 } from "lucide-react";
 import styles from "./settings.module.css";

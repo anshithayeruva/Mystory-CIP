@@ -16,17 +16,21 @@ import {
   HelpCircle,
   LogOut,
   Settings,
-  GraduationCap
+  GraduationCap,
+  Sparkles,
+  Clock
 } from "lucide-react";
 import styles from "../../styles/faculty-layout.module.css";
 
 const navItems = [
   { label: "Dashboard", href: "/faculty", icon: LayoutDashboard },
-  { label: "Students", href: "/faculty/students", icon: UserCircle },
-  { label: "Subjects", href: "/faculty/subjects", icon: BookOpen },
-  { label: "AI Assessments", href: "/faculty/pulse-sessions", icon: Radio },
-  { label: "Reports", href: "/faculty/concept-gap-analysis", icon: ActivitySquare },
+  { label: "Live Classroom", href: "/faculty/live-classroom", icon: Radio },
+  { label: "Timetable", href: "/faculty/timetable", icon: Clock },
+  { label: "AI Assessments", href: "/faculty/pulse-sessions", icon: Sparkles },
+  { label: "Curriculum & Courses", href: "/faculty/subjects", icon: BookOpen },
   { label: "Resources", href: "/faculty/resources", icon: FileText },
+  { label: "Reports", href: "/faculty/concept-gap-analysis", icon: ActivitySquare },
+  { label: "Student Directory", href: "/faculty/students", icon: UserCircle },
   { label: "Settings", href: "/faculty/settings", icon: Settings },
 ];
 

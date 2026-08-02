@@ -84,14 +84,19 @@ export default function StudentCoursesPage() {
               </div>
 
               {/* Course Stats Row */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", padding: "12px 14px", backgroundColor: "#f8fafc", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", padding: "12px 14px", backgroundColor: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
                 <div>
-                  <div style={{ fontSize: "0.68rem", color: "#64748b", fontWeight: 600, textTransform: "uppercase" }}>Attendance</div>
-                  <div style={{ fontSize: "1rem", fontWeight: 700, color: "#00522E" }}>{course.attendance}%</div>
+                  <div style={{ fontSize: "0.68rem", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.03em" }}>Attendance</div>
+                  <div style={{ fontSize: "0.98rem", fontWeight: 700, color: "#00522E", marginTop: "2px" }}>{course.attendance}%</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: "0.68rem", color: "#64748b", fontWeight: 600, textTransform: "uppercase" }}>Grade</div>
-                  <div style={{ fontSize: "1rem", fontWeight: 700, color: "#0f172a" }}>{course.currentGrade}</div>
+                  <div style={{ fontSize: "0.68rem", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.03em" }}>Course Progress</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginTop: "2px" }}>
+                    <div style={{ fontSize: "0.98rem", fontWeight: 700, color: "#0f172a" }}>{course.progress}%</div>
+                    <div style={{ width: "100%", height: "4px", backgroundColor: "#e2e8f0", borderRadius: "2px", overflow: "hidden" }}>
+                      <div style={{ width: `${course.progress}%`, height: "100%", backgroundColor: "#00522E", borderRadius: "2px" }} />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

@@ -19,11 +19,11 @@ import styles from "../student-layout.module.css";
 
 const navItems = [
   { label: "Dashboard", href: "/student", icon: LayoutDashboard },
-  { label: "My Courses", href: "/student/courses", icon: BookOpen },
-  { label: "Live Classroom", href: "/student/pulse", icon: Radio },
-  { label: "Reports & Analytics", href: "/student/reports", icon: BarChart3 },
   { label: "Timetable", href: "/student/timetable", icon: Clock },
+  { label: "Live Classroom", href: "/student/pulse", icon: Radio },
+  { label: "My Courses", href: "/student/courses", icon: BookOpen },
   { label: "Resources", href: "/student/resources", icon: FolderDown },
+  { label: "Reports & Analytics", href: "/student/reports", icon: BarChart3 },
   { label: "Settings", href: "/student/settings", icon: Settings },
 ];
 

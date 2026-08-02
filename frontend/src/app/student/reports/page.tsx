@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import styles from "./reports.module.css";
-import { 
-  CalendarCheck, 
-  BrainCircuit, 
-  Download, 
-  Check, 
-  CheckCircle2, 
+import {
+  CalendarCheck,
+  BrainCircuit,
+  Download,
+  Check,
+  CheckCircle2,
   XCircle,
   Sparkles,
   Info,
@@ -186,7 +186,7 @@ export default function StudentReportsPage() {
           </div>
 
           <div className={styles.headerActions}>
-            <select 
+            <select
               className={styles.selectInput}
               value={selectedSemester}
               onChange={(e) => {
@@ -209,7 +209,7 @@ export default function StudentReportsPage() {
 
         {/* TABS: ATTENDANCE TRACKER & CONCEPT UNDERSTANDING */}
         <div className={styles.tabs}>
-          <div 
+          <div
             className={`${styles.tab} ${activeTab === "attendance" ? styles.tabActive : ""}`}
             onClick={() => setActiveTab("attendance")}
           >
@@ -217,12 +217,12 @@ export default function StudentReportsPage() {
             Attendance Tracker
           </div>
 
-          <div 
+          <div
             className={`${styles.tab} ${activeTab === "understanding" ? styles.tabActive : ""}`}
             onClick={() => setActiveTab("understanding")}
           >
             <BrainCircuit size={18} />
-            Concept & Pulse Understanding
+            Concept Understanding
           </div>
         </div>
       </div>
@@ -257,7 +257,7 @@ export default function StudentReportsPage() {
                 <CalendarCheck size={20} style={{ color: "#00522E" }} />
                 Daily Biometric Attendance Logs
               </h3>
-              <select 
+              <select
                 className={styles.selectInput}
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
@@ -315,8 +315,8 @@ export default function StudentReportsPage() {
                 <BrainCircuit size={20} style={{ color: "#00522E" }} />
                 Real-Time Course & Topic Understanding Breakdown
               </h3>
-              
-              <button 
+
+              <button
                 onClick={toggleAllSubjects}
                 style={{
                   display: "inline-flex",
@@ -342,23 +342,23 @@ export default function StudentReportsPage() {
               {subjectTopicUnderstandingData.map((item) => {
                 const isExpanded = expandedSubjects[item.code] ?? true;
                 return (
-                  <div 
-                    key={item.code} 
-                    style={{ 
-                      borderRadius: "10px", 
-                      backgroundColor: "#f8fafc", 
-                      border: "1px solid #e2e8f0", 
+                  <div
+                    key={item.code}
+                    style={{
+                      borderRadius: "10px",
+                      backgroundColor: "#f8fafc",
+                      border: "1px solid #e2e8f0",
                       overflow: "hidden",
                       transition: "all 0.2s ease"
                     }}
                   >
                     {/* Subject Header Row */}
-                    <div 
+                    <div
                       onClick={() => toggleSubjectExpand(item.code)}
-                      style={{ 
-                        padding: "16px 20px", 
-                        display: "flex", 
-                        justifyContent: "space-between", 
+                      style={{
+                        padding: "16px 20px",
+                        display: "flex",
+                        justifyContent: "space-between",
                         alignItems: "center",
                         cursor: "pointer",
                         backgroundColor: isExpanded ? "#f1f5f9" : "#f8fafc",
@@ -466,7 +466,7 @@ export default function StudentReportsPage() {
               <Sparkles size={20} style={{ color: "#00522E" }} />
               Recommended Concept Review Areas
             </h3>
-            
+
             <div className={styles.gapGrid}>
               <div className={styles.gapCard}>
                 <Info size={20} style={{ color: "#00522E", flexShrink: 0, marginTop: "2px" }} />

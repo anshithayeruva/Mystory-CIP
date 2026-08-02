@@ -88,7 +88,7 @@ export default function CreatePulseSessionPage() {
             Configure the assessment details and let AI generate questions based on the topic taught.
           </p>
         </div>
-        <Link href="/faculty/pulse-sessions" className={styles.primaryButton} style={{ backgroundColor: '#ffffff', color: '#475569', border: '1px solid #cbd5e1', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+        <Link href="/faculty/pulse-sessions" className={styles.secondaryButton}>
           <ArrowLeft size={16} />
           Back to Assessments
         </Link>

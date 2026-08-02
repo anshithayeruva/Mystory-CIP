@@ -179,7 +179,66 @@ export default function StudentDashboard() {
         {/* LEFT COLUMN */}
         <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
           
-          {/* Card 1: Registered Courses */}
+          {/* Card 1: Today's Schedule & Live Session Monitor */}
+          <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", display: "flex", flexDirection: "column", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", overflow: "hidden" }}>
+            <div style={{ padding: "16px 20px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <div style={{ width: "8px", height: "8px", backgroundColor: "#00522E", borderRadius: "50%", boxShadow: "0 0 0 3px rgba(0, 82, 46, 0.2)" }} />
+                <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "#0f172a" }}>TODAY'S CLASS SCHEDULE & MONITOR</span>
+              </div>
+              <span style={{ fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "#00522E", backgroundColor: "#e9f2ee", padding: "4px 10px", borderRadius: "20px" }}>
+                LIVE FEEDBACK ACTIVE
+              </span>
+            </div>
+
+            <div className={styles.tableWrapper}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>SUBJECT & ROOM</th>
+                    <th>FACULTY INSTRUCTOR</th>
+                    <th>SCHEDULE SLOT</th>
+                    <th>STATUS</th>
+                    <th>ACTION</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {TODAY_CLASSES.map((c) => (
+                    <tr key={c.id}>
+                      <td>
+                        <div style={{ fontWeight: 700, color: "#0f172a", fontSize: "0.875rem" }}>{c.courseCode}: {c.courseName}</div>
+                        <div style={{ fontSize: "0.75rem", color: "#64748b", marginTop: "2px" }}>{c.room} ({c.type})</div>
+                      </td>
+                      <td style={{ fontWeight: 500, color: "#334155" }}>{c.faculty}</td>
+                      <td style={{ fontSize: "0.8rem", color: "#64748b" }}>{c.time}</td>
+                      <td>
+                        <span className={c.status === "LIVE" ? styles.badgeLive : c.status === "UPCOMING" ? styles.badgeUpcoming : styles.badgeCompleted}>
+                          {c.status}
+                        </span>
+                      </td>
+                      <td>
+                        {c.status === "LIVE" ? (
+                          <Link href="/student/pulse" className={styles.btnPrimary} style={{ padding: "4px 10px", fontSize: "0.75rem" }}>
+                            <Radio size={12} /> Join Live
+                          </Link>
+                        ) : (
+                          <button className={styles.btnSecondary} style={{ padding: "4px 8px", fontSize: "0.75rem" }} title="View Details">
+                            <Eye size={12} />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <Link href="/student/timetable" style={{ padding: "14px 20px", textAlign: "center", backgroundColor: "#f8fafc", borderTop: "1px solid #e2e8f0", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "#00522E", textDecoration: "none" }}>
+              VIEW FULL WEEKLY TIMETABLE →
+            </Link>
+          </div>
+
+          {/* Card 2: Registered Courses */}
           <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", display: "flex", flexDirection: "column", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", overflow: "hidden" }}>
             <div style={{ padding: "16px 20px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "#0f172a" }}>REGISTERED COURSES</span>
@@ -253,65 +312,6 @@ export default function StudentDashboard() {
                 <>SHOW ALL {STUDENT_COURSES.length} COURSES <ChevronDown size={14} /></>
               )}
             </button>
-          </div>
-
-          {/* Card 2: Today's Schedule & Live Session Monitor */}
-          <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", display: "flex", flexDirection: "column", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", overflow: "hidden" }}>
-            <div style={{ padding: "16px 20px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <div style={{ width: "8px", height: "8px", backgroundColor: "#00522E", borderRadius: "50%", boxShadow: "0 0 0 3px rgba(0, 82, 46, 0.2)" }} />
-                <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "#0f172a" }}>TODAY'S CLASS SCHEDULE & MONITOR</span>
-              </div>
-              <span style={{ fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "#00522E", backgroundColor: "#e9f2ee", padding: "4px 10px", borderRadius: "20px" }}>
-                LIVE FEEDBACK ACTIVE
-              </span>
-            </div>
-
-            <div className={styles.tableWrapper}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>SUBJECT & ROOM</th>
-                    <th>FACULTY INSTRUCTOR</th>
-                    <th>SCHEDULE SLOT</th>
-                    <th>STATUS</th>
-                    <th>ACTION</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {TODAY_CLASSES.map((c) => (
-                    <tr key={c.id}>
-                      <td>
-                        <div style={{ fontWeight: 700, color: "#0f172a", fontSize: "0.875rem" }}>{c.courseCode}: {c.courseName}</div>
-                        <div style={{ fontSize: "0.75rem", color: "#64748b", marginTop: "2px" }}>{c.room} ({c.type})</div>
-                      </td>
-                      <td style={{ fontWeight: 500, color: "#334155" }}>{c.faculty}</td>
-                      <td style={{ fontSize: "0.8rem", color: "#64748b" }}>{c.time}</td>
-                      <td>
-                        <span className={c.status === "LIVE" ? styles.badgeLive : c.status === "UPCOMING" ? styles.badgeUpcoming : styles.badgeCompleted}>
-                          {c.status}
-                        </span>
-                      </td>
-                      <td>
-                        {c.status === "LIVE" ? (
-                          <Link href="/student/pulse" className={styles.btnPrimary} style={{ padding: "4px 10px", fontSize: "0.75rem" }}>
-                            <Radio size={12} /> Join Live
-                          </Link>
-                        ) : (
-                          <button className={styles.btnSecondary} style={{ padding: "4px 8px", fontSize: "0.75rem" }} title="View Details">
-                            <Eye size={12} />
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <Link href="/student/timetable" style={{ padding: "14px 20px", textAlign: "center", backgroundColor: "#f8fafc", borderTop: "1px solid #e2e8f0", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "#00522E", textDecoration: "none" }}>
-              VIEW FULL WEEKLY TIMETABLE →
-            </Link>
           </div>
 
         </div>

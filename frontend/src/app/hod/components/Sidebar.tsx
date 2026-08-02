@@ -16,10 +16,10 @@ import styles from "../hod-layout.module.css";
 
 const navItems = [
   { label: "Dashboard", href: "/hod", icon: LayoutDashboard },
-  { label: "Faculty", href: "/hod/faculty", icon: GraduationCap },
-  { label: "Students", href: "/hod/students", icon: Users },
-  { label: "Subjects", href: "/hod/subjects", icon: BookOpen },
   { label: "Reports & Analytics", href: "/hod/reports", icon: BarChart3 },
+  { label: "Curriculum & Courses", href: "/hod/subjects", icon: BookOpen },
+  { label: "Faculty Directory", href: "/hod/faculty", icon: GraduationCap },
+  { label: "Student Directory", href: "/hod/students", icon: Users },
   { label: "Settings", href: "/hod/settings", icon: Settings },
 ];
 

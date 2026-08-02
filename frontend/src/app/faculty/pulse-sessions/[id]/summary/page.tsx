@@ -51,7 +51,21 @@ export default function SessionSummary() {
 
   return (
     <div className={styles.pageContainer}>
-      {/* Header */}
+      {/* Top Navigation Bar */}
+      <div className={styles.topNavRow}>
+        <button type="button" className={styles.secondaryButton} onClick={handleBackToPulse}>
+          <ArrowLeft size={16} />
+          Back to AI Assessments
+        </button>
+        <div className={styles.headerActions}>
+          <button type="button" className={styles.primaryButton} onClick={handleCreateNew}>
+            <Plus size={16} />
+            Create Another Assessment
+          </button>
+        </div>
+      </div>
+
+      {/* Header Card */}
       <div className={styles.headerCard}>
         <div className={styles.titleRow}>
           <h1 className={styles.title}>Session Summary: Mid-Term Review</h1>
@@ -122,13 +136,13 @@ export default function SessionSummary() {
                   {questionAnalysis.map((q, i) => (
                     <tr key={i}>
                       <td style={{ fontWeight: 600 }}>{q.id}: {q.text}</td>
-                      <td style={{ color: '#16a34a', fontWeight: 600 }}>{q.correct}</td>
-                      <td style={{ color: '#dc2626', fontWeight: 600 }}>{q.incorrect}</td>
+                      <td style={{ color: '#00522E', fontWeight: 600 }}>{q.correct}</td>
+                      <td style={{ color: '#64748b', fontWeight: 600 }}>{q.incorrect}</td>
                       <td>{q.skipped}</td>
                       <td>
                         <span className={styles.statusBadge} style={{ 
-                          backgroundColor: q.difficulty === 'Hard' ? '#fef2f2' : q.difficulty === 'Medium' ? '#fef9c3' : '#dcfce7',
-                          color: q.difficulty === 'Hard' ? '#991b1b' : q.difficulty === 'Medium' ? '#854d0e' : '#166534'
+                          backgroundColor: q.difficulty === 'Hard' ? '#f1f5f9' : q.difficulty === 'Medium' ? '#fef3c7' : '#ecfdf5',
+                          color: q.difficulty === 'Hard' ? '#475569' : q.difficulty === 'Medium' ? '#92400e' : '#00522E'
                         }}>
                           {q.difficulty}
                         </span>
@@ -167,7 +181,7 @@ export default function SessionSummary() {
                         {s.attendance === 'Present' ? (
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <div className={styles.progressWrapper}>
-                              <div className={styles.progressFill} style={{ width: `${s.understanding}%`, backgroundColor: s.understanding >= 80 ? '#10633B' : s.understanding >= 60 ? '#eab308' : '#dc2626' }} />
+                              <div className={styles.progressFill} style={{ width: `${s.understanding}%`, backgroundColor: '#00522E' }} />
                             </div>
                             <span style={{ fontSize: '0.75rem', fontWeight: 600 }}>{s.understanding}%</span>
                           </div>
@@ -177,8 +191,8 @@ export default function SessionSummary() {
                       </td>
                       <td>
                         <span className={styles.statusBadge} style={{
-                          backgroundColor: s.status === 'Excellent' || s.status === 'Good' ? '#dcfce7' : s.status === 'Missed' ? '#f1f5f9' : '#fef2f2',
-                          color: s.status === 'Excellent' || s.status === 'Good' ? '#166534' : s.status === 'Missed' ? '#475569' : '#991b1b'
+                          backgroundColor: s.status === 'Excellent' || s.status === 'Good' ? '#ecfdf5' : '#f1f5f9',
+                          color: s.status === 'Excellent' || s.status === 'Good' ? '#00522E' : '#475569'
                         }}>
                           {s.status}
                         </span>
@@ -236,20 +250,6 @@ export default function SessionSummary() {
               <button type="button" className={styles.secondaryButton}>
                 <Printer size={16} />
                 Print Summary
-              </button>
-            </div>
-          </div>
-
-          <div className={styles.card}>
-            <div className={styles.cardHeader}>Navigation</div>
-            <div className={styles.cardBody} style={{ gap: '12px' }}>
-              <button type="button" className={styles.secondaryButton} onClick={handleBackToPulse}>
-                <ArrowLeft size={16} />
-                Back to Pulse Sessions
-              </button>
-              <button type="button" className={styles.primaryButton} onClick={handleCreateNew}>
-                <Plus size={16} />
-                Create Another Session
               </button>
             </div>
           </div>
