@@ -6,6 +6,7 @@ import adminRoutes from './routes/admin.routes';
 import academicRoutes from './routes/academic.routes';
 import userRoutes from './routes/user.routes';
 import facultyRoutes from './routes/faculty.routes';
+import hodRoutes from './routes/hod.routes';
 import { errorHandler } from './middleware/errorHandler';
 
 dotenv.config();
@@ -24,6 +25,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/academic', academicRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/faculty', facultyRoutes);
+app.use('/api/hod', hodRoutes);
 
 // Basic health check endpoint
 app.get('/api/health', (req, res) => {
@@ -34,16 +36,15 @@ app.get('/api/health', (req, res) => {
 app.use(errorHandler as any);
 
 async function startServer() {
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+  });
+
   try {
     await prisma.$connect();
     console.log('MongoDB connected successfully!');
-    
-    app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
-    });
   } catch (error) {
-    console.error('Failed to connect to MongoDB:', error);
-    process.exit(1);
+    console.warn('MongoDB connection warning (running in offline/resilient mode):', error);
   }
 }
 
