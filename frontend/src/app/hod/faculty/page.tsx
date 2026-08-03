@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { 
   Search, 
   Filter, 
@@ -11,10 +11,11 @@ import {
   Clock,
   Eye,
   Pencil,
+  Trash2,
   X
 } from "lucide-react";
-import Link from "next/link";
 import styles from "./faculty.module.css";
+import { HodService } from "@/services/hod.service";
 
 interface FacultyItem {
   id: string;
@@ -26,10 +27,10 @@ interface FacultyItem {
   sections: string;
   students: string;
   teachingHours: number;
+  email?: string;
 }
 
 const initialFacultyData: FacultyItem[] = [
-  // Page 1
   {
     id: "1",
     name: "Dr. Albert Thorne",
@@ -85,7 +86,6 @@ const initialFacultyData: FacultyItem[] = [
     students: "300",
     teachingHours: 18,
   },
-  // Page 2
   {
     id: "6",
     name: "Dr. Marcus Vance",
@@ -97,114 +97,16 @@ const initialFacultyData: FacultyItem[] = [
     students: "165",
     teachingHours: 12,
   },
-  {
-    id: "7",
-    name: "Prof. Anita Sharma",
-    role: "Associate Professor",
-    avatar: "AS",
-    empId: "EMP-55192",
-    subjects: ["Computer Networks"],
-    sections: "04",
-    students: "210",
-    teachingHours: 14,
-  },
-  {
-    id: "8",
-    name: "Mr. David Miller",
-    role: "Assistant Professor",
-    avatar: "DM",
-    empId: "EMP-44821",
-    subjects: ["Software Engineering"],
-    sections: "02",
-    students: "130",
-    teachingHours: 10,
-  },
-  {
-    id: "9",
-    name: "Dr. Priya Patel",
-    role: "Senior Faculty",
-    avatar: "PP",
-    empId: "EMP-22983",
-    subjects: ["Cybersecurity"],
-    sections: "03",
-    students: "175",
-    teachingHours: 15,
-  },
-  {
-    id: "10",
-    name: "Prof. Robert Chen",
-    role: "Professor",
-    avatar: "RC",
-    empId: "EMP-66104",
-    subjects: ["Cloud Computing"],
-    sections: "04",
-    students: "220",
-    teachingHours: 16,
-  },
-  // Page 3
-  {
-    id: "11",
-    name: "Dr. Sophia Al-Mansoor",
-    role: "Associate Professor",
-    avatar: "SA",
-    empId: "EMP-99231",
-    subjects: ["Compiler Design"],
-    sections: "02",
-    students: "110",
-    teachingHours: 12,
-  },
-  {
-    id: "12",
-    name: "Mr. James Wilson",
-    role: "Lab Instructor",
-    avatar: "JW",
-    empId: "EMP-88123",
-    subjects: ["Python Programming"],
-    sections: "05",
-    students: "290",
-    teachingHours: 20,
-  },
-  {
-    id: "13",
-    name: "Dr. Karen Taylor",
-    role: "Assistant Professor",
-    avatar: "KT",
-    empId: "EMP-77412",
-    subjects: ["Discrete Mathematics"],
-    sections: "03",
-    students: "160",
-    teachingHours: 11,
-  },
-  {
-    id: "14",
-    name: "Prof. Vikram Singh",
-    role: "Senior Faculty",
-    avatar: "VS",
-    empId: "EMP-55320",
-    subjects: ["Big Data Analytics"],
-    sections: "02",
-    students: "140",
-    teachingHours: 13,
-  },
-  {
-    id: "15",
-    name: "Dr. Chloe Bennett",
-    role: "Associate Professor",
-    avatar: "CB",
-    empId: "EMP-11943",
-    subjects: ["Computer Architecture"],
-    sections: "03",
-    students: "155",
-    teachingHours: 14,
-  },
 ];
 
 export default function HodFacultyPage() {
   const [facultyList, setFacultyList] = useState<FacultyItem[]>(initialFacultyData);
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
   
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(initialFacultyData.length);
   const itemsPerPage = 5;
 
   // Modal State
@@ -217,6 +119,34 @@ export default function HodFacultyPage() {
   const [subjectFilter, setSubjectFilter] = useState("ALL");
   const [hoursFilter, setHoursFilter] = useState("ALL");
   const filterRef = useRef<HTMLDivElement>(null);
+
+  // Load Faculty Data from Backend
+  const fetchFaculty = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await HodService.getFacultyList({
+        search: searchQuery,
+        role: roleFilter !== "ALL" ? roleFilter : undefined,
+        page: currentPage,
+        limit: itemsPerPage
+      });
+
+      if (response && response.success && response.data?.data) {
+        if (response.data.data.length > 0) {
+          setFacultyList(response.data.data);
+          setTotalCount(response.data.pagination?.total || response.data.data.length);
+        }
+      }
+    } catch (err) {
+      console.warn("Backend API offline or using demo faculty data:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [searchQuery, roleFilter, currentPage, itemsPerPage]);
+
+  useEffect(() => {
+    fetchFaculty();
+  }, [fetchFaculty]);
 
   // Auto-close filter dropdown when clicking outside
   useEffect(() => {
@@ -236,6 +166,7 @@ export default function HodFacultyPage() {
   // Form State
   const [formData, setFormData] = useState({
     name: "",
+    email: "",
     role: "Assistant Professor",
     empId: "",
     subjects: "",
@@ -255,6 +186,7 @@ export default function HodFacultyPage() {
     setEditingId(null);
     setFormData({
       name: "",
+      email: "",
       role: "Assistant Professor",
       empId: "",
       subjects: "",
@@ -269,9 +201,10 @@ export default function HodFacultyPage() {
     setEditingId(item.id);
     setFormData({
       name: item.name,
+      email: item.email || "",
       role: item.role,
       empId: item.empId,
-      subjects: item.subjects.join(", "),
+      subjects: Array.isArray(item.subjects) ? item.subjects.join(", ") : "",
       sections: item.sections,
       students: item.students,
       teachingHours: item.teachingHours.toString(),
@@ -279,11 +212,10 @@ export default function HodFacultyPage() {
     setIsModalOpen(true);
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim()) return;
 
-    // Generate Initials
     const nameParts = formData.name.trim().split(" ");
     let initials = "FC";
     if (nameParts.length >= 2) {
@@ -300,55 +232,87 @@ export default function HodFacultyPage() {
       ? formData.subjects.split(",").map((s) => s.trim()).filter(Boolean)
       : ["General CS"];
 
-    if (editingId) {
-      // Edit existing
-      setFacultyList((prev) =>
-        prev.map((item) =>
-          item.id === editingId
-            ? {
-                ...item,
-                name: formData.name.trim(),
-                role: formData.role,
-                empId: generatedEmpId,
-                subjects: parsedSubjects,
-                sections: formData.sections.padStart(2, "0"),
-                students: formData.students,
-                teachingHours: Number(formData.teachingHours) || 12,
-              }
-            : item
-        )
-      );
-    } else {
-      // Add new
-      const newItem: FacultyItem = {
-        id: Date.now().toString(),
-        name: formData.name.trim(),
-        role: formData.role,
-        avatar: initials,
-        empId: generatedEmpId,
-        subjects: parsedSubjects,
-        sections: formData.sections.padStart(2, "0"),
-        students: formData.students,
-        teachingHours: Number(formData.teachingHours) || 12,
-      };
-      setFacultyList((prev) => [newItem, ...prev]);
+    try {
+      if (editingId) {
+        // Backend Update
+        await HodService.updateFaculty(editingId, {
+          name: formData.name.trim(),
+          role: formData.role,
+          empId: generatedEmpId,
+          email: formData.email,
+        });
+
+        setFacultyList((prev) =>
+          prev.map((item) =>
+            item.id === editingId
+              ? {
+                  ...item,
+                  name: formData.name.trim(),
+                  role: formData.role,
+                  empId: generatedEmpId,
+                  subjects: parsedSubjects,
+                  sections: formData.sections.padStart(2, "0"),
+                  students: formData.students,
+                  teachingHours: Number(formData.teachingHours) || 12,
+                }
+              : item
+          )
+        );
+      } else {
+        // Backend Create
+        const generatedEmail = formData.email.trim() || `faculty.${Date.now()}@university.edu`;
+        await HodService.createFaculty({
+          name: formData.name.trim(),
+          email: generatedEmail,
+          role: formData.role,
+          empId: generatedEmpId,
+        });
+
+        const newItem: FacultyItem = {
+          id: Date.now().toString(),
+          name: formData.name.trim(),
+          email: generatedEmail,
+          role: formData.role,
+          avatar: initials,
+          empId: generatedEmpId,
+          subjects: parsedSubjects,
+          sections: formData.sections.padStart(2, "0"),
+          students: formData.students,
+          teachingHours: Number(formData.teachingHours) || 12,
+        };
+        setFacultyList((prev) => [newItem, ...prev]);
+        setTotalCount((prev) => prev + 1);
+      }
+    } catch (error) {
+      console.warn("Backend update error, updating local UI:", error);
     }
 
     setIsModalOpen(false);
   };
 
-  // Filter Logic
+  const handleDeleteFaculty = async (id: string) => {
+    if (!confirm("Are you sure you want to remove this faculty member?")) return;
+    try {
+      await HodService.deleteFaculty(id);
+    } catch (err) {
+      console.warn("Backend delete error:", err);
+    }
+    setFacultyList((prev) => prev.filter((item) => item.id !== id));
+    setTotalCount((prev) => Math.max(0, prev - 1));
+  };
+
+  // Local Filter Logic as Fallback
   const filteredFaculty = facultyList.filter((item) => {
     const matchesSearch =
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.empId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.subjects.some((sub) => sub.toLowerCase().includes(searchQuery.toLowerCase()));
+      (Array.isArray(item.subjects) && item.subjects.some((sub) => sub.toLowerCase().includes(searchQuery.toLowerCase())));
 
     const matchesRole = roleFilter === "ALL" || item.role === roleFilter;
 
     const matchesSubject =
       subjectFilter === "ALL" ||
-      item.subjects.some((sub) => sub.toLowerCase() === subjectFilter.toLowerCase());
+      (Array.isArray(item.subjects) && item.subjects.some((sub) => sub.toLowerCase() === subjectFilter.toLowerCase()));
 
     let matchesHours = true;
     if (hoursFilter === "0-8") matchesHours = item.teachingHours <= 8;
@@ -359,7 +323,6 @@ export default function HodFacultyPage() {
     return matchesSearch && matchesRole && matchesSubject && matchesHours;
   });
 
-  // Pagination Slice
   const totalPages = Math.ceil(filteredFaculty.length / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = Math.min(startIndex + itemsPerPage, filteredFaculty.length);
@@ -462,8 +425,6 @@ export default function HodFacultyPage() {
                     <option value="Artificial Intelligence">Artificial Intelligence</option>
                     <option value="Computer Networks">Computer Networks</option>
                     <option value="Software Engineering">Software Engineering</option>
-                    <option value="Cybersecurity">Cybersecurity</option>
-                    <option value="Cloud Computing">Cloud Computing</option>
                   </select>
                 </div>
 
@@ -519,7 +480,7 @@ export default function HodFacultyPage() {
                   <tr key={item.id}>
                     <td>
                       <div className={styles.facultyProfile}>
-                        <div className={styles.avatarCircle}>{item.avatar}</div>
+                        <div className={styles.avatarCircle}>{item.avatar || "FC"}</div>
                         <div className={styles.facultyDetails}>
                           <span className={styles.facultyName}>{item.name}</span>
                           <span className={styles.facultyRole}>{item.role}</span>
@@ -531,7 +492,7 @@ export default function HodFacultyPage() {
                     </td>
                     <td>
                       <div className={styles.subjectBadges}>
-                        {item.subjects.map((sub, idx) => (
+                        {Array.isArray(item.subjects) && item.subjects.map((sub, idx) => (
                           <span key={idx} className={styles.subjectBadge}>
                             {sub}
                           </span>
@@ -554,18 +515,20 @@ export default function HodFacultyPage() {
                       <div className={styles.actionsGroup}>
                         <button 
                           className={styles.actionCellBtn}
-                          title={`View ${item.name}`}
-                          aria-label={`View ${item.name}`}
-                        >
-                          <Eye size={17} />
-                        </button>
-                        <button 
-                          className={styles.actionCellBtn}
                           title={`Edit ${item.name}`}
                           aria-label={`Edit ${item.name}`}
                           onClick={() => openEditModal(item)}
                         >
                           <Pencil size={16} />
+                        </button>
+                        <button 
+                          className={styles.actionCellBtn}
+                          title={`Delete ${item.name}`}
+                          aria-label={`Delete ${item.name}`}
+                          onClick={() => handleDeleteFaculty(item.id)}
+                          style={{ color: '#ef4444' }}
+                        >
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </td>
@@ -625,7 +588,7 @@ export default function HodFacultyPage() {
           </div>
           <div className={styles.summaryInfo}>
             <span className={styles.summaryTitle}>Total Faculty Count</span>
-            <div className={styles.summaryValue}>{facultyList.length}</div>
+            <div className={styles.summaryValue}>{totalCount}</div>
             <div className={styles.summarySubtext}>
               <span className={styles.subtextGreen}>100% Active</span> status across department
             </div>
@@ -699,6 +662,18 @@ export default function HodFacultyPage() {
                   </div>
 
                   <div className={styles.formGroup}>
+                    <label className={styles.formLabel}>Email Address</label>
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="e.g. jane.doe@university.edu"
+                      className={styles.formInput}
+                      value={formData.email}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+
+                  <div className={styles.formGroup}>
                     <label className={styles.formLabel}>Academic Rank / Role *</label>
                     <select
                       name="role"
@@ -753,18 +728,6 @@ export default function HodFacultyPage() {
                     />
                   </div>
 
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>Total Students Count</label>
-                    <input
-                      type="number"
-                      name="students"
-                      placeholder="e.g. 140"
-                      className={styles.formInput}
-                      value={formData.students}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
                   <div className={styles.formGroupFull}>
                     <label className={styles.formLabel}>Assigned Subjects (comma separated)</label>
                     <input
@@ -798,22 +761,6 @@ export default function HodFacultyPage() {
           </div>
         </div>
       )}
-
-      {/* Page Footer */}
-      <footer className={styles.pageFooter}>
-        <div>© 2024 MyStory CIP Academic Management. All rights reserved.</div>
-        <div className={styles.footerLinks}>
-          <Link href="#" className={styles.footerLink}>
-            Terms of Service
-          </Link>
-          <Link href="#" className={styles.footerLink}>
-            Privacy Policy
-          </Link>
-          <Link href="#" className={styles.footerLink}>
-            Faculty Portal Guide
-          </Link>
-        </div>
-      </footer>
     </div>
   );
 }

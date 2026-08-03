@@ -2,16 +2,27 @@
 
 import styles from "../dashboard.module.css";
 
-export default function UniversityBanner() {
+interface UniversityBannerProps {
+  department?: {
+    name?: string;
+    code?: string;
+  };
+}
+
+export default function UniversityBanner({ department }: UniversityBannerProps) {
   return (
     <div className={styles.universityBanner}>
       {/* Left: Logo + Name */}
       <div className={styles.universityInfo}>
         <div className={styles.universityLogo}>
-          <div className={styles.universityLogoPlaceholder}>Logo</div>
+          <div className={styles.universityLogoPlaceholder}>
+            {department?.code || "SRM"}
+          </div>
         </div>
         <div className={styles.universityDetails}>
-          <h2 className={styles.universityName}>SRM AP University</h2>
+          <h2 className={styles.universityName}>
+            {department?.name ? `${department.name} Department` : "SRM AP University"}
+          </h2>
           <div className={styles.statusBadge}>
             <div className={styles.statusDot} />
             OPERATIONAL STATUS: LIVE
@@ -23,7 +34,7 @@ export default function UniversityBanner() {
       <div className={styles.bannerAcademicInfo}>
         <div style={{ textAlign: "right" }}>
           <span className={styles.bannerStatLabel}>ACADEMIC YEAR</span>
-          <div className={styles.bannerStatValue}>2023 – 24</div>
+          <div className={styles.bannerStatValue}>2024 – 25</div>
         </div>
         <div className={styles.bannerDividerVertical} />
         <div>

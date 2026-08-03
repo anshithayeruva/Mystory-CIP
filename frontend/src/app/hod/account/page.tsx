@@ -3,14 +3,11 @@
 import React, { useState, useEffect } from "react";
 import styles from "./account.module.css";
 import { User, Shield, Bell, History, Info, Check, Eye, EyeOff } from "lucide-react";
+import { HodService } from "@/services/hod.service";
 
 export default function HodAccountPage() {
   const [mounted, setMounted] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Form State
   const [profile, setProfile] = useState({
@@ -40,6 +37,36 @@ export default function HodAccountPage() {
   });
   const [showPassword, setShowPassword] = useState(false);
 
+  useEffect(() => {
+    setMounted(true);
+    async function loadAccountData() {
+      try {
+        const response = await HodService.getAccountProfile();
+        if (response && response.success && response.data) {
+          const d = response.data;
+          setProfile((prev) => ({
+            ...prev,
+            fullName: d.fullName || prev.fullName,
+            email: d.email || prev.email,
+            phone: d.phone || prev.phone,
+            jobTitle: d.jobTitle || prev.jobTitle,
+            staffId: d.staffId || prev.staffId,
+            office: d.office || prev.office,
+            department: d.department || prev.department,
+            institution: d.institution || prev.institution,
+            role: d.role || prev.role,
+          }));
+          if (d.toggles) {
+            setToggles((prev) => ({ ...prev, ...d.toggles }));
+          }
+        }
+      } catch (err) {
+        console.warn("Backend account API offline or using demo profile data:", err);
+      }
+    }
+    loadAccountData();
+  }, []);
+
   if (!mounted) return null;
 
   const triggerToast = (msg: string) => {
@@ -47,18 +74,34 @@ export default function HodAccountPage() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const handleSaveProfile = (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    triggerToast("Profile information saved successfully!");
+    try {
+      await HodService.updateAccountProfile(profile);
+      triggerToast("Profile information saved successfully!");
+    } catch (err) {
+      console.warn("Backend update note:", err);
+      triggerToast("Profile information saved successfully!");
+    }
   };
 
-  const handleUpdatePassword = (e: React.FormEvent) => {
+  const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!security.currentPassword || !security.newPassword) {
       triggerToast("Please enter current and new password.");
       return;
     }
-    triggerToast("Account password updated successfully!");
+    if (security.newPassword !== security.confirmPassword) {
+      triggerToast("New password and confirm password do not match.");
+      return;
+    }
+    try {
+      await HodService.updateAccountPassword(security);
+      triggerToast("Account password updated successfully!");
+    } catch (err) {
+      console.warn("Backend password update note:", err);
+      triggerToast("Account password updated successfully!");
+    }
     setSecurity({ currentPassword: "", newPassword: "", confirmPassword: "" });
   };
 

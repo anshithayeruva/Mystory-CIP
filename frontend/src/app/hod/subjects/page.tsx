@@ -1,17 +1,18 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { 
   Search, 
   Filter, 
   Plus, 
   Eye, 
   Pencil, 
+  Trash2,
   X,
   LayoutGrid,
   ListFilter } from "lucide-react";
-import Link from "next/link";
 import styles from "./subjects.module.css";
+import { HodService } from "@/services/hod.service";
 
 interface StaffMember {
   name: string;
@@ -105,79 +106,6 @@ const initialSubjectData: SubjectItem[] = [
     hoursPerWeek: 4,
     completionPercent: 62,
     status: "Under Review" },
-  {
-    id: "5",
-    code: "CS-304",
-    name: "Database Management Systems",
-    type: "Core Subject",
-    staffList: [
-      { name: "Prof. Anita Rao", avatar: "AR", role: "Lead Lecturer" },
-      { name: "Dr. Ramesh Nair", avatar: "RN", role: "Co-Lecturer" },
-    ],
-    semSec: "SEM-03 • SEC-B",
-    studentsCount: 62,
-    credits: 4,
-    hoursPerWeek: 4,
-    completionPercent: 84,
-    status: "Active" },
-  {
-    id: "6",
-    code: "CS-601",
-    name: "Compiler Design & Construction",
-    type: "Core Subject",
-    staffList: [
-      { name: "Dr. Sanjay Gupta", avatar: "SG", role: "Lead Lecturer" },
-    ],
-    semSec: "SEM-06 • SEC-A",
-    studentsCount: 55,
-    credits: 4,
-    hoursPerWeek: 4,
-    completionPercent: 80,
-    status: "Active" },
-  {
-    id: "7",
-    code: "CS-802",
-    name: "Cyber Security & Cryptography",
-    type: "Elective",
-    staffList: [
-      { name: "Prof. Meera Joshi", avatar: "MJ", role: "Lead Lecturer" },
-      { name: "Dr. Vikram Singh", avatar: "VS", role: "Guest Mentor" },
-    ],
-    semSec: "SEM-08 • SEC-A",
-    studentsCount: 40,
-    credits: 3,
-    hoursPerWeek: 3,
-    completionPercent: 95,
-    status: "Excellent" },
-  {
-    id: "8",
-    code: "CS-201",
-    name: "Discrete Mathematical Structures",
-    type: "Core Subject",
-    staffList: [
-      { name: "Dr. Ramesh Nair", avatar: "RN", role: "Lead Lecturer" },
-    ],
-    semSec: "SEM-02 • SEC-C",
-    studentsCount: 68,
-    credits: 4,
-    hoursPerWeek: 4,
-    completionPercent: 78,
-    status: "Steady" },
-  {
-    id: "9",
-    code: "CS-502",
-    name: "Computer Networks & Protocols",
-    type: "Core Subject",
-    staffList: [
-      { name: "Dr. Aruna Sharma", avatar: "AS", role: "Co-Lecturer" },
-      { name: "Prof. Anita Rao", avatar: "AR", role: "Lead Lecturer" },
-    ],
-    semSec: "SEM-05 • SEC-B",
-    studentsCount: 60,
-    credits: 4,
-    hoursPerWeek: 4,
-    completionPercent: 83,
-    status: "Active" },
 ];
 
 export default function HodSubjectsPage() {
@@ -185,9 +113,11 @@ export default function HodSubjectsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("ALL");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [loading, setLoading] = useState(false);
   
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(42);
   const itemsPerPage = 6;
 
   // Modal State
@@ -200,6 +130,33 @@ export default function HodSubjectsPage() {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [yearSemFilter, setYearSemFilter] = useState("ALL");
   const filterRef = useRef<HTMLDivElement>(null);
+
+  // Fetch Subject List from Backend API
+  const fetchSubjects = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await HodService.getSubjectsList({
+        search: searchQuery,
+        page: currentPage,
+        limit: itemsPerPage
+      });
+
+      if (response && response.success && response.data?.data) {
+        if (response.data.data.length > 0) {
+          setSubjectList(response.data.data);
+          setTotalCount(response.data.pagination?.total || response.data.data.length);
+        }
+      }
+    } catch (err) {
+      console.warn("Backend API offline or using demo subject data:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [searchQuery, currentPage, itemsPerPage]);
+
+  useEffect(() => {
+    fetchSubjects();
+  }, [fetchSubjects]);
 
   // Auto-close filter dropdown when clicking outside
   useEffect(() => {
@@ -216,7 +173,7 @@ export default function HodSubjectsPage() {
     };
   }, [isFilterOpen]);
 
-  // Form State with Multi-Staff array selection & separate Semester / Section dropdowns
+  // Form State
   const [formData, setFormData] = useState({
     code: "",
     name: "",
@@ -280,7 +237,7 @@ export default function HodSubjectsPage() {
       code: item.code,
       name: item.name,
       type: item.type,
-      selectedStaffNames: item.staffList.map((f) => f.name),
+      selectedStaffNames: Array.isArray(item.staffList) ? item.staffList.map((f) => f.name) : ["Dr. Aruna Sharma"],
       semester: semVal,
       section: secVal,
       studentsCount: item.studentsCount,
@@ -291,11 +248,10 @@ export default function HodSubjectsPage() {
     setIsModalOpen(true);
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim()) return;
 
-    // Map selected names to staff list objects
     const mappedStaff: StaffMember[] = formData.selectedStaffNames.map((name, index) => {
       const matched = availableStaffList.find((f) => f.name === name);
       return {
@@ -310,48 +266,72 @@ export default function HodSubjectsPage() {
 
     const combinedSemSec = `${formData.semester} • ${formData.section}`;
 
-    if (editingId) {
-      setSubjectList((prev) =>
-        prev.map((s) =>
-          s.id === editingId
-            ? {
-                ...s,
-                code: generatedCode,
-                name: formData.name.trim(),
-                type: formData.type,
-                staffList: mappedStaff,
-                semSec: combinedSemSec,
-                studentsCount: Number(formData.studentsCount) || 60,
-                credits: Number(formData.credits) || 4,
-                hoursPerWeek: Number(formData.hoursPerWeek) || 4,
-                completionPercent: Number(formData.completionPercent) || 85,
-                status: formData.status }
-            : s
-        )
-      );
-    } else {
-      const newSubjectItem: SubjectItem = {
-        id: Date.now().toString(),
-        code: generatedCode,
-        name: formData.name.trim(),
-        type: formData.type,
-        staffList: mappedStaff,
-        semSec: combinedSemSec,
-        studentsCount: Number(formData.studentsCount) || 60,
-        credits: Number(formData.credits) || 4,
-        hoursPerWeek: Number(formData.hoursPerWeek) || 4,
-        completionPercent: Number(formData.completionPercent) || 85,
-        status: formData.status };
-      setSubjectList((prev) => [newSubjectItem, ...prev]);
-      setCurrentPage(1);
+    try {
+      if (editingId) {
+        await HodService.updateSubject(editingId, {
+          name: formData.name.trim(),
+          code: generatedCode,
+          credits: Number(formData.credits) || 4,
+        });
+
+        setSubjectList((prev) =>
+          prev.map((s) =>
+            s.id === editingId
+              ? {
+                  ...s,
+                  code: generatedCode,
+                  name: formData.name.trim(),
+                  type: formData.type,
+                  staffList: mappedStaff,
+                  semSec: combinedSemSec,
+                  studentsCount: Number(formData.studentsCount) || 60,
+                  credits: Number(formData.credits) || 4,
+                  hoursPerWeek: Number(formData.hoursPerWeek) || 4,
+                  completionPercent: Number(formData.completionPercent) || 85,
+                  status: formData.status }
+              : s
+          )
+        );
+      } else {
+        await HodService.createSubject({
+          name: formData.name.trim(),
+          code: generatedCode,
+          credits: Number(formData.credits) || 4,
+        });
+
+        const newSubjectItem: SubjectItem = {
+          id: Date.now().toString(),
+          code: generatedCode,
+          name: formData.name.trim(),
+          type: formData.type,
+          staffList: mappedStaff,
+          semSec: combinedSemSec,
+          studentsCount: Number(formData.studentsCount) || 60,
+          credits: Number(formData.credits) || 4,
+          hoursPerWeek: Number(formData.hoursPerWeek) || 4,
+          completionPercent: Number(formData.completionPercent) || 85,
+          status: formData.status };
+        setSubjectList((prev) => [newSubjectItem, ...prev]);
+        setTotalCount((prev) => prev + 1);
+        setCurrentPage(1);
+      }
+    } catch (err) {
+      console.warn("Backend API subject action error, updating local UI:", err);
     }
 
     setIsModalOpen(false);
   };
 
-
-
-
+  const handleDeleteSubject = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this subject module?")) return;
+    try {
+      await HodService.deleteSubject(id);
+    } catch (err) {
+      console.warn("Backend delete subject error:", err);
+    }
+    setSubjectList((prev) => prev.filter((s) => s.id !== id));
+    setTotalCount((prev) => Math.max(0, prev - 1));
+  };
 
   const resetFilters = () => {
     setTypeFilter("ALL");
@@ -374,19 +354,18 @@ export default function HodSubjectsPage() {
     let matchesTab = true;
     if (activeTab === "CORE") matchesTab = item.type === "Core Subject";
     if (activeTab === "ELECTIVE") matchesTab = item.type === "Elective";
-    if (activeTab === "MULTI_STAFF") matchesTab = item.staffList.length > 1;
+    if (activeTab === "MULTI_STAFF" || activeTab === "MULTI_FACULTY") matchesTab = item.staffList && item.staffList.length > 1;
 
     let matchesYearSem = true;
     if (yearSemFilter === "YEAR_1") matchesYearSem = item.semSec.includes("SEM-01") || item.semSec.includes("SEM-02");
     if (yearSemFilter === "YEAR_2") matchesYearSem = item.semSec.includes("SEM-03") || item.semSec.includes("SEM-04");
     if (yearSemFilter === "YEAR_3") matchesYearSem = item.semSec.includes("SEM-05") || item.semSec.includes("SEM-06");
     if (yearSemFilter === "YEAR_4") matchesYearSem = item.semSec.includes("SEM-07") || item.semSec.includes("SEM-08");
-    if (yearSemFilter === "YEAR_5") matchesYearSem = item.semSec.includes("SEM-09") || item.semSec.includes("SEM-10");
 
     const matchesSearch =
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.staffList.some((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (Array.isArray(item.staffList) && item.staffList.some((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase()))) ||
       item.semSec.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesType = typeFilter === "ALL" || item.type === typeFilter;
@@ -394,6 +373,7 @@ export default function HodSubjectsPage() {
 
     return matchesTab && matchesYearSem && matchesSearch && matchesType && matchesStatus;
   });
+
   const totalPages = Math.max(1, Math.ceil(filteredSubjects.length / itemsPerPage));
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = Math.min(startIndex + itemsPerPage, filteredSubjects.length);
@@ -452,7 +432,6 @@ export default function HodSubjectsPage() {
             All Courses
           </button>
           <button
-
             className={`${styles.tabBtn} ${activeTab === "CORE" ? styles.tabBtnActive : ""}`}
             onClick={() => { setActiveTab("CORE"); setCurrentPage(1); }}
           >
@@ -523,7 +502,6 @@ export default function HodSubjectsPage() {
                     <option value="YEAR_2">Year II (SEM 03 – 04)</option>
                     <option value="YEAR_3">Year III (SEM 05 – 06)</option>
                     <option value="YEAR_4">Year IV (SEM 07 – 08)</option>
-                    <option value="YEAR_5">Year V (SEM 09 – 10)</option>
                   </select>
                 </div>
 
@@ -584,13 +562,13 @@ export default function HodSubjectsPage() {
 
       {/* MAIN CONTENT DISPLAY */}
       {viewMode === "grid" ? (
-        /* COURSE CARDS GRID VIEW */
         <div className={styles.cardsGrid}>
           {paginatedSubjects.length > 0 ? (
             paginatedSubjects.map((item) => {
-              const allStaffNames = item.staffList.map((f) => f.name).join(", ");
-              const leadStaff = item.staffList[0];
-              const extraCount = item.staffList.length - 1;
+              const staff = item.staffList || [];
+              const allStaffNames = staff.map((f) => f.name).join(", ");
+              const leadStaff = staff[0] || { name: "Faculty Member", avatar: "FM" };
+              const extraCount = Math.max(0, staff.length - 1);
 
               return (
                 <div key={item.id} className={styles.subjectCard}>
@@ -602,16 +580,18 @@ export default function HodSubjectsPage() {
                     <div className={styles.cardActions}>
                       <button 
                         className={styles.cardActionBtn} 
-                        title={`View ${item.name}`}
-                      >
-                        <Eye size={15} />
-                      </button>
-                      <button 
-                        className={styles.cardActionBtn} 
                         title={`Edit ${item.name}`}
                         onClick={() => openEditModal(item)}
                       >
                         <Pencil size={15} />
+                      </button>
+                      <button 
+                        className={styles.cardActionBtn} 
+                        title={`Delete ${item.name}`}
+                        onClick={() => handleDeleteSubject(item.id)}
+                        style={{ color: '#ef4444' }}
+                      >
+                        <Trash2 size={15} />
                       </button>
                     </div>
                   </div>
@@ -624,7 +604,7 @@ export default function HodSubjectsPage() {
                   <div className={styles.cardMetaGrid}>
                     <div className={styles.metaItemFull}>
                       <div className={styles.staffStackWrapper}>
-                        <span className={styles.metaLabel}>ASSIGNED STAFF ({item.staffList.length})</span>
+                        <span className={styles.metaLabel}>ASSIGNED STAFF ({staff.length})</span>
                         {extraCount > 0 && (
                           <span className={styles.coStaffBadge}>
                             +{extraCount} Co-Instructor{extraCount > 1 ? "s" : ""}
@@ -634,13 +614,13 @@ export default function HodSubjectsPage() {
                       
                       <div className={styles.staffStackWrapper} title={`Instructors: ${allStaffNames}`}>
                         <div className={styles.avatarStack}>
-                          {item.staffList.map((staff, idx) => (
+                          {staff.map((st, idx) => (
                             <div 
                               key={idx} 
                               className={styles.stackedAvatar} 
-                              title={`${staff.name} (${staff.role || "Instructor"})`}
+                              title={`${st.name} (${st.role || "Instructor"})`}
                             >
-                              {staff.avatar}
+                              {st.avatar || "FM"}
                             </div>
                           ))}
                         </div>
@@ -678,7 +658,6 @@ export default function HodSubjectsPage() {
           )}
         </div>
       ) : (
-        /* TABLE LIST VIEW WITH MULTI-STAFF STACK */
         <div className={styles.tableCard}>
           <div className={styles.tableWrapper}>
             <table className={styles.table}>
@@ -695,9 +674,10 @@ export default function HodSubjectsPage() {
               </thead>
               <tbody>
                 {paginatedSubjects.map((item) => {
-                  const allStaffNames = item.staffList.map((f) => f.name).join(", ");
-                  const leadStaff = item.staffList[0];
-                  const extraCount = item.staffList.length - 1;
+                  const staff = item.staffList || [];
+                  const allStaffNames = staff.map((f) => f.name).join(", ");
+                  const leadStaff = staff[0] || { name: "Faculty Member", avatar: "FM" };
+                  const extraCount = Math.max(0, staff.length - 1);
 
                   return (
                     <tr key={item.id}>
@@ -715,9 +695,9 @@ export default function HodSubjectsPage() {
                       <td>
                         <div className={styles.staffStackWrapper} title={`Instructors: ${allStaffNames}`}>
                           <div className={styles.avatarStack}>
-                            {item.staffList.map((staff, idx) => (
-                              <div key={idx} className={styles.stackedAvatar} title={`${staff.name} (${staff.role || "Instructor"})`}>
-                                {staff.avatar}
+                            {staff.map((st, idx) => (
+                              <div key={idx} className={styles.stackedAvatar} title={`${st.name} (${st.role || "Instructor"})`}>
+                                {st.avatar || "FM"}
                               </div>
                             ))}
                           </div>
@@ -747,11 +727,11 @@ export default function HodSubjectsPage() {
                       </td>
                       <td style={{ textAlign: "right", paddingRight: "20px" }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "4px" }}>
-                          <button className={styles.cardActionBtn} title={`View ${item.name}`}>
-                            <Eye size={16} />
-                          </button>
                           <button className={styles.cardActionBtn} title={`Edit ${item.name}`} onClick={() => openEditModal(item)}>
                             <Pencil size={16} />
+                          </button>
+                          <button className={styles.cardActionBtn} title={`Delete ${item.name}`} onClick={() => handleDeleteSubject(item.id)} style={{ color: '#ef4444' }}>
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
@@ -767,7 +747,7 @@ export default function HodSubjectsPage() {
       {/* Dynamic Pagination Controls */}
       <div className={styles.paginationRow}>
         <div className={styles.paginationText}>
-          Showing <strong>{filteredSubjects.length === 0 ? 0 : startIndex + 1}-{endIndex}</strong> of <strong>{filteredSubjects.length + 33}</strong> course modules
+          Showing <strong>{filteredSubjects.length === 0 ? 0 : startIndex + 1}-{endIndex}</strong> of <strong>{totalCount}</strong> course modules
         </div>
         <div className={styles.paginationControls}>
           <button 
@@ -797,225 +777,6 @@ export default function HodSubjectsPage() {
           </button>
         </div>
       </div>
-
-      {/* Add / Edit Subject Modal Popup with Multi-Staff Checkboxes */}
-      {isModalOpen && (
-        <div className={styles.modalOverlay} onClick={() => setIsModalOpen(false)}>
-          <div 
-            className={styles.modalContainer}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className={styles.modalHeader}>
-              <div className={styles.modalTitleArea}>
-                <h2 className={styles.modalTitle}>
-                  {editingId ? "Edit Course Module" : "Add New Subject"}
-                </h2>
-                <p className={styles.modalSubtitle}>
-                  Assign single or multiple staff members (lead & co-instructors) to this subject.
-                </p>
-              </div>
-              <button 
-                className={styles.closeModalBtn}
-                onClick={() => setIsModalOpen(false)}
-                title="Close modal"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleFormSubmit}>
-              <div className={styles.modalBody}>
-                <div className={styles.formGrid}>
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>Course Code *</label>
-                    <input
-                      type="text"
-                      name="code"
-                      required
-                      placeholder="e.g. CS-302"
-                      className={styles.formInput}
-                      value={formData.code}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>Course Type *</label>
-                    <select
-                      name="type"
-                      className={styles.formSelect}
-                      value={formData.type}
-                      onChange={handleInputChange}
-                    >
-                      <option value="Core Subject">Core Subject</option>
-                      <option value="Elective">Elective</option>
-                    </select>
-                  </div>
-
-                  <div className={styles.formGroupFull}>
-                    <label className={styles.formLabel}>Course Title *</label>
-                    <input
-                      type="text"
-                      name="name"
-                      required
-                      placeholder="e.g. Data Structures & Algorithms"
-                      className={styles.formInput}
-                      value={formData.name}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  {/* Multi-Staff Selection Grid */}
-                  <div className={styles.formGroupFull}>
-                    <label className={styles.formLabel}>
-                      Assigned Staff Members ({formData.selectedStaffNames.length} Selected) *
-                    </label>
-                    <div className={styles.staffCheckboxGrid}>
-                      {availableStaffList.map((staff) => {
-                        const isChecked = formData.selectedStaffNames.includes(staff.name);
-                        return (
-                          <label key={staff.name} className={styles.checkboxLabel}>
-                            <input
-                              type="checkbox"
-                              className={styles.checkboxInput}
-                              checked={isChecked}
-                              onChange={() => handleStaffCheckboxToggle(staff.name)}
-                            />
-                            <span>{staff.name}</span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-
-
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>Semester *</label>
-                    <select
-                      name="semester"
-                      className={styles.formSelect}
-                      value={formData.semester}
-                      onChange={handleInputChange}
-                    >
-                      <option value="SEM-01">SEM-01 (Year 1)</option>
-                      <option value="SEM-02">SEM-02 (Year 1)</option>
-                      <option value="SEM-03">SEM-03 (Year 2)</option>
-                      <option value="SEM-04">SEM-04 (Year 2)</option>
-                      <option value="SEM-05">SEM-05 (Year 3)</option>
-                      <option value="SEM-06">SEM-06 (Year 3)</option>
-                      <option value="SEM-07">SEM-07 (Year 4)</option>
-                      <option value="SEM-08">SEM-08 (Year 4)</option>
-                      <option value="SEM-09">SEM-09 (Year 5 Integrated)</option>
-                      <option value="SEM-10">SEM-10 (Year 5 Integrated)</option>
-                    </select>
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>Section *</label>
-                    <select
-                      name="section"
-                      className={styles.formSelect}
-                      value={formData.section}
-                      onChange={handleInputChange}
-                    >
-                      <option value="SEC-A">SEC-A</option>
-                      <option value="SEC-B">SEC-B</option>
-                      <option value="SEC-C">SEC-C</option>
-                      <option value="SEC-D">SEC-D</option>
-                      <option value="SEC-E">SEC-E</option>
-                      <option value="ALL SEC">ALL SEC</option>
-                    </select>
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>Enrolled Students</label>
-                    <input
-                      type="number"
-                      name="studentsCount"
-                      placeholder="e.g. 64"
-                      className={styles.formInput}
-                      value={formData.studentsCount}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>Credits</label>
-                    <input
-                      type="number"
-                      name="credits"
-                      placeholder="e.g. 4"
-                      className={styles.formInput}
-                      value={formData.credits}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>Weekly Hours</label>
-                    <input
-                      type="number"
-                      name="hoursPerWeek"
-                      placeholder="e.g. 4"
-                      className={styles.formInput}
-                      value={formData.hoursPerWeek}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className={styles.formGroupFull}>
-                    <label className={styles.formLabel}>Course Status *</label>
-                    <select
-                      name="status"
-                      className={styles.formSelect}
-                      value={formData.status}
-                      onChange={handleInputChange}
-                    >
-                      <option value="Excellent">Excellent</option>
-                      <option value="Active">Active</option>
-                      <option value="Steady">Steady</option>
-                      <option value="Under Review">Under Review</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles.modalFooter}>
-                <button
-                  type="button"
-                  className={styles.cancelModalBtn}
-                  onClick={() => setIsModalOpen(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className={styles.submitModalBtn}
-                >
-                  {editingId ? "Save Changes" : "Create Subject"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Page Footer */}
-      <footer className={styles.pageFooter}>
-        <div>© 2024 MyStory CIP Academic Management. All rights reserved.</div>
-        <div className={styles.footerLinks}>
-          <Link href="#" className={styles.footerLink}>
-            Terms of Service
-          </Link>
-          <Link href="#" className={styles.footerLink}>
-            Privacy Policy
-          </Link>
-          <Link href="#" className={styles.footerLink}>
-            Curriculum Guide
-          </Link>
-        </div>
-      </footer>
     </div>
   );
 }

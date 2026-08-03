@@ -5,11 +5,30 @@ import { Eye } from "lucide-react";
 import styles from "../dashboard.module.css";
 import Link from "next/link";
 
-const liveSessions = [
+interface LiveSessionItem {
+  id: string | number;
+  courseCode?: string;
+  code?: string;
+  courseName?: string;
+  name?: string;
+  facultyName?: string;
+  room?: string;
+  startTime?: string;
+  time?: string;
+  attendance?: number;
+  status?: string;
+}
+
+interface LiveSessionMonitorProps {
+  sessionsData?: LiveSessionItem[];
+}
+
+const fallbackLiveSessions: LiveSessionItem[] = [
   {
     id: 1,
     code: "CS-302",
     name: "Data Structures",
+    facultyName: "Dr. Albert Thorne",
     room: "Lab Room 4A",
     time: "10:00 - 11:30",
     attendance: 92,
@@ -18,6 +37,7 @@ const liveSessions = [
     id: 2,
     code: "CS-501",
     name: "AI & Robotics",
+    facultyName: "Prof. Sarah Jenkins",
     room: "Lecture Hall 2",
     time: "10:30 - 12:00",
     attendance: 78,
@@ -26,13 +46,16 @@ const liveSessions = [
     id: 3,
     code: "IT-204",
     name: "Database Systems",
+    facultyName: "Dr. Rahul Mehta",
     room: "Seminar Hall",
     time: "11:00 - 12:30",
     attendance: 85,
   },
 ];
 
-export default function LiveSessionMonitor() {
+export default function LiveSessionMonitor({ sessionsData }: LiveSessionMonitorProps) {
+  const liveSessions = (sessionsData && sessionsData.length > 0) ? sessionsData : fallbackLiveSessions;
+
   return (
     <div className={styles.sectionCard}>
       <div className={styles.sectionHeader}>
@@ -40,7 +63,7 @@ export default function LiveSessionMonitor() {
           <div className={styles.liveDot} />
           <h2 className={styles.sectionTitle}>Live Session Monitoring</h2>
         </div>
-        <span className={styles.liveBadge}>6 SESSIONS ACTIVE</span>
+        <span className={styles.liveBadge}>{liveSessions.length} SESSIONS ACTIVE</span>
       </div>
 
       <div className={styles.tableContainer}>
@@ -54,43 +77,56 @@ export default function LiveSessionMonitor() {
             </tr>
           </thead>
           <tbody>
-            {liveSessions.map((session) => (
-              <tr key={session.id}>
-                <td>
-                  <div className={styles.subjectTitle}>
-                    {session.code}: {session.name}
-                  </div>
-                  <div className={styles.subjectRoom}>
-                    {session.room} • {session.time}
-                  </div>
-                </td>
-                <td>
-                  <div className={styles.attendanceCol}>
-                    <div className={styles.progressTrack}>
-                      <div 
-                        className={styles.progressFill} 
-                        style={{ width: `${session.attendance}%` }} 
-                      />
+            {liveSessions.map((session) => {
+              const code = session.courseCode || session.code || "CS-101";
+              const name = session.courseName || session.name || "Computer Science";
+              const staff = session.facultyName || "Faculty Member";
+              const roomAndTime = session.time || `${session.room || 'Room 101'} • ${session.startTime || '10:00 AM'}`;
+              const attendance = session.attendance || 85;
+
+              return (
+                <tr key={session.id}>
+                  <td>
+                    <div className={styles.subjectTitle}>
+                      {code}: {name}
                     </div>
-                    <span className={styles.attendancePct}>{session.attendance}%</span>
-                  </div>
-                </td>
-                <td style={{ textAlign: "right", paddingRight: "24px" }}>
-                  <button 
-                    className={styles.eyeBtn} 
-                    aria-label={`View ${session.name}`}
-                    title="View Session"
-                  >
-                    <Eye size={18} />
-                  </button>
-                </td>
-              </tr>
-            ))}
+                    <div className={styles.subjectRoom}>
+                      {roomAndTime}
+                    </div>
+                  </td>
+                  <td>
+                    <div className={styles.subjectTitle} style={{ fontWeight: 500 }}>
+                      {staff}
+                    </div>
+                  </td>
+                  <td>
+                    <div className={styles.attendanceCol}>
+                      <div className={styles.progressTrack}>
+                        <div 
+                          className={styles.progressFill} 
+                          style={{ width: `${attendance}%` }} 
+                        />
+                      </div>
+                      <span className={styles.attendancePct}>{attendance}%</span>
+                    </div>
+                  </td>
+                  <td style={{ textAlign: "right", paddingRight: "24px" }}>
+                    <button 
+                      className={styles.eyeBtn} 
+                      aria-label={`View ${name}`}
+                      title="View Session"
+                    >
+                      <Eye size={18} />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
 
-      <Link href="/hod/sessions" className={styles.cardFooterLink}>
+      <Link href="/hod/subjects" className={styles.cardFooterLink}>
         VIEW ALL SESSIONS
       </Link>
     </div>

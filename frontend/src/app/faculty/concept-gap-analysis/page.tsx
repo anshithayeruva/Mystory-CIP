@@ -1,13 +1,13 @@
 "use client";
 
-import React from "react";
-import { AlertCircle, Activity, ArrowRight, Lightbulb } from "lucide-react";
+import React, { useState, useEffect } from "react";
 import styles from "./concept-gap.module.css";
+import { FacultyService } from "@/services/faculty.service";
 
-// --- Mock Data for the 5 Sections ---
+// --- Mock Data Fallbacks ---
 
 // Section 1: Students Requiring Attention
-const studentsAtRisk = [
+const initialStudentsAtRisk = [
   { id: 1, name: "Rahul Sharma", subject: "Data Structures", understanding: 42, weakConcept: "Recursion", priority: "High", action: "Review concepts before next class" },
   { id: 2, name: "Priya Singh", subject: "DBMS", understanding: 58, weakConcept: "SQL Joins", priority: "Medium", action: "Assign additional practice" },
   { id: 3, name: "Akash Reddy", subject: "Data Structures", understanding: 35, weakConcept: "Trees", priority: "High", action: "Schedule one-to-one discussion" },
@@ -15,7 +15,7 @@ const studentsAtRisk = [
 ];
 
 // Section 2: Concept Mastery
-const conceptMastery = [
+const initialConceptMastery = [
   { concept: "Recursion", score: 78 },
   { concept: "Trees", score: 92 },
   { concept: "Binary Search", score: 64 },
@@ -23,8 +23,8 @@ const conceptMastery = [
   { concept: "Dynamic Programming", score: 42 },
 ];
 
-// Section 2: Class Performance Distribution
-const classPerformance = [
+// Section 3: Class Performance Distribution
+const initialClassPerformance = [
   { level: "Excellent", range: "85-100%", count: 18, color: "#10633b" },
   { level: "Good", range: "70-84%", count: 24, color: "rgba(0, 59, 130, 0.85)" },
   { level: "Needs Review", range: "50-69%", count: 12, color: "rgba(0, 59, 130, 0.5)" },
@@ -32,6 +32,25 @@ const classPerformance = [
 ];
 
 export default function LearningInsightsPage() {
+  const [studentsAtRisk, setStudentsAtRisk] = useState(initialStudentsAtRisk);
+  const [conceptMastery, setConceptMastery] = useState(initialConceptMastery);
+  const [classPerformance, setClassPerformance] = useState(initialClassPerformance);
+
+  useEffect(() => {
+    async function loadConceptGaps() {
+      try {
+        const response = await FacultyService.getAllConceptGaps();
+        if (response && response.success && response.data) {
+          if (response.data.studentsAtRisk) setStudentsAtRisk(response.data.studentsAtRisk);
+          if (response.data.conceptMastery) setConceptMastery(response.data.conceptMastery);
+          if (response.data.classPerformance) setClassPerformance(response.data.classPerformance);
+        }
+      } catch (err) {
+        console.warn("Backend concept gap API offline, using interactive state:", err);
+      }
+    }
+    loadConceptGaps();
+  }, []);
 
   return (
     <div className={styles.pageContainer}>
@@ -67,7 +86,7 @@ export default function LearningInsightsPage() {
               </tr>
             </thead>
             <tbody>
-              {studentsAtRisk.map(student => (
+              {studentsAtRisk.map((student) => (
                 <tr key={student.id} style={{ borderBottom: "1px solid #e2e8f0" }}>
                   <td style={{ padding: "16px 24px", fontWeight: 600, color: "var(--text-main)", fontSize: "0.875rem" }}>{student.name}</td>
                   <td style={{ padding: "16px 24px", color: "var(--text-muted)", fontSize: "0.875rem" }}>{student.subject}</td>

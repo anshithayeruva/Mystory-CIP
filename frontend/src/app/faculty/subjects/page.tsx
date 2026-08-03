@@ -1,20 +1,16 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { 
   Search, 
   Filter, 
-  BookOpen, 
-  Layers, 
-  Users, 
-  Clock, 
   X, 
   Check,
-  ChevronLeft,
   ChevronRight
 } from "lucide-react";
 import styles from "./subjects.module.css";
+import { FacultyService } from "@/services/faculty.service";
 
 export interface FacultySubjectItem {
   id: string;
@@ -74,48 +70,6 @@ const MOCK_FACULTY_SUBJECTS: FacultySubjectItem[] = [
     studentsCount: 180,
     weeklyHours: 16,
   },
-  {
-    id: "4",
-    initials: "OS",
-    name: "Operating Systems Concepts",
-    code: "CS-304",
-    category: "Multi-Faculty",
-    program: "B.Tech CSE",
-    semester: "Semester 4",
-    programInfo: "B.Tech CSE • Semester 4",
-    credits: 3,
-    sectionsCount: 2,
-    studentsCount: 120,
-    weeklyHours: 12,
-  },
-  {
-    id: "5",
-    initials: "CN",
-    name: "Computer Networks & Security",
-    code: "CS-306",
-    category: "Core",
-    program: "B.Tech CSE",
-    semester: "Semester 5",
-    programInfo: "B.Tech CSE • Semester 5",
-    credits: 3,
-    sectionsCount: 3,
-    studentsCount: 195,
-    weeklyHours: 14,
-  },
-  {
-    id: "6",
-    initials: "SE",
-    name: "Software Engineering & Agile",
-    code: "CS-308",
-    category: "Lab",
-    program: "M.Tech SE",
-    semester: "Semester 1",
-    programInfo: "M.Tech SE • Semester 1",
-    credits: 2,
-    sectionsCount: 2,
-    studentsCount: 110,
-    weeklyHours: 8,
-  },
 ];
 
 export default function FacultySubjectsPage() {
@@ -152,6 +106,24 @@ export default function FacultySubjectsPage() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
+  // Fetch subjects from backend
+  const fetchSubjects = useCallback(async () => {
+    try {
+      const response = await FacultyService.getSubjects();
+      if (response && response.success && response.data) {
+        if (response.data.length > 0) {
+          setSubjectsList(response.data);
+        }
+      }
+    } catch (err) {
+      console.warn("Backend API offline, using interactive state:", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSubjects();
+  }, [fetchSubjects]);
+
   // Filtered list
   const filteredSubjects = useMemo(() => {
     return subjectsList.filter((item) => {
@@ -172,67 +144,43 @@ export default function FacultySubjectsPage() {
     return filteredSubjects.slice(start, start + itemsPerPage);
   }, [filteredSubjects, currentPage]);
 
-  // Total summary metrics
-  const totalSubjectsCount = subjectsList.length;
-  const totalSectionsCount = subjectsList.reduce((sum, item) => sum + item.sectionsCount, 0);
-  const totalStudentsCount = subjectsList.reduce((sum, item) => sum + item.studentsCount, 0);
-
-  // Modal Handlers
-  const handleOpenAddModal = () => {
-    setEditingSubject(null);
-    setFormState({
-      name: "",
-      code: "",
-      category: "Core",
-      program: "B.Tech CSE",
-      semester: "Semester 3",
-      programInfo: "B.Tech CSE • Semester 3",
-      credits: 4,
-      sectionsCount: 2,
-      studentsCount: 120,
-      weeklyHours: 12,
-    });
-    setIsModalOpen(true);
-  };
-
-  const handleOpenEditModal = (subject: FacultySubjectItem) => {
-    setEditingSubject(subject);
-    setFormState({
-      name: subject.name,
-      code: subject.code,
-      category: subject.category,
-      program: subject.program,
-      semester: subject.semester,
-      programInfo: subject.programInfo,
-      credits: subject.credits,
-      sectionsCount: subject.sectionsCount,
-      studentsCount: subject.studentsCount,
-      weeklyHours: subject.weeklyHours,
-    });
-    setIsModalOpen(true);
-  };
-
-  const handleSubmitModal = (e: React.FormEvent) => {
+  const handleSubmitModal = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formState.name || !formState.code) {
       triggerToast("Please enter subject name and code.");
       return;
     }
 
-    if (editingSubject) {
-      setSubjectsList((prev) =>
-        prev.map((s) => (s.id === editingSubject.id ? { ...s, ...formState, programInfo: `${formState.program} • ${formState.semester}` } : s))
-      );
-      triggerToast(`Subject "${formState.name}" updated successfully!`);
-    } else {
-      const newSubject: FacultySubjectItem = {
-        id: String(Date.now()),
-        initials: formState.name.substring(0, 2).toUpperCase(),
-        ...formState,
-        programInfo: `${formState.program} • ${formState.semester}`,
-      };
-      setSubjectsList((prev) => [newSubject, ...prev]);
-      triggerToast(`Subject "${formState.name}" created successfully!`);
+    try {
+      if (editingSubject) {
+        await FacultyService.updateSubject(editingSubject.id, {
+          name: formState.name,
+          code: formState.code,
+          credits: formState.credits,
+        });
+
+        setSubjectsList((prev) =>
+          prev.map((s) => (s.id === editingSubject.id ? { ...s, ...formState, programInfo: `${formState.program} • ${formState.semester}` } : s))
+        );
+        triggerToast(`Subject "${formState.name}" updated successfully!`);
+      } else {
+        await FacultyService.createSubject({
+          name: formState.name,
+          code: formState.code,
+          credits: formState.credits,
+        });
+
+        const newSubject: FacultySubjectItem = {
+          id: String(Date.now()),
+          initials: formState.name.substring(0, 2).toUpperCase(),
+          ...formState,
+          programInfo: `${formState.program} • ${formState.semester}`,
+        };
+        setSubjectsList((prev) => [newSubject, ...prev]);
+        triggerToast(`Subject "${formState.name}" created successfully!`);
+      }
+    } catch (err) {
+      console.warn("Backend subject action update notice:", err);
     }
     setIsModalOpen(false);
   };
@@ -354,7 +302,6 @@ export default function FacultySubjectsPage() {
               </div>
             )}
           </div>
-
         </div>
       </div>
 
@@ -453,8 +400,6 @@ export default function FacultySubjectsPage() {
           </div>
         </div>
       </div>
-
-
 
       {/* Add / Edit Subject Modal */}
       {isModalOpen && (

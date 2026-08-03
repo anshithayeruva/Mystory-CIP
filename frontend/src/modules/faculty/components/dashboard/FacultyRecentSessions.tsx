@@ -5,7 +5,13 @@ import Link from "next/link";
 import styles from "../../styles/faculty-dashboard.module.css";
 import { mockRecentSessions } from "../../constants/mockData";
 
-export default function FacultyRecentSessions() {
+interface FacultyRecentSessionsProps {
+  sessions?: any[];
+}
+
+export default function FacultyRecentSessions({ sessions }: FacultyRecentSessionsProps) {
+  const displaySessions = sessions && sessions.length > 0 ? sessions : mockRecentSessions;
+
   return (
     <div className={styles.sectionCard}>
       <div className={styles.sectionHeader}>
@@ -27,7 +33,7 @@ export default function FacultyRecentSessions() {
             </tr>
           </thead>
           <tbody>
-            {mockRecentSessions.map((session) => (
+            {displaySessions.map((session) => (
               <tr key={session.id} style={{ borderBottom: '1px solid var(--surface-border)' }}>
                 <td style={{ padding: '16px 20px', fontWeight: 600, color: 'var(--text-main)', fontSize: '0.875rem' }}>{session.name}</td>
                 <td style={{ padding: '16px 20px', color: 'var(--text-muted)', fontSize: '0.875rem' }}>{session.subject}</td>

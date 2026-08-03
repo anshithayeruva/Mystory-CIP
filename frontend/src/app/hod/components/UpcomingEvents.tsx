@@ -4,7 +4,22 @@ import React from "react";
 import Link from "next/link";
 import styles from "../dashboard.module.css";
 
-const events = [
+interface EventItem {
+  id: string | number;
+  day?: string;
+  month?: string;
+  date?: string | Date;
+  title: string;
+  time?: string;
+  meta?: string;
+  isDarkDate?: boolean;
+}
+
+interface UpcomingEventsProps {
+  eventsData?: EventItem[];
+}
+
+const fallbackEvents: EventItem[] = [
   {
     id: 1,
     day: "14",
@@ -23,7 +38,29 @@ const events = [
   },
 ];
 
-export default function UpcomingEvents() {
+export default function UpcomingEvents({ eventsData }: UpcomingEventsProps) {
+  const events = (eventsData && eventsData.length > 0)
+    ? eventsData.map((e, idx) => {
+        let day = e.day || "15";
+        let month = e.month || "NOV";
+        if (e.date) {
+          const d = new Date(e.date);
+          if (!isNaN(d.getTime())) {
+            day = d.getDate().toString().padStart(2, '0');
+            month = d.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+          }
+        }
+        return {
+          id: e.id,
+          day,
+          month,
+          title: e.title,
+          meta: e.meta || e.time || "Main Campus Hall",
+          isDarkDate: idx % 2 === 0
+        };
+      })
+    : fallbackEvents;
+
   return (
     <div className={styles.sectionCard}>
       <div className={styles.sectionHeader}>

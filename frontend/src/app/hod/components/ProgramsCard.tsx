@@ -4,7 +4,23 @@ import React, { useState } from "react";
 import { Users, GraduationCap, Clock, X } from "lucide-react";
 import styles from "../dashboard.module.css";
 
-const programs = [
+interface ProgramItem {
+  id: string | number;
+  code: string;
+  name: string;
+  studentCount?: number;
+  students?: number;
+  courseCount?: number;
+  faculty?: number;
+  degreeLevel?: string;
+  duration?: string;
+}
+
+interface ProgramsCardProps {
+  programsData?: ProgramItem[];
+}
+
+const fallbackPrograms: ProgramItem[] = [
   { id: 1, code: "B.Tech", name: "Computer Science & Engineering",      students: 480, faculty: 18, duration: "4 Years" },
   { id: 2, code: "B.Tech", name: "CSE – Artificial Intelligence & ML",  students: 120, faculty: 8,  duration: "4 Years" },
   { id: 3, code: "B.Tech", name: "CSE – Data Science",                  students: 120, faculty: 7,  duration: "4 Years" },
@@ -23,20 +39,25 @@ const degreeColor: Record<string, string> = {
   "Ph.D":   styles.degreeBadgePhd,
 };
 
-function ProgramRow({ prog }: { prog: typeof programs[0] }) {
+function ProgramRow({ prog }: { prog: ProgramItem }) {
+  const code = prog.code || prog.degreeLevel || "B.Tech";
+  const studentCount = prog.studentCount !== undefined ? prog.studentCount : (prog.students || 0);
+  const facultyCount = prog.courseCount !== undefined ? prog.courseCount : (prog.faculty || 0);
+  const duration = prog.duration || "4 Years";
+
   return (
     <div className={styles.programItem}>
-      <span className={`${styles.degreeBadge} ${degreeColor[prog.code] ?? ""}`}>
-        {prog.code}
+      <span className={`${styles.degreeBadge} ${degreeColor[code] ?? ""}`}>
+        {code}
       </span>
       <div className={styles.programInfo}>
         <div className={styles.programName}>{prog.name}</div>
         <div className={styles.programMeta}>
-          <span><Users size={11} style={{ display: "inline", marginRight: 3 }} />{prog.students} Students</span>
+          <span><Users size={11} style={{ display: "inline", marginRight: 3 }} />{studentCount} Students</span>
           <span className={styles.programMetaDot}>·</span>
-          <span><GraduationCap size={11} style={{ display: "inline", marginRight: 3 }} />{prog.faculty} Faculty</span>
+          <span><GraduationCap size={11} style={{ display: "inline", marginRight: 3 }} />{facultyCount} Courses/Faculty</span>
           <span className={styles.programMetaDot}>·</span>
-          <span><Clock size={11} style={{ display: "inline", marginRight: 3 }} />{prog.duration}</span>
+          <span><Clock size={11} style={{ display: "inline", marginRight: 3 }} />{duration}</span>
         </div>
       </div>
       <span className={styles.programStatusActive}>ACTIVE</span>
@@ -44,8 +65,9 @@ function ProgramRow({ prog }: { prog: typeof programs[0] }) {
   );
 }
 
-export default function ProgramsCard() {
+export default function ProgramsCard({ programsData }: ProgramsCardProps) {
   const [modalOpen, setModalOpen] = useState(false);
+  const programs = (programsData && programsData.length > 0) ? programsData : fallbackPrograms;
 
   return (
     <>

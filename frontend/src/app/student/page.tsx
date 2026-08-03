@@ -2,15 +2,15 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { 
-  Award, 
-  BookOpen, 
-  CalendarCheck, 
-  Clock, 
-  FolderDown, 
-  Radio, 
-  Eye, 
-  ChevronDown, 
+import {
+  Award,
+  BookOpen,
+  CalendarCheck,
+  Clock,
+  FolderDown,
+  Radio,
+  Eye,
+  ChevronDown,
   ChevronUp,
   ArrowRight,
   Sparkles,
@@ -18,11 +18,11 @@ import {
   AlertCircle
 } from "lucide-react";
 import styles from "./student.module.css";
-import { 
-  STUDENT_INFO, 
-  TODAY_CLASSES, 
-  STUDENT_ASSIGNMENTS, 
-  STUDENT_COURSES 
+import {
+  STUDENT_INFO,
+  TODAY_CLASSES,
+  STUDENT_ASSIGNMENTS,
+  STUDENT_COURSES
 } from "./mockData";
 
 const formatDueDate = (dateStr: string) => {
@@ -48,7 +48,7 @@ export default function StudentDashboard() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-      
+
       {/* 1. University Banner */}
       <div style={{
         backgroundColor: "#ffffff",
@@ -175,10 +175,10 @@ export default function StudentDashboard() {
 
       {/* 3. Main Two-Column Layout */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "24px", alignItems: "start" }}>
-        
+
         {/* LEFT COLUMN */}
         <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-          
+
           {/* Card 1: Today's Schedule & Live Session Monitor */}
           <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", display: "flex", flexDirection: "column", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", overflow: "hidden" }}>
             <div style={{ padding: "16px 20px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -318,7 +318,7 @@ export default function StudentDashboard() {
 
         {/* RIGHT COLUMN (340px width) */}
         <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-          
+
           {/* Card 1: Upcoming Events & Deadlines */}
           <div style={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "10px", display: "flex", flexDirection: "column", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", overflow: "hidden" }}>
             <div style={{ padding: "16px 20px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -381,7 +381,7 @@ export default function StudentDashboard() {
             </div>
 
             <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: "18px" }}>
-              
+
               {/* 1. Strongest Subject */}
               <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.725rem", fontWeight: 700, color: "#00522E", textTransform: "uppercase", letterSpacing: "0.05em" }}>

@@ -1,17 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  User, 
-  Award, 
-  Download, 
-  Bell, 
-  ShieldCheck, 
-  Save, 
-  Check, 
-  Lock, 
-  Eye, 
-  EyeOff, 
+import {
+  User,
+  Award,
+  Download,
+  Bell,
+  ShieldCheck,
+  Save,
+  Check,
+  Lock,
+  Eye,
+  EyeOff,
   ArrowRight,
   FileText
 } from "lucide-react";
@@ -111,10 +111,10 @@ export default function StudentSettingsPage() {
             {activeTab === "Security" && "Update account credentials, login passwords, and multi-factor authentication."}
           </p>
         </div>
-        
+
         <div className={styles.tabs}>
           {tabs.map((tab) => (
-            <div 
+            <div
               key={tab}
               className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ""}`}
               onClick={() => setActiveTab(tab)}
@@ -141,69 +141,69 @@ export default function StudentSettingsPage() {
                   <div className={styles.formGrid}>
                     <div className={styles.formGroup}>
                       <label className={styles.label}>Full Name</label>
-                      <input 
-                        className={styles.input} 
-                        type="text" 
-                        value={profileForm.name} 
-                        onChange={(e) => setProfileForm({...profileForm, name: e.target.value})}
+                      <input
+                        className={styles.input}
+                        type="text"
+                        value={profileForm.name}
+                        onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
                       />
                     </div>
                     <div className={styles.formGroup}>
                       <label className={styles.label}>Roll Number</label>
-                      <input 
-                        className={`${styles.input} ${styles.inputDisabled}`} 
-                        type="text" 
-                        value={profileForm.rollNo} 
+                      <input
+                        className={`${styles.input} ${styles.inputDisabled}`}
+                        type="text"
+                        value={profileForm.rollNo}
                         disabled
                       />
                     </div>
                     <div className={styles.formGroup}>
                       <label className={styles.label}>Email Address</label>
-                      <input 
-                        className={`${styles.input} ${styles.inputDisabled}`} 
-                        type="email" 
-                        value={profileForm.email} 
+                      <input
+                        className={`${styles.input} ${styles.inputDisabled}`}
+                        type="email"
+                        value={profileForm.email}
                         disabled
                       />
                     </div>
                     <div className={styles.formGroup}>
                       <label className={styles.label}>Registration Number</label>
-                      <input 
-                        className={`${styles.input} ${styles.inputDisabled}`} 
-                        type="text" 
-                        value={profileForm.regNo} 
+                      <input
+                        className={`${styles.input} ${styles.inputDisabled}`}
+                        type="text"
+                        value={profileForm.regNo}
                         disabled
                       />
                     </div>
                     <div className={styles.formGroup} style={{ gridColumn: "span 2" }}>
                       <label className={styles.label}>Phone Number</label>
-                      <input 
-                        className={styles.input} 
-                        type="text" 
-                        value={profileForm.phone} 
-                        onChange={(e) => setProfileForm({...profileForm, phone: e.target.value})}
+                      <input
+                        className={styles.input}
+                        type="text"
+                        value={profileForm.phone}
+                        onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
                       />
                     </div>
                     <div className={styles.formGroup} style={{ gridColumn: "span 2" }}>
                       <label className={styles.label}>Campus Address</label>
-                      <input 
-                        className={styles.input} 
-                        type="text" 
-                        value={profileForm.address} 
-                        onChange={(e) => setProfileForm({...profileForm, address: e.target.value})}
+                      <input
+                        className={styles.input}
+                        type="text"
+                        value={profileForm.address}
+                        onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })}
                       />
                     </div>
                     <div className={styles.formGroup} style={{ gridColumn: "span 2" }}>
                       <label className={styles.label}>Emergency Contact</label>
-                      <input 
-                        className={styles.input} 
-                        type="text" 
-                        value={profileForm.emergencyContact} 
-                        onChange={(e) => setProfileForm({...profileForm, emergencyContact: e.target.value})}
+                      <input
+                        className={styles.input}
+                        type="text"
+                        value={profileForm.emergencyContact}
+                        onChange={(e) => setProfileForm({ ...profileForm, emergencyContact: e.target.value })}
                       />
                     </div>
                   </div>
-                  
+
                   <div className={styles.btnGroup}>
                     <button type="button" className={styles.btnCancel} onClick={() => triggerToast("Reverted to saved values.")}>Cancel</button>
                     <button type="submit" className={styles.btnSave} disabled={isSaving}>
@@ -229,64 +229,64 @@ export default function StudentSettingsPage() {
                   <div className={styles.formGrid}>
                     <div className={styles.formGroup}>
                       <label className={styles.label}>Degree Program</label>
-                      <input 
-                        className={`${styles.input} ${styles.inputDisabled}`} 
-                        type="text" 
-                        value={academicForm.program} 
+                      <input
+                        className={`${styles.input} ${styles.inputDisabled}`}
+                        type="text"
+                        value={academicForm.program}
                         disabled
                       />
                     </div>
                     <div className={styles.formGroup}>
                       <label className={styles.label}>Department</label>
-                      <input 
-                        className={`${styles.input} ${styles.inputDisabled}`} 
-                        type="text" 
-                        value={academicForm.department} 
+                      <input
+                        className={`${styles.input} ${styles.inputDisabled}`}
+                        type="text"
+                        value={academicForm.department}
                         disabled
                       />
                     </div>
                     <div className={styles.formGroup}>
                       <label className={styles.label}>Academic Year</label>
-                      <input 
-                        className={`${styles.input} ${styles.inputDisabled}`} 
-                        type="text" 
-                        value={academicForm.academicYear} 
+                      <input
+                        className={`${styles.input} ${styles.inputDisabled}`}
+                        type="text"
+                        value={academicForm.academicYear}
                         disabled
                       />
                     </div>
                     <div className={styles.formGroup}>
                       <label className={styles.label}>Active Semester</label>
-                      <input 
-                        className={`${styles.input} ${styles.inputDisabled}`} 
-                        type="text" 
-                        value={academicForm.semester} 
+                      <input
+                        className={`${styles.input} ${styles.inputDisabled}`}
+                        type="text"
+                        value={academicForm.semester}
                         disabled
                       />
                     </div>
                     <div className={styles.formGroup}>
                       <label className={styles.label}>Faculty Advisor</label>
-                      <input 
-                        className={`${styles.input} ${styles.inputDisabled}`} 
-                        type="text" 
-                        value={academicForm.advisorName} 
+                      <input
+                        className={`${styles.input} ${styles.inputDisabled}`}
+                        type="text"
+                        value={academicForm.advisorName}
                         disabled
                       />
                     </div>
                     <div className={styles.formGroup}>
                       <label className={styles.label}>Cumulative CGPA</label>
-                      <input 
-                        className={`${styles.input} ${styles.inputDisabled}`} 
-                        type="text" 
-                        value={academicForm.cgpa} 
+                      <input
+                        className={`${styles.input} ${styles.inputDisabled}`}
+                        type="text"
+                        value={academicForm.cgpa}
                         disabled
                       />
                     </div>
                     <div className={styles.formGroup} style={{ gridColumn: "span 2" }}>
                       <label className={styles.label}>Preferred Learning Mode</label>
-                      <select 
-                        className={styles.select} 
+                      <select
+                        className={styles.select}
                         value={academicForm.learningMode}
-                        onChange={(e) => setAcademicForm({...academicForm, learningMode: e.target.value})}
+                        onChange={(e) => setAcademicForm({ ...academicForm, learningMode: e.target.value })}
                       >
                         <option>Hybrid / Classroom</option>
                         <option>In-Person Campus Only</option>
@@ -388,11 +388,11 @@ export default function StudentSettingsPage() {
                     <div className={styles.toggleDesc}>Get notified 15 minutes before scheduled lectures and practical sessions.</div>
                   </div>
                   <label className={styles.switch}>
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       checked={notifications.timetableReminders}
                       onChange={(e) => {
-                        setNotifications({...notifications, timetableReminders: e.target.checked});
+                        setNotifications({ ...notifications, timetableReminders: e.target.checked });
                         triggerToast("Alert preference saved!");
                       }}
                     />
@@ -406,11 +406,11 @@ export default function StudentSettingsPage() {
                     <div className={styles.toggleDesc}>Receive immediate notification if course attendance drops close to 75%.</div>
                   </div>
                   <label className={styles.switch}>
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       checked={notifications.attendanceAlerts}
                       onChange={(e) => {
-                        setNotifications({...notifications, attendanceAlerts: e.target.checked});
+                        setNotifications({ ...notifications, attendanceAlerts: e.target.checked });
                         triggerToast("Alert preference saved!");
                       }}
                     />
@@ -424,11 +424,11 @@ export default function StudentSettingsPage() {
                     <div className={styles.toggleDesc}>Instant alerts when faculty upload new study notes or lecture slides.</div>
                   </div>
                   <label className={styles.switch}>
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       checked={notifications.resourceUploads}
                       onChange={(e) => {
-                        setNotifications({...notifications, resourceUploads: e.target.checked});
+                        setNotifications({ ...notifications, resourceUploads: e.target.checked });
                         triggerToast("Alert preference saved!");
                       }}
                     />
@@ -442,11 +442,11 @@ export default function StudentSettingsPage() {
                     <div className={styles.toggleDesc}>Receive an aggregated email summary of attendance and course updates every Monday.</div>
                   </div>
                   <label className={styles.switch}>
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       checked={notifications.weeklyDigest}
                       onChange={(e) => {
-                        setNotifications({...notifications, weeklyDigest: e.target.checked});
+                        setNotifications({ ...notifications, weeklyDigest: e.target.checked });
                         triggerToast("Alert preference saved!");
                       }}
                     />
@@ -554,7 +554,7 @@ export default function StudentSettingsPage() {
             <div className={styles.quickActionTitle}>Security & Account Credentials</div>
             <div className={styles.quickActionDesc}>Manage password security, active student portal sessions, and multi-factor authentication.</div>
           </div>
-          <button 
+          <button
             className={styles.quickActionBtn}
             onClick={() => setActiveTab("Security")}
           >
@@ -568,7 +568,7 @@ export default function StudentSettingsPage() {
             <div className={styles.quickActionTitle}>Official Documents & Records</div>
             <div className={styles.quickActionDesc}>View and download verified university student ID, academic transcripts, and bonafide letters.</div>
           </div>
-          <button 
+          <button
             className={styles.quickActionBtn}
             onClick={() => setActiveTab("Documents")}
           >

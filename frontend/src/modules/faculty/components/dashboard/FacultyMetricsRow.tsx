@@ -4,10 +4,16 @@ import React from "react";
 import styles from "../../styles/faculty-dashboard.module.css";
 import { mockKPIs } from "../../constants/mockData";
 
-export default function FacultyMetricsRow() {
+interface FacultyMetricsRowProps {
+  data?: any;
+}
+
+export default function FacultyMetricsRow({ data }: FacultyMetricsRowProps) {
+  const displayKpis = data?.metrics || mockKPIs;
+
   return (
     <div className={styles.metricsGrid}>
-      {mockKPIs.map((kpi, index) => {
+      {displayKpis.map((kpi: any, index: number) => {
         const Icon = kpi.icon;
         return (
           <div 

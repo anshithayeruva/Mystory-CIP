@@ -50,16 +50,16 @@ export default function StudentCoursesPage() {
       {/* Course Cards Grid - Equal Card Height & Uniform Bottom Pinned Buttons */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "20px" }}>
         {filteredCourses.map((course) => (
-          <div 
-            key={course.id} 
-            className={styles.card} 
-            style={{ 
-              display: "flex", 
-              flexDirection: "column", 
-              justifyContent: "space-between", 
-              height: "100%", 
-              padding: "20px", 
-              gap: "16px" 
+          <div
+            key={course.id}
+            className={styles.card}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              height: "100%",
+              padding: "20px",
+              gap: "16px"
             }}
           >
             {/* Card Header: Code & Credits */}
@@ -102,9 +102,9 @@ export default function StudentCoursesPage() {
             </div>
 
             {/* Uniform Action Button Pinned to Card Bottom */}
-            <Link 
-              href={`/student/courses/${course.id}`} 
-              className={styles.btnPrimary} 
+            <Link
+              href={`/student/courses/${course.id}`}
+              className={styles.btnPrimary}
               style={{ justifyContent: "center", marginTop: "auto", width: "100%" }}
             >
               View Course Details <ArrowRight size={14} />

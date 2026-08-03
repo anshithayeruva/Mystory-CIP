@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -18,6 +18,7 @@ import {
   FileText
 } from "lucide-react";
 import styles from "./reports.module.css";
+import { HodService } from "@/services/hod.service";
 
 interface SubjectReport {
   id: string;
@@ -69,62 +70,6 @@ const initialSubjectReports: SubjectReport[] = [
     score: 62,
     status: "UNDER REVIEW",
   },
-  {
-    id: "6",
-    code: "DAA",
-    name: "Design & Analysis of Algorithms",
-    staff: "Dr. Sneha Roy",
-    score: 91,
-    status: "EXCELLENT",
-  },
-  {
-    id: "7",
-    code: "SE",
-    name: "Software Engineering",
-    staff: "Prof. Meera Joshi",
-    score: 78,
-    status: "ON TRACK",
-  },
-  {
-    id: "8",
-    code: "WC",
-    name: "Web Development & Cloud",
-    staff: "Dr. Ananya Reddy",
-    score: 85,
-    status: "EXCELLENT",
-  },
-  {
-    id: "9",
-    code: "CS",
-    name: "Cyber Security & Cryptography",
-    staff: "Prof. Sunita Patil",
-    score: 58,
-    status: "NEEDS ATTENTION",
-  },
-  {
-    id: "10",
-    code: "CD",
-    name: "Compiler Design",
-    staff: "Dr. Manoj Verma",
-    score: 72,
-    status: "ON TRACK",
-  },
-  {
-    id: "11",
-    code: "DM",
-    name: "Discrete Mathematics",
-    staff: "Prof. R. C. Rao",
-    score: 68,
-    status: "ON TRACK",
-  },
-  {
-    id: "12",
-    code: "CA",
-    name: "Computer Architecture",
-    staff: "Dr. Alok Nath",
-    score: 64,
-    status: "UNDER REVIEW",
-  },
 ];
 
 export default function HodReportsPage() {
@@ -167,6 +112,46 @@ export default function HodReportsPage() {
 
   // Mastery Detail Modal
   const [isMasteryModalOpen, setIsMasteryModalOpen] = useState(false);
+
+  // Fetch Reports from Backend API
+  useEffect(() => {
+    async function loadReports() {
+      try {
+        const response = await HodService.getDepartmentReports();
+        if (response && response.success && response.data) {
+          if (response.data.metrics) {
+            setMetrics((prev) => ({
+              ...prev,
+              understanding: response.data.metrics.avgSyllabusCompletion || prev.understanding,
+              attendance: response.data.metrics.avgAttendance || prev.attendance,
+              activeEngagement: response.data.metrics.totalEvaluatedStudents || prev.activeEngagement,
+            }));
+          }
+          if (response.data.subjectReports && response.data.subjectReports.length > 0) {
+            setSubjectReports(response.data.subjectReports);
+          }
+        }
+      } catch (err) {
+        console.warn("Backend reports API offline, using interactive state:", err);
+      }
+    }
+    loadReports();
+  }, []);
+
+  const handleExport = async () => {
+    try {
+      await HodService.exportReport({
+        title: `${selectedSemester} Department Performance Analytics`,
+        type: "ANALYTICS",
+        format: exportFormat,
+      });
+      alert(`Report exported successfully as ${exportFormat}!`);
+    } catch (err) {
+      console.warn("Backend export notice:", err);
+      alert(`Exporting ${selectedSemester} Analytics Report (${exportFormat})...`);
+    }
+    setIsExportModalOpen(false);
+  };
 
   // Filtering & Display Slice
   const filteredSubjects = subjectReports.filter(
@@ -376,7 +361,6 @@ export default function HodReportsPage() {
                 strokeWidth="3"
                 strokeLinecap="round"
               />
-              {/* Plot Data Dots */}
               <circle cx="10" cy="110" r="4" fill="#00522E" />
               <circle cx="170" cy="80" r="4" fill="#00522E" />
               <circle cx="330" cy="72" r="4" fill="#00522E" />
@@ -400,8 +384,6 @@ export default function HodReportsPage() {
               Student categorization based on assessment scores.
             </p>
           </div>
-
-
 
           <div className={styles.masteryList}>
             <div className={styles.masteryItem}>
@@ -767,10 +749,7 @@ export default function HodReportsPage() {
               <button
                 type="button"
                 className={styles.submitModalBtn}
-                onClick={() => {
-                  alert(`Downloading ${selectedSemester} Department Analytics Report (${exportFormat})...`);
-                  setIsExportModalOpen(false);
-                }}
+                onClick={handleExport}
               >
                 Download Report
               </button>
@@ -798,19 +777,19 @@ export default function HodReportsPage() {
               <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "8px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", backgroundColor: "#f0fdf4", borderRadius: "8px", borderLeft: "4px solid #16a34a" }}>
                   <span style={{ fontWeight: 700, color: "#16a34a" }}>Advanced Mastery (85% – 100%)</span>
-                  <span style={{ fontWeight: 800, color: "#0f172a" }}>124 Students (27.4%)</span>
+                  <span style={{ fontWeight: 700 }}>124 Students</span>
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", backgroundColor: "#e6f4ea", borderRadius: "8px", borderLeft: "4px solid #00522e" }}>
-                  <span style={{ fontWeight: 700, color: "#00522e" }}>Proficient (60% – 84%)</span>
-                  <span style={{ fontWeight: 800, color: "#0f172a" }}>240 Students (53.1%)</span>
+                <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", backgroundColor: "#f0fdf4", borderRadius: "8px", borderLeft: "4px solid #15803d" }}>
+                  <span style={{ fontWeight: 700, color: "#15803d" }}>Proficient (60% – 84%)</span>
+                  <span style={{ fontWeight: 700 }}>240 Students</span>
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", backgroundColor: "#fffbeb", borderRadius: "8px", borderLeft: "4px solid #d97706" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", backgroundColor: "#fef3c7", borderRadius: "8px", borderLeft: "4px solid #d97706" }}>
                   <span style={{ fontWeight: 700, color: "#b45309" }}>Developing (40% – 59%)</span>
-                  <span style={{ fontWeight: 800, color: "#0f172a" }}>68 Students (15.0%)</span>
+                  <span style={{ fontWeight: 700 }}>68 Students</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 14px", backgroundColor: "#fef2f2", borderRadius: "8px", borderLeft: "4px solid #dc2626" }}>
-                  <span style={{ fontWeight: 700, color: "#b91c1c" }}>Critical Attention (&lt; 40%)</span>
-                  <span style={{ fontWeight: 800, color: "#0f172a" }}>20 Students (4.5%)</span>
+                  <span style={{ fontWeight: 700, color: "#991b1b" }}>Critical (&lt; 40%)</span>
+                  <span style={{ fontWeight: 700 }}>20 Students</span>
                 </div>
               </div>
             </div>
@@ -821,7 +800,7 @@ export default function HodReportsPage() {
                 className={styles.submitModalBtn}
                 onClick={() => setIsMasteryModalOpen(false)}
               >
-                Close Breakdown
+                Done
               </button>
             </div>
           </div>

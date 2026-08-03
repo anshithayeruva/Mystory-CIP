@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { 
   Plus, 
@@ -10,16 +10,12 @@ import {
   Brain, 
   ChevronRight, 
   Search, 
-  Filter, 
-  Clock, 
-  Sparkles, 
-  CheckCircle2, 
-  AlertCircle, 
+  RotateCcw,
   Radio,
-  FileText,
-  RotateCcw
+  FileText
 } from "lucide-react";
 import styles from "./pulse-sessions.module.css";
+import { FacultyService } from "@/services/faculty.service";
 
 interface AssessmentItem {
   id: string;
@@ -74,19 +70,37 @@ const MOCK_ASSESSMENTS: AssessmentItem[] = [
 ];
 
 export default function FacultyPulseSessionsPage() {
+  const [assessmentsList, setAssessmentsList] = useState<AssessmentItem[]>(MOCK_ASSESSMENTS);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState("All");
 
+  const fetchSessions = useCallback(async () => {
+    try {
+      const response = await FacultyService.getPulseSessions();
+      if (response && response.success && response.data) {
+        if (response.data.length > 0) {
+          setAssessmentsList(response.data);
+        }
+      }
+    } catch (err) {
+      console.warn("Backend pulse sessions API offline, using fallback state:", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSessions();
+  }, [fetchSessions]);
+
   // Calculated Metrics
-  const totalCount = MOCK_ASSESSMENTS.length;
-  const completedCount = MOCK_ASSESSMENTS.filter(a => a.status === "Completed").length;
-  const evaluatingCount = MOCK_ASSESSMENTS.filter(a => a.status === "Evaluating").length;
-  const liveCount = MOCK_ASSESSMENTS.filter(a => a.status === "Live").length;
+  const totalCount = assessmentsList.length;
+  const completedCount = assessmentsList.filter(a => a.status === "Completed").length;
+  const evaluatingCount = assessmentsList.filter(a => a.status === "Evaluating").length;
+  const liveCount = assessmentsList.filter(a => a.status === "Live").length;
 
   // Filtered Assessments List
   const filteredAssessments = useMemo(() => {
-    return MOCK_ASSESSMENTS.filter((item) => {
+    return assessmentsList.filter((item) => {
       const matchesSearch = 
         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -95,7 +109,7 @@ export default function FacultyPulseSessionsPage() {
       const matchesStatus = selectedStatus === "All" || item.status === selectedStatus;
       return matchesSearch && matchesSubject && matchesStatus;
     });
-  }, [searchTerm, selectedSubject, selectedStatus]);
+  }, [assessmentsList, searchTerm, selectedSubject, selectedStatus]);
 
   const handleResetFilters = () => {
     setSearchTerm("");
@@ -341,4 +355,3 @@ export default function FacultyPulseSessionsPage() {
     </div>
   );
 }
-

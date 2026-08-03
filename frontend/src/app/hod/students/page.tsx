@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { 
   Search, 
   Filter, 
@@ -10,10 +10,11 @@ import {
   Award,
   Eye,
   Pencil,
+  Trash2,
   X
 } from "lucide-react";
-import Link from "next/link";
 import styles from "./students.module.css";
+import { HodService } from "@/services/hod.service";
 
 interface StudentItem {
   id: string;
@@ -28,7 +29,6 @@ interface StudentItem {
 }
 
 const initialStudentData: StudentItem[] = [
-  // Page 1
   {
     id: "1",
     name: "Ethan Rivers",
@@ -84,126 +84,16 @@ const initialStudentData: StudentItem[] = [
     attendance: "89.5%",
     status: "Good Standing",
   },
-  // Page 2
-  {
-    id: "6",
-    name: "Maya Lin",
-    email: "m.lin@university.edu",
-    avatar: "ML",
-    regId: "2023CS033",
-    program: "B.Tech CS • Year IV",
-    section: "Section A",
-    attendance: "94.0%",
-    status: "Honor Roll",
-  },
-  {
-    id: "7",
-    name: "Lucas Rossi",
-    email: "l.rossi@university.edu",
-    avatar: "LR",
-    regId: "2023CS072",
-    program: "B.Tech CS • Year I",
-    section: "Section B",
-    attendance: "81.2%",
-    status: "Good Standing",
-  },
-  {
-    id: "8",
-    name: "Aaliyah Khan",
-    email: "a.khan@university.edu",
-    avatar: "AK",
-    regId: "2023CS104",
-    program: "B.Tech CS • Year II",
-    section: "Section C",
-    attendance: "64.5%",
-    status: "Academic Warning",
-  },
-  {
-    id: "9",
-    name: "Benjamin Carter",
-    email: "b.carter@university.edu",
-    avatar: "BC",
-    regId: "2023CS058",
-    program: "B.Tech CS • Year III",
-    section: "Section A",
-    attendance: "91.0%",
-    status: "Good Standing",
-  },
-  {
-    id: "10",
-    name: "Zoe Martinez",
-    email: "z.martinez@university.edu",
-    avatar: "ZM",
-    regId: "2023CS119",
-    program: "B.Tech CS • Year IV",
-    section: "Section B",
-    attendance: "96.5%",
-    status: "Honor Roll",
-  },
-  // Page 3
-  {
-    id: "11",
-    name: "Devon Hughes",
-    email: "d.hughes@university.edu",
-    avatar: "DH",
-    regId: "2023CS024",
-    program: "B.Tech CS • Year I",
-    section: "Section A",
-    attendance: "88.0%",
-    status: "Good Standing",
-  },
-  {
-    id: "12",
-    name: "Elena Popov",
-    email: "e.popov@university.edu",
-    avatar: "EP",
-    regId: "2023CS087",
-    program: "B.Tech CS • Year II",
-    section: "Section C",
-    attendance: "52.5%",
-    status: "At-Risk",
-  },
-  {
-    id: "13",
-    name: "Gabriel Santos",
-    email: "g.santos@university.edu",
-    avatar: "GS",
-    regId: "2023CS140",
-    program: "B.Tech CS • Year III",
-    section: "Section D",
-    attendance: "90.2%",
-    status: "Good Standing",
-  },
-  {
-    id: "14",
-    name: "Hannah Abbott",
-    email: "h.abbott@university.edu",
-    avatar: "HA",
-    regId: "2023CS061",
-    program: "B.Tech CS • Year IV",
-    section: "Section A",
-    attendance: "97.1%",
-    status: "Honor Roll",
-  },
-  {
-    id: "15",
-    name: "Ibrahim Ali",
-    email: "i.ali@university.edu",
-    avatar: "IA",
-    regId: "2023CS155",
-    program: "B.Tech CS • Year I",
-    section: "Section B",
-    attendance: "85.4%",
-    status: "Good Standing",
-  },
 ];
 
 export default function HodStudentsPage() {
   const [studentList, setStudentList] = useState<StudentItem[]>(initialStudentData);
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
   
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(1284);
   const itemsPerPage = 5;
 
   // Modal State
@@ -216,6 +106,33 @@ export default function HodStudentsPage() {
   const [sectionFilter, setSectionFilter] = useState("ALL");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const filterRef = useRef<HTMLDivElement>(null);
+
+  // Fetch student list from Backend
+  const fetchStudents = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await HodService.getStudentsList({
+        search: searchQuery,
+        page: currentPage,
+        limit: itemsPerPage
+      });
+
+      if (response && response.success && response.data?.data) {
+        if (response.data.data.length > 0) {
+          setStudentList(response.data.data);
+          setTotalCount(response.data.pagination?.total || response.data.data.length);
+        }
+      }
+    } catch (err) {
+      console.warn("Backend API offline or using demo student data:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [searchQuery, currentPage, itemsPerPage]);
+
+  useEffect(() => {
+    fetchStudents();
+  }, [fetchStudents]);
 
   // Auto-close filter dropdown when clicking outside
   useEffect(() => {
@@ -278,11 +195,10 @@ export default function HodStudentsPage() {
     setIsModalOpen(true);
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim()) return;
 
-    // Generate Initials
     const nameParts = formData.name.trim().split(" ");
     let initials = "ST";
     if (nameParts.length >= 2) {
@@ -299,43 +215,69 @@ export default function HodStudentsPage() {
       ? formData.email.trim()
       : `${formData.name.toLowerCase().replace(/\s+/g, ".")}@university.edu`;
 
-    if (editingId) {
-      // Edit existing student
-      setStudentList((prev) =>
-        prev.map((s) =>
-          s.id === editingId
-            ? {
-                ...s,
-                name: formData.name.trim(),
-                email: generatedEmail,
-                avatar: initials,
-                regId: generatedRegId,
-                program: formData.program,
-                section: formData.section,
-                attendance: formData.attendance,
-                status: formData.status,
-              }
-            : s
-        )
-      );
-    } else {
-      // Add new student
-      const newStudentItem: StudentItem = {
-        id: Date.now().toString(),
-        name: formData.name.trim(),
-        email: generatedEmail,
-        avatar: initials,
-        regId: generatedRegId,
-        program: formData.program,
-        section: formData.section,
-        attendance: formData.attendance || "90.0%",
-        status: formData.status,
-      };
-      setStudentList((prev) => [newStudentItem, ...prev]);
-      setCurrentPage(1);
+    try {
+      if (editingId) {
+        await HodService.updateStudent(editingId, {
+          name: formData.name.trim(),
+          email: generatedEmail,
+          rollNumber: generatedRegId,
+        });
+
+        setStudentList((prev) =>
+          prev.map((s) =>
+            s.id === editingId
+              ? {
+                  ...s,
+                  name: formData.name.trim(),
+                  email: generatedEmail,
+                  avatar: initials,
+                  regId: generatedRegId,
+                  program: formData.program,
+                  section: formData.section,
+                  attendance: formData.attendance,
+                  status: formData.status,
+                }
+              : s
+          )
+        );
+      } else {
+        await HodService.createStudent({
+          name: formData.name.trim(),
+          email: generatedEmail,
+          rollNumber: generatedRegId,
+        });
+
+        const newStudentItem: StudentItem = {
+          id: Date.now().toString(),
+          name: formData.name.trim(),
+          email: generatedEmail,
+          avatar: initials,
+          regId: generatedRegId,
+          program: formData.program,
+          section: formData.section,
+          attendance: formData.attendance || "90.0%",
+          status: formData.status,
+        };
+        setStudentList((prev) => [newStudentItem, ...prev]);
+        setTotalCount((prev) => prev + 1);
+        setCurrentPage(1);
+      }
+    } catch (err) {
+      console.warn("Backend API action error, updating local state:", err);
     }
 
     setIsModalOpen(false);
+  };
+
+  const handleDeleteStudent = async (id: string) => {
+    if (!confirm("Are you sure you want to remove this student record?")) return;
+    try {
+      await HodService.deleteStudent(id);
+    } catch (err) {
+      console.warn("Backend delete error:", err);
+    }
+    setStudentList((prev) => prev.filter((s) => s.id !== id));
+    setTotalCount((prev) => Math.max(0, prev - 1));
   };
 
   const resetFilters = () => {
@@ -372,7 +314,6 @@ export default function HodStudentsPage() {
     return matchesSearch && matchesProgram && matchesSection && matchesStatus;
   });
 
-  // Calculate Pagination
   const totalPages = Math.max(1, Math.ceil(filteredStudents.length / itemsPerPage));
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = Math.min(startIndex + itemsPerPage, filteredStudents.length);
@@ -541,7 +482,7 @@ export default function HodStudentsPage() {
                   <tr key={item.id}>
                     <td>
                       <div className={styles.studentProfile}>
-                        <div className={styles.avatarCircle}>{item.avatar}</div>
+                        <div className={styles.avatarCircle}>{item.avatar || "ST"}</div>
                         <div className={styles.studentDetails}>
                           <span className={styles.studentName}>{item.name}</span>
                           <span className={styles.studentEmail}>{item.email}</span>
@@ -571,18 +512,20 @@ export default function HodStudentsPage() {
                       <div className={styles.actionsGroup}>
                         <button 
                           className={styles.actionCellBtn}
-                          title={`View ${item.name}`}
-                          aria-label={`View ${item.name}`}
-                        >
-                          <Eye size={17} />
-                        </button>
-                        <button 
-                          className={styles.actionCellBtn}
                           title={`Edit ${item.name}`}
                           aria-label={`Edit ${item.name}`}
                           onClick={() => openEditModal(item)}
                         >
                           <Pencil size={16} />
+                        </button>
+                        <button 
+                          className={styles.actionCellBtn}
+                          title={`Delete ${item.name}`}
+                          aria-label={`Delete ${item.name}`}
+                          onClick={() => handleDeleteStudent(item.id)}
+                          style={{ color: '#ef4444' }}
+                        >
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </td>
@@ -602,7 +545,7 @@ export default function HodStudentsPage() {
         {/* Table Pagination */}
         <div className={styles.paginationRow}>
           <div className={styles.paginationText}>
-            Showing <strong>{filteredStudents.length === 0 ? 0 : startIndex + 1}-{endIndex}</strong> of <strong>{filteredStudents.length + 1269}</strong> students
+            Showing <strong>{filteredStudents.length === 0 ? 0 : startIndex + 1}-{endIndex}</strong> of <strong>{totalCount}</strong> students
           </div>
           <div className={styles.paginationControls}>
             <button 
@@ -642,7 +585,7 @@ export default function HodStudentsPage() {
           </div>
           <div className={styles.summaryInfo}>
             <span className={styles.summaryTitle}>Total Enrolled Students</span>
-            <div className={styles.summaryValue}>1,284</div>
+            <div className={styles.summaryValue}>{totalCount.toLocaleString()}</div>
             <div className={styles.summarySubtext}>
               <span className={styles.subtextGreen}>↑ 5.2%</span> from last academic term
             </div>
@@ -667,7 +610,7 @@ export default function HodStudentsPage() {
           <div className={styles.summaryInfo}>
             <span className={styles.summaryTitle}>Good Standing Rate</span>
             <div className={styles.summaryValue}>94.2%</div>
-            <div className={styles.summarySubtext}>1,210 students in good standing</div>
+            <div className={styles.summarySubtext}>Students in good standing</div>
           </div>
         </div>
       </div>
@@ -810,29 +753,13 @@ export default function HodStudentsPage() {
                   type="submit"
                   className={styles.submitModalBtn}
                 >
-                  {editingId ? "Save Changes" : "Enroll Student"}
+                  {editingId ? "Save Changes" : "Add Student"}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
-
-      {/* Page Footer */}
-      <footer className={styles.pageFooter}>
-        <div>© 2024 MyStory CIP Academic Management. All rights reserved.</div>
-        <div className={styles.footerLinks}>
-          <Link href="#" className={styles.footerLink}>
-            Terms of Service
-          </Link>
-          <Link href="#" className={styles.footerLink}>
-            Privacy Policy
-          </Link>
-          <Link href="#" className={styles.footerLink}>
-            Student Portal Guide
-          </Link>
-        </div>
-      </footer>
     </div>
   );
 }
