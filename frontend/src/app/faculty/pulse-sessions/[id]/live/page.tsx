@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { 
-  Users, 
-  CheckCircle2, 
-  Pause, 
+import {
+  Users,
+  CheckCircle2,
+  Pause,
   Square,
   QrCode,
   Clock,
@@ -87,13 +87,13 @@ export default function LivePulseSession() {
               Are you sure you want to end this assessment early? Students will not be able to submit any further answers.
             </p>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px" }}>
-              <button 
+              <button
                 onClick={() => setShowEndConfirm(false)}
                 style={{ padding: "8px 16px", borderRadius: "6px", border: "1px solid #cbd5e1", backgroundColor: "#fff", color: "var(--text-main)", fontWeight: 600, cursor: "pointer" }}
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={confirmEndSession}
                 style={{ padding: "8px 16px", borderRadius: "6px", border: "1px solid #0f172a", backgroundColor: "#0f172a", color: "#fff", fontWeight: 600, cursor: "pointer" }}
               >
@@ -127,7 +127,7 @@ export default function LivePulseSession() {
       <div className={styles.mainGrid}>
         {/* Left Column */}
         <div className={styles.leftColumn}>
-          
+
           <div className={styles.card}>
             <div className={styles.cardHeader} style={{ fontSize: "1.125rem", fontWeight: 600, padding: "16px 20px", borderBottom: "1px solid #e2e8f0", backgroundColor: "#fff", borderTopLeftRadius: "8px", borderTopRightRadius: "8px" }}>
               Live Progress
@@ -169,10 +169,10 @@ export default function LivePulseSession() {
                       <td style={{ padding: "16px 20px", color: "var(--text-muted)", fontSize: "0.875rem" }}>{student.roll}</td>
                       <td style={{ padding: "16px 20px", color: "var(--text-muted)", fontSize: "0.875rem" }}>{student.joinedAt}</td>
                       <td style={{ padding: "16px 20px" }}>
-                        <span style={{ 
-                          padding: "4px 8px", 
-                          borderRadius: "999px", 
-                          fontSize: "0.75rem", 
+                        <span style={{
+                          padding: "4px 8px",
+                          borderRadius: "999px",
+                          fontSize: "0.75rem",
                           fontWeight: 600,
                           backgroundColor: "#f1f5f9",
                           color: "#475569",
@@ -192,7 +192,7 @@ export default function LivePulseSession() {
 
         {/* Right Column */}
         <div className={styles.rightColumn}>
-          
+
           <div className={styles.card}>
             <div className={styles.cardHeader} style={{ fontSize: "1.125rem", fontWeight: 600, padding: "16px 20px", borderBottom: "1px solid #e2e8f0", backgroundColor: "#fff", borderTopLeftRadius: "8px", borderTopRightRadius: "8px" }}>
               Join Details
@@ -204,20 +204,20 @@ export default function LivePulseSession() {
                 </div>
                 <p style={{ fontSize: "0.875rem", color: "var(--text-muted)", fontWeight: 500 }}>Scan to Join</p>
               </div>
-              
+
               <div style={{ width: "100%", padding: "16px", backgroundColor: "#f8fafc", borderRadius: "8px", border: "1px dashed #cbd5e1", textAlign: "center" }}>
                 <p style={{ fontSize: "0.75rem", textTransform: "uppercase", fontWeight: 600, color: "var(--text-muted)", marginBottom: "4px" }}>Session Code</p>
                 <p style={{ fontSize: "2rem", fontWeight: 700, color: "#10633b", letterSpacing: "0.1em" }}>DSA-4921</p>
               </div>
 
               <div style={{ display: "flex", gap: "12px", width: "100%" }}>
-                <button 
+                <button
                   onClick={handleCopyCode}
                   style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1", backgroundColor: "#fff", color: "var(--text-main)", fontWeight: 600, cursor: "pointer", fontSize: "0.875rem", transition: "background-color 0.2s" }}
                 >
                   <Copy size={16} /> Copy Code
                 </button>
-                <button 
+                <button
                   onClick={handleShareLink}
                   style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1", backgroundColor: "#fff", color: "var(--text-main)", fontWeight: 600, cursor: "pointer", fontSize: "0.875rem", transition: "background-color 0.2s" }}
                 >
@@ -232,24 +232,24 @@ export default function LivePulseSession() {
               Session Controls
             </div>
             <div className={styles.controlsBox} style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={() => setIsPaused(!isPaused)}
                 style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #cbd5e1", backgroundColor: "#fff", color: "var(--text-main)", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", fontSize: "0.875rem" }}
               >
                 {isPaused ? <CheckCircle2 size={18} /> : <Pause size={18} />}
                 {isPaused ? "Resume Assessment" : "Pause Assessment"}
               </button>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={handleExtendTime}
                 style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #cbd5e1", backgroundColor: "#fff", color: "var(--text-main)", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", fontSize: "0.875rem" }}
               >
                 <Timer size={18} />
                 Extend Time (+5m)
               </button>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={handleEndSession}
                 style={{ width: "100%", padding: "12px", borderRadius: "8px", border: "1px solid #cbd5e1", backgroundColor: "#fff", color: "var(--text-main)", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", fontSize: "0.875rem", marginTop: "8px" }}
               >

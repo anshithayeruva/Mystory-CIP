@@ -1,31 +1,72 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { 
   TrendingUp, TrendingDown, GraduationCap, FileText, Calendar, Activity, 
   Building2, Users,    
-   Download, Info, X, FileSpreadsheet, FileJson,
-   Award, UserCheck, MoreVertical,  ArrowRight, ChevronLeft, ChevronRight
+  Download, Info, X, FileSpreadsheet, FileJson,
+  Award, UserCheck, MoreVertical,  ArrowRight, ChevronLeft, ChevronRight, Loader2
 } from "lucide-react";
 import styles from "./reports.module.css";
+import { AdminReportsService } from "../../../services/admin.reports.service";
 
-const reportsData = [
-  { id: 1, name: "Institution Performance Report", desc: "Overall academic performance across the institution.", date: "Oct 12, 2023", icon: FileText },
-  { id: 2, name: "Attendance Report", desc: "Student attendance and participation records.", date: "Oct 11, 2023", icon: Calendar },
-  { id: 3, name: "Understanding Report", desc: "Student understanding and learning performance.", date: "Oct 10, 2023", icon: Activity },
-  { id: 4, name: "Department Report", desc: "Department-wise academic performance.", date: "Oct 09, 2023", icon: Building2 },
-  { id: 5, name: "Staff Report", desc: "Staff assessment and teaching performance.", date: "Oct 08, 2023", icon: Users },
-  { id: 6, name: "Student Report", desc: "Individual student academic performance.", date: "Oct 07, 2023", icon: GraduationCap },
-];
+// Use dynamic icons for the reports
+const getIconComponent = (iconName: string) => {
+  switch (iconName) {
+    case 'FileText': return FileText;
+    case 'Calendar': return Calendar;
+    case 'Activity': return Activity;
+    case 'Building2': return Building2;
+    case 'Users': return Users;
+    case 'GraduationCap': return GraduationCap;
+    default: return FileText;
+  }
+};
 
 export default function ReportsAnalyticsPage() {
   const [activeTab, setActiveTab] = useState("overview");
+  
+  // Data State
+  const [metrics, setMetrics] = useState<any>(null);
+  const [mastery, setMastery] = useState<any[]>([]);
+  const [trend, setTrend] = useState<any>(null);
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [reportsData, setReportsData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   
   // Modal State
   const [downloadModalOpen, setDownloadModalOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<any>(null);
   const [selectedFormat, setSelectedFormat] = useState("pdf");
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        if (activeTab === "overview") {
+          const [met, mast, tr, depts] = await Promise.all([
+            AdminReportsService.getOverviewMetrics(),
+            AdminReportsService.getMasteryDistribution(),
+            AdminReportsService.getUnderstandingTrend(),
+            AdminReportsService.getDepartmentPerformance(1, 5) // page 1, limit 5
+          ]);
+          setMetrics(met);
+          setMastery(mast);
+          setTrend(tr);
+          setDepartments(depts.data);
+        } else {
+          const reps = await AdminReportsService.getAvailableReports();
+          setReportsData(reps);
+        }
+      } catch (error) {
+        console.error("Failed to load data", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, [activeTab]);
 
   const openDownloadModal = (report: unknown) => {
     setSelectedReport(report);
@@ -36,6 +77,13 @@ export default function ReportsAnalyticsPage() {
   const closeDownloadModal = () => {
     setDownloadModalOpen(false);
     setSelectedReport(null);
+  };
+
+  const handleDownloadConfirm = () => {
+    if (!selectedReport) return;
+    const url = AdminReportsService.downloadReportUrl(selectedReport.id, selectedFormat);
+    window.open(url, '_blank');
+    closeDownloadModal();
   };
 
   return (
@@ -69,7 +117,11 @@ export default function ReportsAnalyticsPage() {
         </div>
       </div>
 
-      {activeTab === "overview" ? (
+      {loading ? (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+          <Loader2 className="animate-spin" style={{ marginRight: '8px' }} /> Loading...
+        </div>
+      ) : activeTab === "overview" ? (
         <div className={styles.overviewContainer}>
           
           <div className={styles.topMetricsGrid}>
@@ -79,7 +131,7 @@ export default function ReportsAnalyticsPage() {
                 <Award size={18} className={styles.metricIconNew} />
               </div>
               <div className={styles.metricValueRow}>
-                <span className={styles.metricValueNew}>84%</span>
+                <span className={styles.metricValueNew}>{metrics?.overallUnderstanding ?? 0}%</span>
                 <span className={styles.trendUp}><TrendingUp size={12}/> +2.4%</span>
               </div>
             </div>
@@ -90,7 +142,7 @@ export default function ReportsAnalyticsPage() {
                 <UserCheck size={18} className={styles.metricIconNew} />
               </div>
               <div className={styles.metricValueRow}>
-                <span className={styles.metricValueNew}>12,480</span>
+                <span className={styles.metricValueNew}>{metrics?.studentsAssessed?.toLocaleString() ?? 0}</span>
                 <span className={styles.metricSubtext}>Total Population</span>
               </div>
             </div>
@@ -101,7 +153,7 @@ export default function ReportsAnalyticsPage() {
                 <Calendar size={18} className={styles.metricIconNew} />
               </div>
               <div className={styles.metricValueRow}>
-                <span className={styles.metricValueNew}>89%</span>
+                <span className={styles.metricValueNew}>{metrics?.overallAttendance ?? 0}%</span>
                 <span className={styles.trendDown}><TrendingDown size={12}/> -0.8%</span>
               </div>
             </div>
@@ -112,7 +164,7 @@ export default function ReportsAnalyticsPage() {
                 <Building2 size={18} className={styles.metricIconNew} />
               </div>
               <div className={styles.metricValueRow}>
-                <span className={styles.metricValueNew}>18</span>
+                <span className={styles.metricValueNew}>{metrics?.departmentsCount ?? 0}</span>
                 <span className={styles.metricSubtext}>Active Faculties</span>
               </div>
             </div>
@@ -126,45 +178,19 @@ export default function ReportsAnalyticsPage() {
               </div>
               
               <div className={styles.masteryList}>
-                <div className={styles.masteryItem}>
-                  <div className={styles.masteryTop}>
-                    <span className={styles.masteryLabel} style={{color: "#005233"}}>Mastered</span>
-                    <span className={styles.masteryStats}><strong>32%</strong> (3,994 Students)</span>
+                {mastery.map((item, i) => (
+                  <div className={styles.masteryItem} key={i}>
+                    <div className={styles.masteryTop}>
+                      <span className={styles.masteryLabel} style={{color: item.color}}>{item.level}</span>
+                      <span className={styles.masteryStats}>
+                        <strong style={{color: item.color}}>{item.percentage}%</strong> ({item.count?.toLocaleString()} Students)
+                      </span>
+                    </div>
+                    <div className={styles.masteryBarBg}>
+                      <div className={styles.masteryBarFill} style={{width: `${item.percentage}%`, backgroundColor: item.color}}></div>
+                    </div>
                   </div>
-                  <div className={styles.masteryBarBg}>
-                    <div className={styles.masteryBarFill} style={{width: "32%", backgroundColor: "#005233"}}></div>
-                  </div>
-                </div>
-
-                <div className={styles.masteryItem}>
-                  <div className={styles.masteryTop}>
-                    <span className={styles.masteryLabel} style={{color: "#143155"}}>Proficient</span>
-                    <span className={styles.masteryStats}><strong>42%</strong> (5,242 Students)</span>
-                  </div>
-                  <div className={styles.masteryBarBg}>
-                    <div className={styles.masteryBarFill} style={{width: "42%", backgroundColor: "#143155"}}></div>
-                  </div>
-                </div>
-
-                <div className={styles.masteryItem}>
-                  <div className={styles.masteryTop}>
-                    <span className={styles.masteryLabel} style={{color: "#2D476D"}}>Developing</span>
-                    <span className={styles.masteryStats}><strong>18%</strong> (2,246 Students)</span>
-                  </div>
-                  <div className={styles.masteryBarBg}>
-                    <div className={styles.masteryBarFill} style={{width: "18%", backgroundColor: "#2D476D"}}></div>
-                  </div>
-                </div>
-
-                <div className={styles.masteryItem}>
-                  <div className={styles.masteryTop}>
-                    <span className={styles.masteryLabel} style={{color: "#C4C8C2"}}>Needs Support</span>
-                    <span className={styles.masteryStats}><strong style={{color: "#C4C8C2"}}>8%</strong> (998 Students)</span>
-                  </div>
-                  <div className={styles.masteryBarBg}>
-                    <div className={styles.masteryBarFill} style={{width: "8%", backgroundColor: "#C4C8C2"}}></div>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
@@ -175,7 +201,7 @@ export default function ReportsAnalyticsPage() {
                   <div className={styles.chartPanelSub}>Institutional performance tracking from August to Current.</div>
                 </div>
                 <div className={styles.trendScore}>
-                  <div className={styles.trendScoreVal}>84%</div>
+                  <div className={styles.trendScoreVal}>{trend?.currentAvg ?? 0}%</div>
                   <div className={styles.trendScoreSub}>Current Avg</div>
                 </div>
               </div>
@@ -201,12 +227,9 @@ export default function ReportsAnalyticsPage() {
                   />
                 </svg>
                 <div className={styles.trendXAxis}>
-                  <span>Aug</span>
-                  <span>Sep</span>
-                  <span>Oct</span>
-                  <span>Nov</span>
-                  <span>Dec</span>
-                  <span>Current</span>
+                  {trend?.labels.map((lbl: string, i: number) => (
+                    <span key={i}>{lbl}</span>
+                  ))}
                 </div>
               </div>
             </div>
@@ -231,114 +254,40 @@ export default function ReportsAnalyticsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td className={styles.tdDept}>Computer Science</td>
-                    <td>
-                      <div className={styles.barCell}>
-                        <div className={styles.miniBarBg}><div className={styles.miniBarFill} style={{width: "91%"}}></div></div>
-                        <span className={styles.miniBarVal}>91%</span>
-                        <TrendingUp size={14} className={styles.iconGreen} />
-                      </div>
-                    </td>
-                    <td>
-                      <div className={styles.barCell}>
-                        <div className={styles.miniBarBg}><div className={styles.miniBarFill} style={{width: "93%"}}></div></div>
-                        <span className={styles.miniBarVal}>93%</span>
-                        <ArrowRight size={14} className={styles.iconGrey} />
-                      </div>
-                    </td>
-                    <td>820</td>
-                    <td><span className={styles.badgeExcellent}>Excellent</span></td>
-                    <td className={styles.tdAction}><MoreVertical size={16}/></td>
-                  </tr>
-                  
-                  <tr>
-                    <td className={styles.tdDept}>Business Administration</td>
-                    <td>
-                      <div className={styles.barCell}>
-                        <div className={styles.miniBarBg}><div className={styles.miniBarFillLight} style={{width: "88%"}}></div></div>
-                        <span className={styles.miniBarVal}>88%</span>
-                        <ArrowRight size={14} className={styles.iconGrey} />
-                      </div>
-                    </td>
-                    <td>
-                      <div className={styles.barCell}>
-                        <div className={styles.miniBarBg}><div className={styles.miniBarFillLight} style={{width: "90%"}}></div></div>
-                        <span className={styles.miniBarVal}>90%</span>
-                        <TrendingUp size={14} className={styles.iconGreen} />
-                      </div>
-                    </td>
-                    <td>540</td>
-                    <td><span className={styles.badgeGood}>Good</span></td>
-                    <td className={styles.tdAction}><MoreVertical size={16}/></td>
-                  </tr>
-                  
-                  <tr>
-                    <td className={styles.tdDept}>Mechanical Engineering</td>
-                    <td>
-                      <div className={styles.barCell}>
-                        <div className={styles.miniBarBg}><div className={styles.miniBarFillLight} style={{width: "82%"}}></div></div>
-                        <span className={styles.miniBarVal}>82%</span>
-                        <TrendingDown size={14} className={styles.iconRed} />
-                      </div>
-                    </td>
-                    <td>
-                      <div className={styles.barCell}>
-                        <div className={styles.miniBarBg}><div className={styles.miniBarFillLight} style={{width: "86%"}}></div></div>
-                        <span className={styles.miniBarVal}>86%</span>
-                        <ArrowRight size={14} className={styles.iconGrey} />
-                      </div>
-                    </td>
-                    <td>610</td>
-                    <td><span className={styles.badgeGood}>Good</span></td>
-                    <td className={styles.tdAction}><MoreVertical size={16}/></td>
-                  </tr>
-
-                  <tr>
-                    <td className={styles.tdDept}>Civil Engineering</td>
-                    <td>
-                      <div className={styles.barCell}>
-                        <div className={styles.miniBarBg}><div className={styles.miniBarFillRed} style={{width: "74%"}}></div></div>
-                        <span className={styles.miniBarVal}>74%</span>
-                        <TrendingDown size={14} className={styles.iconRed} />
-                      </div>
-                    </td>
-                    <td>
-                      <div className={styles.barCell}>
-                        <div className={styles.miniBarBg}><div className={styles.miniBarFillLight} style={{width: "78%"}}></div></div>
-                        <span className={styles.miniBarVal}>78%</span>
-                        <ArrowRight size={14} className={styles.iconGrey} />
-                      </div>
-                    </td>
-                    <td>430</td>
-                    <td><span className={styles.badgeNeedsAttention}>Needs Attention</span></td>
-                    <td className={styles.tdAction}><MoreVertical size={16}/></td>
-                  </tr>
-
-                  <tr>
-                    <td className={styles.tdDept}>Electronics</td>
-                    <td>
-                      <div className={styles.barCell}>
-                        <div className={styles.miniBarBg}><div className={styles.miniBarFill} style={{width: "89%"}}></div></div>
-                        <span className={styles.miniBarVal}>89%</span>
-                        <TrendingUp size={14} className={styles.iconGreen} />
-                      </div>
-                    </td>
-                    <td>
-                      <div className={styles.barCell}>
-                        <div className={styles.miniBarBg}><div className={styles.miniBarFill} style={{width: "91%"}}></div></div>
-                        <span className={styles.miniBarVal}>91%</span>
-                        <TrendingUp size={14} className={styles.iconGreen} />
-                      </div>
-                    </td>
-                    <td>590</td>
-                    <td><span className={styles.badgeExcellent}>Excellent</span></td>
-                    <td className={styles.tdAction}><MoreVertical size={16}/></td>
-                  </tr>
+                  {departments.map(dept => (
+                    <tr key={dept.id}>
+                      <td className={styles.tdDept}>{dept.name}</td>
+                      <td>
+                        <div className={styles.barCell}>
+                          <div className={styles.miniBarBg}>
+                            <div className={dept.understanding >= 80 ? styles.miniBarFill : dept.understanding >= 60 ? styles.miniBarFillLight : styles.miniBarFillRed} style={{width: `${dept.understanding}%`}}></div>
+                          </div>
+                          <span className={styles.miniBarVal}>{dept.understanding}%</span>
+                          {dept.trendUnderstanding === 'up' ? <TrendingUp size={14} className={styles.iconGreen} /> : dept.trendUnderstanding === 'down' ? <TrendingDown size={14} className={styles.iconRed} /> : <ArrowRight size={14} className={styles.iconGrey} />}
+                        </div>
+                      </td>
+                      <td>
+                        <div className={styles.barCell}>
+                          <div className={styles.miniBarBg}>
+                            <div className={dept.attendance >= 80 ? styles.miniBarFill : dept.attendance >= 60 ? styles.miniBarFillLight : styles.miniBarFillRed} style={{width: `${dept.attendance}%`}}></div>
+                          </div>
+                          <span className={styles.miniBarVal}>{dept.attendance}%</span>
+                          {dept.trendAttendance === 'up' ? <TrendingUp size={14} className={styles.iconGreen} /> : dept.trendAttendance === 'down' ? <TrendingDown size={14} className={styles.iconRed} /> : <ArrowRight size={14} className={styles.iconGrey} />}
+                        </div>
+                      </td>
+                      <td>{dept.studentsCount}</td>
+                      <td>
+                        <span className={dept.status === 'Excellent' ? styles.badgeExcellent : dept.status === 'Good' ? styles.badgeGood : styles.badgeNeedsAttention}>
+                          {dept.status}
+                        </span>
+                      </td>
+                      <td className={styles.tdAction}><MoreVertical size={16}/></td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
               <div className={styles.tableFooter}>
-                <span className={styles.footerText}>Showing 1 to 5 of 18 departments</span>
+                <span className={styles.footerText}>Showing 1 to {departments.length} of {metrics?.departmentsCount ?? 0} departments</span>
                 <div className={styles.footerNav}>
                   <button className={styles.navBtn}><ChevronLeft size={16}/></button>
                   <button className={styles.navBtn}><ChevronRight size={16}/></button>
@@ -352,7 +301,7 @@ export default function ReportsAnalyticsPage() {
           <div className={styles.reportsCard}>
             <div className={styles.reportsHeader}>
               <span className={styles.reportsTitle}>Available Reports</span>
-              <span className={styles.totalBadge}>10 TOTAL FILES</span>
+              <span className={styles.totalBadge}>{reportsData.length} TOTAL FILES</span>
             </div>
             
             <div className={styles.tableWrapper}>
@@ -366,28 +315,31 @@ export default function ReportsAnalyticsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {reportsData.map((report) => (
-                    <tr key={report.id}>
-                      <td>
-                        <div className={styles.reportNameContainer}>
-                          <div className={styles.reportIconBox}>
-                            <report.icon size={16} />
+                  {reportsData.map((report) => {
+                    const IconComp = getIconComponent(report.icon);
+                    return (
+                      <tr key={report.id}>
+                        <td>
+                          <div className={styles.reportNameContainer}>
+                            <div className={styles.reportIconBox}>
+                              <IconComp size={16} />
+                            </div>
+                            <span className={styles.reportName}>{report.name}</span>
                           </div>
-                          <span className={styles.reportName}>{report.name}</span>
-                        </div>
-                      </td>
-                      <td className={styles.muted}>{report.desc}</td>
-                      <td className={styles.muted}>{report.date}</td>
-                      <td style={{ display: "flex", justifyContent: "center" }}>
-                        <button 
-                          className={styles.downloadButton} 
-                          onClick={() => openDownloadModal(report)}
-                        >
-                          <Download size={16} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td className={styles.muted}>{report.desc}</td>
+                        <td className={styles.muted}>{new Date(report.date).toLocaleDateString()}</td>
+                        <td style={{ display: "flex", justifyContent: "center" }}>
+                          <button 
+                            className={styles.downloadButton} 
+                            onClick={() => openDownloadModal(report)}
+                          >
+                            <Download size={16} />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -482,7 +434,7 @@ export default function ReportsAnalyticsPage() {
 
             <div className={styles.modalFooter}>
               <button className={styles.cancelBtn} onClick={closeDownloadModal}>Cancel</button>
-              <button className={styles.downloadConfirmBtn}>
+              <button className={styles.downloadConfirmBtn} onClick={handleDownloadConfirm}>
                 <Download size={16} /> Download Report
               </button>
             </div>

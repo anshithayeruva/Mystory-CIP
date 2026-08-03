@@ -1,9 +1,85 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Search, Download, ShieldCheck, Clock, Shield, RotateCcw } from "lucide-react";
 import styles from "../settings.module.css";
 import reportsStyles from "../../reports/reports.module.css";
+import { AdminSettingsService } from "../../../../services/admin.settings.service";
 
 export default function SecurityTab() {
+  const [data, setData] = useState({
+    pwdMinLength: 12, pwdRequireUppercase: true, pwdRequireNumbers: true, pwdRequireSpecial: true,
+    sessionTimeoutMins: 30, autoLogout: true, concurrentLoginLimit: "3 Devices",
+    twoFactorAuth: false, otpLogin: true
+  });
+  
+  const [auditLogs, setAuditLogs] = useState<any[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalLogs, setTotalLogs] = useState(0);
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetchData();
+    fetchAuditLogs(1);
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const res = await AdminSettingsService.getSecurity();
+      if (res.data) setData(res.data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAuditLogs = async (p: number) => {
+    try {
+      const res = await AdminSettingsService.getAuditLogs(p, 5);
+      if (res.data) {
+        setAuditLogs(res.data.data);
+        setPage(res.data.page);
+        setTotalPages(res.data.totalPages);
+        setTotalLogs(res.data.total);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await AdminSettingsService.updateSecurity(data);
+      alert("Settings saved successfully!");
+      fetchAuditLogs(1); // Refresh logs
+    } catch (e) {
+      console.error(e);
+      alert("Failed to save settings");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleChange = (e: any) => {
+    const { name, value, type, checked } = e.target;
+    let finalValue = type === 'checkbox' ? checked : value;
+    if (type === 'number') finalValue = parseInt(value, 10);
+    setData(prev => ({ ...prev, [name]: finalValue }));
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      fetchAuditLogs(newPage);
+    }
+  };
+
+  if (loading) {
+    return <div className={styles.tabContent}>Loading...</div>;
+  }
+
   return (
     <div className={styles.tabContent}>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
@@ -17,26 +93,26 @@ export default function SecurityTab() {
           </div>
           <div className={styles.formGroup}>
             <label className={styles.label}>Min Length</label>
-            <input className={styles.input} type="number" defaultValue="12" />
+            <input className={styles.input} type="number" name="pwdMinLength" value={data.pwdMinLength} onChange={handleChange} />
           </div>
           <div className={styles.toggleRow} style={{ padding: '8px 0' }}>
             <span className={styles.toggleTitle} style={{ fontSize: '0.75rem', fontWeight: 500 }}>Require Uppercase</span>
             <label className={styles.switch}>
-              <input type="checkbox" defaultChecked />
+              <input type="checkbox" name="pwdRequireUppercase" checked={data.pwdRequireUppercase} onChange={handleChange} />
               <span className={styles.slider}></span>
             </label>
           </div>
           <div className={styles.toggleRow} style={{ padding: '8px 0' }}>
             <span className={styles.toggleTitle} style={{ fontSize: '0.75rem', fontWeight: 500 }}>Require Numbers</span>
             <label className={styles.switch}>
-              <input type="checkbox" defaultChecked />
+              <input type="checkbox" name="pwdRequireNumbers" checked={data.pwdRequireNumbers} onChange={handleChange} />
               <span className={styles.slider}></span>
             </label>
           </div>
           <div className={styles.toggleRow} style={{ padding: '8px 0' }}>
             <span className={styles.toggleTitle} style={{ fontSize: '0.75rem', fontWeight: 500 }}>Special Characters</span>
             <label className={styles.switch}>
-              <input type="checkbox" defaultChecked />
+              <input type="checkbox" name="pwdRequireSpecial" checked={data.pwdRequireSpecial} onChange={handleChange} />
               <span className={styles.slider}></span>
             </label>
           </div>
@@ -52,21 +128,21 @@ export default function SecurityTab() {
           </div>
           <div className={styles.formGroup}>
             <label className={styles.label}>Timeout (Minutes)</label>
-            <input className={styles.input} type="number" defaultValue="30" />
+            <input className={styles.input} type="number" name="sessionTimeoutMins" value={data.sessionTimeoutMins} onChange={handleChange} />
           </div>
           <div className={styles.toggleRow} style={{ padding: '8px 0' }}>
             <span className={styles.toggleTitle} style={{ fontSize: '0.75rem', fontWeight: 500 }}>Auto Logout</span>
             <label className={styles.switch}>
-              <input type="checkbox" defaultChecked />
+              <input type="checkbox" name="autoLogout" checked={data.autoLogout} onChange={handleChange} />
               <span className={styles.slider}></span>
             </label>
           </div>
           <div className={styles.formGroup} style={{ marginTop: 8 }}>
             <label className={styles.label}>Concurrent Login Limit</label>
-            <select className={styles.select} defaultValue="3 Devices">
-              <option>1 Device</option>
-              <option>3 Devices</option>
-              <option>Unlimited</option>
+            <select className={styles.select} name="concurrentLoginLimit" value={data.concurrentLoginLimit} onChange={handleChange}>
+              <option value="1 Device">1 Device</option>
+              <option value="3 Devices">3 Devices</option>
+              <option value="Unlimited">Unlimited</option>
             </select>
           </div>
         </div>
@@ -80,12 +156,18 @@ export default function SecurityTab() {
             <div className={styles.sectionTitle}>Authentication</div>
           </div>
           
-          <div style={{ padding: 12, backgroundColor: '#f8fafc', borderRadius: 8, border: '1px solid var(--surface-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div style={{ padding: 12, backgroundColor: '#f8fafc', borderRadius: 8, border: '1px solid var(--surface-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
             <div className={styles.toggleInfo}>
               <div className={styles.toggleTitle}>Two-Factor Auth (2FA)</div>
               <div className={styles.toggleDesc}>Add an extra layer of security via mobile app.</div>
             </div>
-            <button className={styles.btnSave} style={{ padding: '4px 10px' }}>Enable</button>
+            <button 
+              className={data.twoFactorAuth ? styles.btnCancel : styles.btnSave} 
+              style={{ padding: '4px 10px', fontSize: '0.7rem' }}
+              onClick={() => setData(prev => ({ ...prev, twoFactorAuth: !prev.twoFactorAuth }))}
+            >
+              {data.twoFactorAuth ? 'Enabled' : 'Enable'}
+            </button>
           </div>
 
           <div style={{ padding: 12, backgroundColor: '#f8fafc', borderRadius: 8, border: '1px solid var(--surface-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -93,7 +175,13 @@ export default function SecurityTab() {
               <div className={styles.toggleTitle}>OTP Login</div>
               <div className={styles.toggleDesc}>Require one-time password for every new login.</div>
             </div>
-            <button className={styles.btnCancel} style={{ padding: '4px 10px', fontSize: '0.7rem' }}>Enabled</button>
+            <button 
+              className={data.otpLogin ? styles.btnCancel : styles.btnSave} 
+              style={{ padding: '4px 10px', fontSize: '0.7rem' }}
+              onClick={() => setData(prev => ({ ...prev, otpLogin: !prev.otpLogin }))}
+            >
+              {data.otpLogin ? 'Enabled' : 'Enable'}
+            </button>
           </div>
         </div>
       </div>
@@ -126,60 +214,48 @@ export default function SecurityTab() {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 28, height: 28, borderRadius: '50%', backgroundColor: '#e0e7ff', color: '#3730a3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 600 }}>JD</div>
-                    <span style={{ fontWeight: 600, fontSize: '0.8rem' }}>Jane Doe</span>
-                  </div>
-                </td>
-                <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Changed Password Policy</td>
-                <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Oct 24, 2023 • 14:22</td>
-                <td>
-                  <span style={{ backgroundColor: '#f1f5f9', padding: '2px 6px', borderRadius: 4, fontFamily: 'monospace', fontSize: '0.75rem', color: '#475569' }}>192.168.1.104</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 28, height: 28, borderRadius: '50%', backgroundColor: '#dcfce7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 600 }}>SM</div>
-                    <span style={{ fontWeight: 600, fontSize: '0.8rem' }}>Samuel Miller</span>
-                  </div>
-                </td>
-                <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Enabled 2FA</td>
-                <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Oct 24, 2023 • 11:05</td>
-                <td>
-                  <span style={{ backgroundColor: '#f1f5f9', padding: '2px 6px', borderRadius: 4, fontFamily: 'monospace', fontSize: '0.75rem', color: '#475569' }}>45.22.109.12</span>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 28, height: 28, borderRadius: '50%', backgroundColor: '#f1f5f9', color: '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 600 }}>AK</div>
-                    <span style={{ fontWeight: 600, fontSize: '0.8rem' }}>Ahmed Khan</span>
-                  </div>
-                </td>
-                <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Failed Login Attempt</td>
-                <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Oct 23, 2023 • 23:58</td>
-                <td>
-                  <span style={{ backgroundColor: '#fee2e2', padding: '2px 6px', borderRadius: 4, fontFamily: 'monospace', fontSize: '0.75rem', color: '#b91c1c' }}>172.16.254.1</span>
-                </td>
-              </tr>
+              {auditLogs.length > 0 ? auditLogs.map((log) => (
+                <tr key={log.id}>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{ width: 28, height: 28, borderRadius: '50%', backgroundColor: '#e0e7ff', color: '#3730a3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 600 }}>
+                        {log.user?.firstName?.[0]}{log.user?.lastName?.[0]}
+                      </div>
+                      <span style={{ fontWeight: 600, fontSize: '0.8rem' }}>{log.user?.firstName} {log.user?.lastName}</span>
+                    </div>
+                  </td>
+                  <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{log.action}</td>
+                  <td style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                    {new Date(log.createdAt).toLocaleDateString()} • {new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </td>
+                  <td>
+                    <span style={{ backgroundColor: '#f1f5f9', padding: '2px 6px', borderRadius: 4, fontFamily: 'monospace', fontSize: '0.75rem', color: '#475569' }}>
+                      {log.ipAddress || 'Unknown'}
+                    </span>
+                  </td>
+                </tr>
+              )) : (
+                <tr>
+                  <td colSpan={4} style={{ textAlign: 'center', padding: '20px', color: 'var(--text-muted)' }}>
+                    No recent audit logs found.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
         <div style={{ padding: '12px 20px', backgroundColor: '#f8fafc', borderTop: '1px solid var(--surface-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-          <span>Showing 4 of 2,450 results</span>
+          <span>Showing {auditLogs.length} of {totalLogs} results</span>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button className={styles.btnCancel} style={{ padding: '4px 8px', fontSize: '0.75rem' }}>&lt;</button>
-            <button className={styles.btnCancel} style={{ padding: '4px 8px', fontSize: '0.75rem' }}>&gt;</button>
+            <button className={styles.btnCancel} style={{ padding: '4px 8px', fontSize: '0.75rem' }} disabled={page === 1} onClick={() => handlePageChange(page - 1)}>&lt;</button>
+            <button className={styles.btnCancel} style={{ padding: '4px 8px', fontSize: '0.75rem' }} disabled={page === totalPages || totalPages === 0} onClick={() => handlePageChange(page + 1)}>&gt;</button>
           </div>
         </div>
       </div>
       
       <div className={styles.btnGroupPageLevel}>
-        <button className={styles.btnCancel}>Discard</button>
-        <button className={styles.btnSave}>Save Changes</button>
+        <button className={styles.btnCancel} onClick={fetchData}>Discard</button>
+        <button className={styles.btnSave} onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</button>
       </div>
     </div>
   );

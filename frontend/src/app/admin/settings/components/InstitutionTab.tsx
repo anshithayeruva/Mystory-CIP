@@ -2,16 +2,56 @@ import React, { useState, useEffect } from "react";
 import { Upload, Info, RotateCcw, Database, ArrowRight } from "lucide-react";
 import styles from "../settings.module.css";
 import Link from "next/link";
+import { AdminSettingsService } from "../../../../services/admin.settings.service";
 
 export default function InstitutionTab() {
   const [mounted, setMounted] = useState(false);
+  const [data, setData] = useState({
+    name: "", code: "", type: "", address: "", country: "", status: true,
+    contactPerson: "", contactEmail: "", contactNumber: "", academicYear: ""
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   
   useEffect(() => {
     setMounted(true);
+    fetchData();
   }, []);
 
-  if (!mounted) {
-    return null; // Bypass SSR to avoid extension-induced hydration mismatches
+  const fetchData = async () => {
+    try {
+      const res = await AdminSettingsService.getInstitution();
+      if (res.data) setData(res.data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await AdminSettingsService.updateInstitution(data);
+      alert("Settings saved successfully!");
+    } catch (e) {
+      console.error(e);
+      alert("Failed to save settings");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleChange = (e: any) => {
+    const { name, value, type, checked } = e.target;
+    setData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  if (!mounted || loading) {
+    return <div className={styles.tabContent}>Loading...</div>;
   }
 
   return (
@@ -26,62 +66,62 @@ export default function InstitutionTab() {
             <div className={styles.formGrid}>
               <div className={styles.formGroup} style={{ gridColumn: "span 2" }}>
                 <label className={styles.label}>Institution Name</label>
-                <input className={styles.input} type="text" defaultValue="St. Andrews International Academy" />
+                <input className={styles.input} type="text" name="name" value={data.name || ''} onChange={handleChange} />
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>Institution Code</label>
-                <input className={styles.input} type="text" defaultValue="SAIA-2024" />
+                <input className={styles.input} type="text" name="code" value={data.code || ''} onChange={handleChange} />
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>Institution Type</label>
-                <select className={styles.select} defaultValue="K-12 Academy">
-                  <option>K-12 Academy</option>
-                  <option>University</option>
+                <select className={styles.select} name="type" value={data.type || ''} onChange={handleChange}>
+                  <option value="K-12 Academy">K-12 Academy</option>
+                  <option value="University">University</option>
                 </select>
               </div>
               <div className={styles.formGroup} style={{ gridColumn: "span 2" }}>
                 <label className={styles.label}>Address</label>
-                <textarea className={styles.input} style={{ resize: "none", height: "60px" }} defaultValue="42 Academic Square, North Campus, Sector 4, 110022"></textarea>
+                <textarea className={styles.input} style={{ resize: "none", height: "60px" }} name="address" value={data.address || ''} onChange={handleChange}></textarea>
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>Country</label>
-                <select className={styles.select} defaultValue="United States">
-                  <option>United States</option>
-                  <option>United Kingdom</option>
-                  <option>India</option>
+                <select className={styles.select} name="country" value={data.country || ''} onChange={handleChange}>
+                  <option value="United States">United States</option>
+                  <option value="United Kingdom">United Kingdom</option>
+                  <option value="India">India</option>
                 </select>
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>Status</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px' }}>
                   <label className={styles.switch}>
-                    <input type="checkbox" defaultChecked />
+                    <input type="checkbox" name="status" checked={data.status} onChange={handleChange} />
                     <span className={styles.slider}></span>
                   </label>
-                  <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Active</span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{data.status ? 'Active' : 'Inactive'}</span>
                 </div>
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>Contact Person</label>
-                <input className={styles.input} type="text" defaultValue="Dr. Sarah Jenkins" />
+                <input className={styles.input} type="text" name="contactPerson" value={data.contactPerson || ''} onChange={handleChange} />
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>Contact Email</label>
-                <input className={styles.input} type="email" defaultValue="s.jenkins@standrews.edu" />
+                <input className={styles.input} type="email" name="contactEmail" value={data.contactEmail || ''} onChange={handleChange} />
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>Contact Number</label>
-                <input className={styles.input} type="text" defaultValue="+1 (555) 0123-456" />
+                <input className={styles.input} type="text" name="contactNumber" value={data.contactNumber || ''} onChange={handleChange} />
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>Current Academic Year</label>
-                <input className={styles.input} type="text" defaultValue="2024-2025" />
+                <input className={styles.input} type="text" name="academicYear" value={data.academicYear || ''} onChange={handleChange} />
               </div>
             </div>
           </div>
           <div className={styles.btnGroup}>
-            <button className={styles.btnCancel}>Cancel</button>
-            <button className={styles.btnSave}>Save Changes</button>
+            <button className={styles.btnCancel} onClick={fetchData}>Cancel</button>
+            <button className={styles.btnSave} onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</button>
           </div>
         </div>
       </div>
@@ -95,7 +135,6 @@ export default function InstitutionTab() {
           <div className={styles.label}>Institution Logo</div>
           <div className={styles.logoUploadRow}>
             <div className={styles.logoUploadBox}>
-              {/* Placeholder for actual logo */}
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
                 <div style={{ width: 24, height: 24, backgroundColor: '#064e3b', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 4 }}>
                   <span style={{ fontSize: 10, fontWeight: 'bold' }}>SAIA</span>

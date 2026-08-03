@@ -25,6 +25,8 @@ model User {
   studentProfile   StudentProfile?
   reports          Report[]
   approvalRequests ApprovalRequest[]
+  auditLogs        AuditLog[]
+
 
   @@index([role])
 }
@@ -503,12 +505,91 @@ model PulseAnswer {
 model Institution {
   id                String   @id @default(auto()) @map("_id") @db.ObjectId
   name              String
+  code              String?
+  type              String?
+  address           String?
+  country           String?
   logo              String?
-  academicYear      String
-  semester          String
+  academicYear      String?
+  semester          String?
   operationalStatus String   @default("LIVE")
+  status            Boolean  @default(true)
+  contactPerson     String?
+  contactEmail      String?
+  contactNumber     String?
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
+
+model AcademicSettings {
+  id                      String   @id @default(auto()) @map("_id") @db.ObjectId
+  attendanceModel         String   @default("Activity Based (Auto-tracked)")
+  minQuestionAttempt      Int      @default(75)
+  minSessionTime          Int      @default(45)
+  allowLateSubmission     Boolean  @default(true)
+  deviceVerification      Boolean  @default(false)
+  
+  passingPercentage       Int      @default(40)
+  defaultDuration         Int      @default(120)
+  maxAttempts             Int      @default(2)
+  allowRetests            Boolean  @default(true)
+  randomizeQuestions      Boolean  @default(true)
+  
+  marksPerQuestion        Int      @default(1)
+  partialMarking          Boolean  @default(false)
+  negativeMarking         Boolean  @default(false)
+  difficultyBasedMarks    Boolean  @default(true)
+  staffOverride           Boolean  @default(true)
+  
+  visScore                Boolean  @default(true)
+  visCorrectAnswers       Boolean  @default(true)
+  visExplanations         Boolean  @default(false)
+  visClassAverage         Boolean  @default(false)
+  visRank                 Boolean  @default(false)
+
+  updatedAt               DateTime @updatedAt
+  createdAt               DateTime @default(now())
+}
+
+model SecuritySettings {
+  id                      String   @id @default(auto()) @map("_id") @db.ObjectId
+  pwdMinLength            Int      @default(12)
+  pwdRequireUppercase     Boolean  @default(true)
+  pwdRequireNumbers       Boolean  @default(true)
+  pwdRequireSpecial       Boolean  @default(true)
+  
+  sessionTimeoutMins      Int      @default(30)
+  autoLogout              Boolean  @default(true)
+  concurrentLoginLimit    String   @default("3 Devices")
+  
+  twoFactorAuth           Boolean  @default(false)
+  otpLogin                Boolean  @default(true)
+
+  updatedAt               DateTime @updatedAt
+  createdAt               DateTime @default(now())
+}
+
+model IntegrationSettings {
+  id                      String   @id @default(auto()) @map("_id") @db.ObjectId
+  erpSystem               Boolean  @default(true)
+  moodle                  Boolean  @default(false)
+  googleClassroom         Boolean  @default(true)
+  microsoftTeams          Boolean  @default(true)
+  canvas                  Boolean  @default(false)
+
+  updatedAt               DateTime @updatedAt
+  createdAt               DateTime @default(now())
+}
+
+model AuditLog {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @db.ObjectId
+  action       String
+  ipAddress    String?
+  createdAt    DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id])
 }
 
 model Event {

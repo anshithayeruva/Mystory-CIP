@@ -1,8 +1,52 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Database, BookOpen, GraduationCap, Users, LayoutDashboard, Info, CheckCircle } from "lucide-react";
 import styles from "../settings.module.css";
+import { AdminSettingsService } from "../../../../services/admin.settings.service";
 
 export default function IntegrationsTab() {
+  const [data, setData] = useState({
+    erpSystem: true, moodle: false, googleClassroom: true, microsoftTeams: true, canvas: false
+  });
+  
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const res = await AdminSettingsService.getIntegrations();
+      if (res.data) setData(res.data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await AdminSettingsService.updateIntegrations(data);
+      alert("Settings saved successfully!");
+    } catch (e) {
+      console.error(e);
+      alert("Failed to save settings");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const toggleIntegration = (key: keyof typeof data) => {
+    setData(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  if (loading) {
+    return <div className={styles.tabContent}>Loading...</div>;
+  }
+
   return (
     <div className={styles.tabContent}>
       <div className={styles.sectionCard} style={{ padding: 0 }}>
@@ -29,12 +73,23 @@ export default function IntegrationsTab() {
               Centralized database for institutional resources and student financials.
             </div>
             <div className={styles.integrationStatus}>
-              <span className={`${styles.badge} ${styles.badgeConnected}`}>
-                <span className={styles.badgeDot}></span> Connected
-              </span>
+              {data.erpSystem ? (
+                <span className={`${styles.badge} ${styles.badgeConnected}`}>
+                  <span className={styles.badgeDot}></span> Connected
+                </span>
+              ) : (
+                <span className={`${styles.badge} ${styles.badgeNotConnected}`}>
+                  <span className={styles.badgeDot}></span> Not Connected
+                </span>
+              )}
             </div>
             <div className={styles.integrationAction}>
-              <button className={styles.btnDisconnect}>Disconnect</button>
+              <button 
+                className={data.erpSystem ? styles.btnDisconnect : styles.btnConnect}
+                onClick={() => toggleIntegration('erpSystem')}
+              >
+                {data.erpSystem ? 'Disconnect' : 'Connect'}
+              </button>
             </div>
           </div>
 
@@ -53,12 +108,23 @@ export default function IntegrationsTab() {
               Sync course materials and student grades directly with your LMS.
             </div>
             <div className={styles.integrationStatus}>
-              <span className={`${styles.badge} ${styles.badgeNotConnected}`}>
-                <span className={styles.badgeDot}></span> Not Connected
-              </span>
+              {data.moodle ? (
+                <span className={`${styles.badge} ${styles.badgeConnected}`}>
+                  <span className={styles.badgeDot}></span> Connected
+                </span>
+              ) : (
+                <span className={`${styles.badge} ${styles.badgeNotConnected}`}>
+                  <span className={styles.badgeDot}></span> Not Connected
+                </span>
+              )}
             </div>
             <div className={styles.integrationAction}>
-              <button className={styles.btnConnect}>Connect</button>
+              <button 
+                className={data.moodle ? styles.btnDisconnect : styles.btnConnect}
+                onClick={() => toggleIntegration('moodle')}
+              >
+                {data.moodle ? 'Disconnect' : 'Connect'}
+              </button>
             </div>
           </div>
 
@@ -77,12 +143,23 @@ export default function IntegrationsTab() {
               Integration with Google Workspace for Education and assignments.
             </div>
             <div className={styles.integrationStatus}>
-              <span className={`${styles.badge} ${styles.badgeConnected}`}>
-                <span className={styles.badgeDot}></span> Connected
-              </span>
+              {data.googleClassroom ? (
+                <span className={`${styles.badge} ${styles.badgeConnected}`}>
+                  <span className={styles.badgeDot}></span> Connected
+                </span>
+              ) : (
+                <span className={`${styles.badge} ${styles.badgeNotConnected}`}>
+                  <span className={styles.badgeDot}></span> Not Connected
+                </span>
+              )}
             </div>
             <div className={styles.integrationAction}>
-              <button className={styles.btnDisconnect}>Disconnect</button>
+              <button 
+                className={data.googleClassroom ? styles.btnDisconnect : styles.btnConnect}
+                onClick={() => toggleIntegration('googleClassroom')}
+              >
+                {data.googleClassroom ? 'Disconnect' : 'Connect'}
+              </button>
             </div>
           </div>
 
@@ -101,12 +178,23 @@ export default function IntegrationsTab() {
               Enable real-time communication and virtual classroom links.
             </div>
             <div className={styles.integrationStatus}>
-              <span className={`${styles.badge} ${styles.badgeConnected}`}>
-                <span className={styles.badgeDot}></span> Connected
-              </span>
+              {data.microsoftTeams ? (
+                <span className={`${styles.badge} ${styles.badgeConnected}`}>
+                  <span className={styles.badgeDot}></span> Connected
+                </span>
+              ) : (
+                <span className={`${styles.badge} ${styles.badgeNotConnected}`}>
+                  <span className={styles.badgeDot}></span> Not Connected
+                </span>
+              )}
             </div>
             <div className={styles.integrationAction}>
-              <button className={styles.btnDisconnect}>Disconnect</button>
+              <button 
+                className={data.microsoftTeams ? styles.btnDisconnect : styles.btnConnect}
+                onClick={() => toggleIntegration('microsoftTeams')}
+              >
+                {data.microsoftTeams ? 'Disconnect' : 'Connect'}
+              </button>
             </div>
           </div>
 
@@ -125,12 +213,23 @@ export default function IntegrationsTab() {
               Comprehensive LMS integration for modern higher education workflows.
             </div>
             <div className={styles.integrationStatus}>
-              <span className={`${styles.badge} ${styles.badgeNotConnected}`}>
-                <span className={styles.badgeDot}></span> Not Connected
-              </span>
+              {data.canvas ? (
+                <span className={`${styles.badge} ${styles.badgeConnected}`}>
+                  <span className={styles.badgeDot}></span> Connected
+                </span>
+              ) : (
+                <span className={`${styles.badge} ${styles.badgeNotConnected}`}>
+                  <span className={styles.badgeDot}></span> Not Connected
+                </span>
+              )}
             </div>
             <div className={styles.integrationAction}>
-              <button className={styles.btnConnect}>Connect</button>
+              <button 
+                className={data.canvas ? styles.btnDisconnect : styles.btnConnect}
+                onClick={() => toggleIntegration('canvas')}
+              >
+                {data.canvas ? 'Disconnect' : 'Connect'}
+              </button>
             </div>
           </div>
         </div>
@@ -141,8 +240,10 @@ export default function IntegrationsTab() {
           <Info size={16} /> Integration changes may take up to 30 minutes to propagate across all systems.
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
-          <button className={styles.btnCancel}>Cancel</button>
-          <button className={styles.btnSave}>Save Changes <CheckCircle size={14} style={{ marginLeft: 4 }} /></button>
+          <button className={styles.btnCancel} onClick={fetchData}>Cancel</button>
+          <button className={styles.btnSave} onClick={handleSave} disabled={saving}>
+            {saving ? 'Saving...' : <>Save Changes <CheckCircle size={14} style={{ marginLeft: 4 }} /></>}
+          </button>
         </div>
       </div>
     </div>
