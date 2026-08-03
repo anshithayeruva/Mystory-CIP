@@ -9,6 +9,7 @@ import {
   Users, 
   BookOpen, 
   BarChart3, 
+  Clock,
   Settings, 
   PanelLeftClose, 
   PanelLeftOpen } from "lucide-react";
@@ -16,6 +17,7 @@ import styles from "../hod-layout.module.css";
 
 const navItems = [
   { label: "Dashboard", href: "/hod", icon: LayoutDashboard },
+  { label: "Timetable Management", href: "/hod/timetable", icon: Clock },
   { label: "Reports & Analytics", href: "/hod/reports", icon: BarChart3 },
   { label: "Curriculum & Courses", href: "/hod/subjects", icon: BookOpen },
   { label: "Faculty Directory", href: "/hod/faculty", icon: GraduationCap },

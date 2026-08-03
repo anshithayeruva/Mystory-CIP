@@ -13,6 +13,7 @@ export default function Header() {
   const pathname = usePathname();
 
   const getHeaderTitle = () => {
+    if (pathname.includes("/hod/timetable")) return "Timetable Management";
     if (pathname.includes("/hod/faculty")) return "Faculty";
     if (pathname.includes("/hod/students")) return "Students";
     if (pathname.includes("/hod/subjects")) return "Subjects";
