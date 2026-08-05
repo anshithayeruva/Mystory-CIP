@@ -1,29 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Award,
   BookOpen,
   CalendarCheck,
-  Clock,
   FolderDown,
   Radio,
   Eye,
   ChevronDown,
   ChevronUp,
-  ArrowRight,
   Sparkles,
   CheckCircle2,
   AlertCircle
 } from "lucide-react";
 import styles from "./student.module.css";
-import {
-  STUDENT_INFO,
-  TODAY_CLASSES,
-  STUDENT_ASSIGNMENTS,
-  STUDENT_COURSES
-} from "./mockData";
+import { studentDashboardService } from "@/services/studentDashboard.service";
 
 const formatDueDate = (dateStr: string) => {
   if (!dateStr) return { month: "", day: "" };
@@ -43,8 +36,77 @@ const formatDueDate = (dateStr: string) => {
 
 export default function StudentDashboard() {
   const [showAllCourses, setShowAllCourses] = useState(false);
-  const pendingAssignments = STUDENT_ASSIGNMENTS.filter(a => a.status === "PENDING");
-  const visibleCourses = showAllCourses ? STUDENT_COURSES : STUDENT_COURSES.slice(0, 3);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // States for backend data
+  const [studentInfo, setStudentInfo] = useState<any>(null);
+  const [todayClasses, setTodayClasses] = useState<any[]>([]);
+  const [studentCourses, setStudentCourses] = useState<any[]>([]);
+  const [studentAssignments, setStudentAssignments] = useState<any[]>([]);
+  const [insights, setInsights] = useState<any>(null);
+
+  // Note: For now, hardcoding a mock studentId for demonstration purposes 
+  // since Authentication is out of scope. Replace with actual logged-in user ID later.
+  const studentId = "6a6a3135b6f279c37d3c4bd4"; // 24-char hex string as required by Zod
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const [info, classes, courses, assignments, insightData] = await Promise.all([
+          studentDashboardService.getStudentInfo(studentId).catch(() => null),
+          studentDashboardService.getTodayClasses(studentId).catch(() => []),
+          studentDashboardService.getCourses(studentId).catch(() => []),
+          studentDashboardService.getAssignments(studentId).catch(() => []),
+          studentDashboardService.getInsights(studentId).catch(() => null),
+        ]);
+
+        // If info is null, it means the backend is unreachable or DB is empty.
+        // We handle this gracefully.
+        if (info) {
+          setStudentInfo(info);
+          setTodayClasses(classes);
+          setStudentCourses(courses);
+          setStudentAssignments(assignments);
+          setInsights(insightData);
+        } else {
+          setError("Failed to fetch dashboard data. Please ensure the backend is running and the database is accessible.");
+        }
+      } catch (err: any) {
+        setError(err.message || "An unexpected error occurred.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [studentId]);
+
+  if (loading) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "60vh" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-700"></div>
+          <p style={{ color: "#64748b", fontWeight: 600 }}>Loading Dashboard Data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !studentInfo) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "60vh" }}>
+        <div style={{ backgroundColor: "#fef2f2", border: "1px solid #fecaca", padding: "24px", borderRadius: "12px", maxWidth: "500px", textAlign: "center" }}>
+          <AlertCircle size={32} color="#dc2626" style={{ margin: "0 auto 12px" }} />
+          <h3 style={{ color: "#991b1b", fontSize: "1.2rem", fontWeight: 700, marginBottom: "8px" }}>Connection Error</h3>
+          <p style={{ color: "#7f1d1d", fontSize: "0.9rem" }}>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const visibleCourses = showAllCourses ? studentCourses : studentCourses.slice(0, 3);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -82,7 +144,7 @@ export default function StudentDashboard() {
             </h2>
             <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "0.68rem", fontWeight: 700, color: "#00522E", textTransform: "uppercase", letterSpacing: "0.05em" }}>
               <div style={{ width: "8px", height: "8px", backgroundColor: "#00522E", borderRadius: "50%" }} />
-              STUDENT PROFILE: ACTIVE ({STUDENT_INFO.name} • {STUDENT_INFO.rollNo})
+              STUDENT PROFILE: {studentInfo.academicStanding?.toUpperCase()} ({studentInfo.name} • {studentInfo.rollNo})
             </div>
           </div>
         </div>
@@ -96,7 +158,7 @@ export default function StudentDashboard() {
           <div style={{ width: "1px", height: "24px", backgroundColor: "#e2e8f0", margin: "0 16px" }} />
           <div>
             <span style={{ fontSize: "0.65rem", fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", display: "block" }}>SEMESTER</span>
-            <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "#0f172a", marginTop: "4px" }}>Semester 6 (Spring 2026)</div>
+            <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "#0f172a", marginTop: "4px" }}>Semester {studentInfo.semester} ({studentInfo.batch})</div>
           </div>
         </div>
       </div>
@@ -119,10 +181,10 @@ export default function StudentDashboard() {
             <Award size={20} color="#0f172a" style={{ opacity: 0.8 }} />
           </div>
           <div style={{ fontSize: "2rem", fontWeight: 800, color: "#0f172a", lineHeight: 1, letterSpacing: "-0.02em" }}>
-            {STUDENT_INFO.cgpa}
+            {studentInfo.cgpa}
           </div>
           <div style={{ fontSize: "0.75rem", color: "#00522E", fontWeight: 600 }}>
-            Top 5% Department Standing ({STUDENT_INFO.academicStanding})
+            {studentInfo.classRank !== 'N/A' ? `Rank: ${studentInfo.classRank}` : `Academic Standing: ${studentInfo.academicStanding}`}
           </div>
         </div>
 
@@ -142,10 +204,10 @@ export default function StudentDashboard() {
             <CalendarCheck size={20} color="#0f172a" style={{ opacity: 0.8 }} />
           </div>
           <div style={{ fontSize: "2rem", fontWeight: 800, color: "#0f172a", lineHeight: 1, letterSpacing: "-0.02em" }}>
-            {STUDENT_INFO.overallAttendance}%
+            {studentInfo.overallAttendance}%
           </div>
-          <div style={{ fontSize: "0.75rem", color: "#00522E", fontWeight: 600 }}>
-            Compliant with Min 75.0% Rule
+          <div style={{ fontSize: "0.75rem", color: studentInfo.overallAttendance >= 75 ? "#00522E" : "#dc2626", fontWeight: 600 }}>
+            {studentInfo.overallAttendance >= 75 ? "Compliant with Min 75.0% Rule" : "Warning: Below 75%"}
           </div>
         </div>
 
@@ -165,10 +227,10 @@ export default function StudentDashboard() {
             <BookOpen size={20} color="#0f172a" style={{ opacity: 0.8 }} />
           </div>
           <div style={{ fontSize: "2rem", fontWeight: 800, color: "#0f172a", lineHeight: 1, letterSpacing: "-0.02em" }}>
-            {STUDENT_INFO.creditsEarned} <span style={{ fontSize: "1.1rem", fontWeight: 600, color: "#64748b" }}>/ 136</span>
+            {studentInfo.creditsEarned} <span style={{ fontSize: "1.1rem", fontWeight: 600, color: "#64748b" }}>/ {studentInfo.creditsEarned + studentInfo.creditsRegistered}</span>
           </div>
           <div style={{ fontSize: "0.75rem", color: "#475569", fontWeight: 500 }}>
-            24 Credits Currently in Progress
+            {studentInfo.creditsRegistered} Credits Currently in Progress
           </div>
         </div>
       </div>
@@ -203,7 +265,13 @@ export default function StudentDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {TODAY_CLASSES.map((c) => (
+                  {todayClasses.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} style={{ textAlign: "center", padding: "32px", color: "#64748b" }}>
+                        No classes scheduled for today.
+                      </td>
+                    </tr>
+                  ) : todayClasses.map((c: any) => (
                     <tr key={c.id}>
                       <td>
                         <div style={{ fontWeight: 700, color: "#0f172a", fontSize: "0.875rem" }}>{c.courseCode}: {c.courseName}</div>
@@ -218,7 +286,7 @@ export default function StudentDashboard() {
                       </td>
                       <td>
                         {c.status === "LIVE" ? (
-                          <Link href="/student/pulse" className={styles.btnPrimary} style={{ padding: "4px 10px", fontSize: "0.75rem" }}>
+                          <Link href={`/student/pulse/${c.pulseSessionId}`} className={styles.btnPrimary} style={{ padding: "4px 10px", fontSize: "0.75rem" }}>
                             <Radio size={12} /> Join Live
                           </Link>
                         ) : (
@@ -248,7 +316,9 @@ export default function StudentDashboard() {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column" }}>
-              {visibleCourses.map((course) => (
+              {visibleCourses.length === 0 ? (
+                <div style={{ padding: "32px", textAlign: "center", color: "#64748b" }}>No registered courses found.</div>
+              ) : visibleCourses.map((course: any) => (
                 <div key={course.id} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "14px 20px", borderBottom: "1px solid #e2e8f0" }}>
                   <div style={{
                     display: "inline-flex",
@@ -286,32 +356,34 @@ export default function StudentDashboard() {
               ))}
             </div>
 
-            <button
-              onClick={() => setShowAllCourses(!showAllCourses)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "6px",
-                width: "100%",
-                padding: "12px 20px",
-                border: "none",
-                borderTop: "1px solid #e2e8f0",
-                backgroundColor: "#f8fafc",
-                color: "#00522E",
-                fontSize: "0.7rem",
-                fontWeight: 700,
-                letterSpacing: "0.05em",
-                textTransform: "uppercase",
-                cursor: "pointer"
-              }}
-            >
-              {showAllCourses ? (
-                <>SHOW LESS <ChevronUp size={14} /></>
-              ) : (
-                <>SHOW ALL {STUDENT_COURSES.length} COURSES <ChevronDown size={14} /></>
-              )}
-            </button>
+            {studentCourses.length > 3 && (
+              <button
+                onClick={() => setShowAllCourses(!showAllCourses)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "6px",
+                  width: "100%",
+                  padding: "12px 20px",
+                  border: "none",
+                  borderTop: "1px solid #e2e8f0",
+                  backgroundColor: "#f8fafc",
+                  color: "#00522E",
+                  fontSize: "0.7rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.05em",
+                  textTransform: "uppercase",
+                  cursor: "pointer"
+                }}
+              >
+                {showAllCourses ? (
+                  <>SHOW LESS <ChevronUp size={14} /></>
+                ) : (
+                  <>SHOW ALL {studentCourses.length} COURSES <ChevronDown size={14} /></>
+                )}
+              </button>
+            )}
           </div>
 
         </div>
@@ -326,7 +398,9 @@ export default function StudentDashboard() {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", padding: "12px 16px", gap: "12px" }}>
-              {STUDENT_ASSIGNMENTS.slice(0, 3).map((asg, idx) => {
+              {studentAssignments.length === 0 ? (
+                <div style={{ padding: "16px", textAlign: "center", color: "#64748b" }}>No upcoming deadlines.</div>
+              ) : studentAssignments.slice(0, 3).map((asg: any, idx: number) => {
                 const { month, day } = formatDueDate(asg.dueDate);
                 return (
                   <div key={asg.id} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "8px 4px" }}>
@@ -363,7 +437,7 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Card 2: Learning Insights (Replaces Quick Actions & Academic Index Bar) */}
+          {/* Card 2: Learning Insights */}
           <div style={{
             backgroundColor: "#ffffff",
             border: "1px solid #e2e8f0",
@@ -381,56 +455,62 @@ export default function StudentDashboard() {
             </div>
 
             <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: "18px" }}>
+              
+              {insights ? (
+                <>
+                  {/* 1. Strongest Subject */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.725rem", fontWeight: 700, color: "#00522E", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                      <div style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#00522E" }} />
+                      Strongest Subject
+                    </div>
+                    <div style={{ fontSize: "0.875rem", fontWeight: 700, color: "#0f172a" }}>
+                      {insights.strongestSubject.name} <span style={{ color: "#00522E", fontWeight: 800 }}>({insights.strongestSubject.percentage}%)</span>
+                    </div>
+                  </div>
 
-              {/* 1. Strongest Subject */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.725rem", fontWeight: 700, color: "#00522E", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  <div style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#00522E" }} />
-                  Strongest Subject
-                </div>
-                <div style={{ fontSize: "0.875rem", fontWeight: 700, color: "#0f172a" }}>
-                  Advanced Data Structures <span style={{ color: "#00522E", fontWeight: 800 }}>(91%)</span>
-                </div>
-              </div>
+                  {/* 2. Needs Attention */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.725rem", fontWeight: 700, color: "#991b1b", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                      <div style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#991b1b" }} />
+                      Needs Attention
+                    </div>
+                    <div style={{ fontSize: "0.875rem", fontWeight: 700, color: "#0f172a" }}>
+                      {insights.needsAttention.name}
+                    </div>
+                    <div style={{ fontSize: "0.775rem", color: "#64748b", lineHeight: 1.4 }}>
+                      {insights.needsAttention.reason}
+                    </div>
+                  </div>
 
-              {/* 2. Needs Attention */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.725rem", fontWeight: 700, color: "#991b1b", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  <div style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#991b1b" }} />
-                  Needs Attention
-                </div>
-                <div style={{ fontSize: "0.875rem", fontWeight: 700, color: "#0f172a" }}>
-                  Computer Networks
-                </div>
-                <div style={{ fontSize: "0.775rem", color: "#64748b", lineHeight: 1.4 }}>
-                  Understanding dropped by 12% this week.
-                </div>
-              </div>
+                  {/* 3. Current Streak */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.725rem", fontWeight: 700, color: "#0f172a", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                      <div style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#0f172a" }} />
+                      Current Streak
+                    </div>
+                    <div style={{ fontSize: "0.875rem", fontWeight: 700, color: "#0f172a" }}>
+                      {insights.currentStreak}
+                    </div>
+                  </div>
 
-              {/* 3. Current Streak */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.725rem", fontWeight: 700, color: "#0f172a", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  <div style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#0f172a" }} />
-                  Current Streak
-                </div>
-                <div style={{ fontSize: "0.875rem", fontWeight: 700, color: "#0f172a" }}>
-                  5 classes attended consecutively
-                </div>
-              </div>
-
-              {/* 4. AI Recommendation */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px", backgroundColor: "#f8fafc", padding: "14px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.725rem", fontWeight: 700, color: "#00522E", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  <Sparkles size={14} color="#00522E" />
-                  AI Recommendation
-                </div>
-                <div style={{ fontSize: "0.825rem", fontWeight: 600, color: "#0f172a", lineHeight: 1.4 }}>
-                  Review Binary Trees before tomorrow's quiz.
-                </div>
-                <div style={{ fontSize: "0.75rem", color: "#64748b", fontWeight: 500 }}>
-                  Estimated study time: 25 mins.
-                </div>
-              </div>
+                  {/* 4. AI Recommendation */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px", backgroundColor: "#f8fafc", padding: "14px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.725rem", fontWeight: 700, color: "#00522E", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                      <Sparkles size={14} color="#00522E" />
+                      AI Recommendation
+                    </div>
+                    <div style={{ fontSize: "0.825rem", fontWeight: 600, color: "#0f172a", lineHeight: 1.4 }}>
+                      {insights.aiRecommendation.text}
+                    </div>
+                    <div style={{ fontSize: "0.75rem", color: "#64748b", fontWeight: 500 }}>
+                      Estimated study time: {insights.aiRecommendation.estimatedTime}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div style={{ textAlign: "center", color: "#64748b" }}>No insights available.</div>
+              )}
 
             </div>
           </div>

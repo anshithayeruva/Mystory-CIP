@@ -64,7 +64,7 @@ export class AdminReportsController {
         return res.status(400).json({ success: false, message: 'Invalid or missing format parameter (pdf, excel, csv)' });
       }
 
-      const reportData = await AdminReportsService.generateReport(id, format as string);
+      const reportData = await AdminReportsService.generateReport(id as string, format as string);
 
       res.setHeader('Content-Type', reportData.contentType);
       res.setHeader('Content-Disposition', `attachment; filename="${reportData.fileName}"`);

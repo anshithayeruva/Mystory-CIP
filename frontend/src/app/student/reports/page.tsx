@@ -14,8 +14,10 @@ import {
   ChevronDown,
   ChevronUp,
   BookOpen,
-  Layers
+  Layers,
+  AlertCircle
 } from "lucide-react";
+import { studentDashboardService } from "@/services/studentDashboard.service";
 
 type TabType = "attendance" | "understanding";
 
@@ -25,20 +27,58 @@ export default function StudentReportsPage() {
   const [selectedSemester, setSelectedSemester] = useState("Semester 6 (Spring 2026)");
   const [statusFilter, setStatusFilter] = useState("all");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  const [attendanceData, setAttendanceData] = useState<any[]>([]);
+  const [dailyLogs, setDailyLogs] = useState<any[]>([]);
+  const [subjectTopicUnderstandingData, setSubjectTopicUnderstandingData] = useState<any[]>([]);
+
+  // Using the same mocked studentId as the dashboard for now
+  const studentId = "6a6a3135b6f279c37d3c4bd4";
 
   // All subjects expanded by default so topic breakdowns are instantly visible
-  const [expandedSubjects, setExpandedSubjects] = useState<Record<string, boolean>>({
-    "CSE 301": true,
-    "CSE 302": true,
-    "CSE 303": true,
-    "CSE 304": true,
-    "CSE 305": true,
-    "CSE 306": true,
-  });
+  const [expandedSubjects, setExpandedSubjects] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        if (activeTab === "attendance") {
+          const data = await studentDashboardService.getAttendanceAnalytics(studentId, selectedSemester);
+          if (data) {
+            setAttendanceData(data.attendanceData || []);
+            setDailyLogs(data.dailyLogs || []);
+          }
+        } else if (activeTab === "understanding") {
+          const data = await studentDashboardService.getUnderstandingAnalytics(studentId, selectedSemester);
+          if (data) {
+            setSubjectTopicUnderstandingData(data);
+            // Initialize expanded state
+            const initialExpanded: Record<string, boolean> = {};
+            data.forEach((item: any) => {
+              initialExpanded[item.code] = true;
+            });
+            setExpandedSubjects(initialExpanded);
+          }
+        }
+      } catch (err: any) {
+        setError(err.message || "An unexpected error occurred while fetching reports.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    if (mounted) {
+      fetchData();
+    }
+  }, [studentId, activeTab, selectedSemester, mounted]);
 
   if (!mounted) return null;
 
@@ -49,18 +89,15 @@ export default function StudentReportsPage() {
     }));
   };
 
-  const allExpanded = Object.values(expandedSubjects).every(Boolean);
+  const allExpanded = Object.values(expandedSubjects).length > 0 && Object.values(expandedSubjects).every(Boolean);
 
   const toggleAllSubjects = () => {
     const nextState = !allExpanded;
-    setExpandedSubjects({
-      "CSE 301": nextState,
-      "CSE 302": nextState,
-      "CSE 303": nextState,
-      "CSE 304": nextState,
-      "CSE 305": nextState,
-      "CSE 306": nextState,
+    const newState: Record<string, boolean> = {};
+    subjectTopicUnderstandingData.forEach(item => {
+      newState[item.code] = nextState;
     });
+    setExpandedSubjects(newState);
   };
 
   const triggerToast = (msg: string) => {
@@ -68,104 +105,28 @@ export default function StudentReportsPage() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const handleExportPDF = () => {
-    triggerToast("Generating & Downloading Official Student Analytics PDF Report...");
+  const handleExportPDF = async () => {
+    try {
+      triggerToast("Generating & Downloading Official Student Analytics PDF Report...");
+      const type = activeTab === "attendance" ? "ATTENDANCE_ANALYTICS" : "CONCEPT_UNDERSTANDING";
+      const title = `${activeTab === "attendance" ? "Attendance" : "Understanding"} Report - ${selectedSemester}`;
+      
+      const response = await studentDashboardService.exportReport(studentId, title, type);
+      if (response && response.fileUrl) {
+        triggerToast("Report saved to database successfully! Download starting...");
+        // In a real application, you might trigger a window.open or <a> tag click here
+        console.log("Download URL:", response.fileUrl);
+      }
+    } catch (err: any) {
+      triggerToast(`Failed to generate report: ${err.message}`);
+    }
   };
-
-  const attendanceData = [
-    { code: "CSE 301", name: "Advanced Data Structures & Algorithms", faculty: "Dr. Aris Thorne", percent: 94.5, attended: 36, total: 38 },
-    { code: "CSE 302", name: "Database Management Systems & Distributed DB", faculty: "Dr. Sarah Jenkins", percent: 91.2, attended: 31, total: 34 },
-    { code: "CSE 303", name: "Operating Systems & System Programming", faculty: "Prof. Kevin Ellis", percent: 88.0, attended: 29, total: 33 },
-    { code: "CSE 304", name: "Computer Networks & Security Protocols", faculty: "Dr. Lisa Muller", percent: 96.0, attended: 24, total: 25 },
-    { code: "CSE 305", name: "Machine Learning & Statistical Pattern Rec.", faculty: "Dr. Robert Vance", percent: 86.4, attended: 19, total: 22 },
-    { code: "CSE 306", name: "Software Engineering & Agile Methodologies", faculty: "Prof. Anita Desai", percent: 93.0, attended: 26, total: 28 },
-  ];
-
-  const dailyLogs = [
-    { date: "Aug 01, 2026", code: "CSE 301", subject: "Advanced Data Structures", time: "09:00 AM - 10:00 AM", status: "Present" },
-    { date: "Aug 01, 2026", code: "CSE 302", subject: "Database Systems", time: "10:15 AM - 11:15 AM", status: "Present" },
-    { date: "Jul 31, 2026", code: "CSE 303", subject: "Operating Systems", time: "02:00 PM - 03:00 PM", status: "Present" },
-    { date: "Jul 31, 2026", code: "CSE 305", subject: "Machine Learning", time: "03:15 PM - 04:15 PM", status: "Absent" },
-    { date: "Jul 30, 2026", code: "CSE 304", subject: "Computer Networks", time: "11:30 AM - 12:30 PM", status: "Present" },
-    { date: "Jul 30, 2026", code: "CSE 306", subject: "Software Engineering", time: "04:30 PM - 05:30 PM", status: "Present" },
-  ];
 
   const filteredLogs = dailyLogs.filter(item => {
     if (statusFilter === "present") return item.status === "Present";
     if (statusFilter === "absent") return item.status === "Absent";
     return true;
   });
-
-  const subjectTopicUnderstandingData = [
-    {
-      code: "CSE 301",
-      name: "Advanced Data Structures",
-      overallClarity: 92,
-      quizzes: "12 / 12 Completed",
-      topics: [
-        { name: "Binary Search Trees & AVL Balance", clarity: 96, status: "Mastery", quizzes: "4/4 Passed" },
-        { name: "Graph Traversal (BFS & DFS)", clarity: 94, status: "Mastery", quizzes: "3/3 Passed" },
-        { name: "Dynamic Programming & Knapsack Problem", clarity: 84, status: "Needs Practice", quizzes: "3/4 Passed" },
-        { name: "Min & Max Heaps & Priority Queues", clarity: 95, status: "Mastery", quizzes: "2/2 Passed" },
-      ]
-    },
-    {
-      code: "CSE 302",
-      name: "Database Management Systems",
-      overallClarity: 88,
-      quizzes: "10 / 10 Completed",
-      topics: [
-        { name: "Relational Algebra & SQL Complex Joins", clarity: 94, status: "Mastery", quizzes: "3/3 Passed" },
-        { name: "Normalization (1NF, 2NF, 3NF & BCNF)", clarity: 88, status: "Good Understanding", quizzes: "3/3 Passed" },
-        { name: "Transaction Concurrency & ACID Protocols", clarity: 82, status: "Needs Practice", quizzes: "2/3 Passed" },
-        { name: "B+ Tree Indexing & Query Plans", clarity: 90, status: "Good Understanding", quizzes: "2/2 Passed" },
-      ]
-    },
-    {
-      code: "CSE 303",
-      name: "Operating Systems",
-      overallClarity: 84,
-      quizzes: "8 / 9 Completed",
-      topics: [
-        { name: "CPU Scheduling Algorithms (Round Robin, SJF)", clarity: 92, status: "Mastery", quizzes: "3/3 Passed" },
-        { name: "Process Synchronization & Semaphores", clarity: 76, status: "Review Recommended", quizzes: "2/3 Passed" },
-        { name: "Virtual Memory Paging & Page Replacement", clarity: 86, status: "Good Understanding", quizzes: "3/3 Passed" },
-      ]
-    },
-    {
-      code: "CSE 304",
-      name: "Computer Networks",
-      overallClarity: 95,
-      quizzes: "11 / 11 Completed",
-      topics: [
-        { name: "TCP/IP Protocol Stack & Congestion Control", clarity: 98, status: "Mastery", quizzes: "4/4 Passed" },
-        { name: "Subnetting, CIDR & IP Routing Tables", clarity: 94, status: "Mastery", quizzes: "3/3 Passed" },
-        { name: "DNS Architecture & Application Layer", clarity: 95, status: "Mastery", quizzes: "2/2 Passed" },
-      ]
-    },
-    {
-      code: "CSE 305",
-      name: "Machine Learning",
-      overallClarity: 86,
-      quizzes: "9 / 10 Completed",
-      topics: [
-        { name: "Linear & Logistic Regression Models", clarity: 90, status: "Good Understanding", quizzes: "3/3 Passed" },
-        { name: "Decision Trees & Random Forests", clarity: 88, status: "Good Understanding", quizzes: "3/3 Passed" },
-        { name: "Gradient Descent Convergence & Learning Rate", clarity: 78, status: "Review Recommended", quizzes: "1/2 Passed" },
-      ]
-    },
-    {
-      code: "CSE 306",
-      name: "Software Engineering",
-      overallClarity: 90,
-      quizzes: "10 / 10 Completed",
-      topics: [
-        { name: "Agile Scrum Sprint Planning & User Stories", clarity: 95, status: "Mastery", quizzes: "3/3 Passed" },
-        { name: "UML Class & Sequence Diagrams", clarity: 90, status: "Good Understanding", quizzes: "3/3 Passed" },
-        { name: "CI/CD Pipelines & Automated Unit Testing", clarity: 88, status: "Good Understanding", quizzes: "2/2 Passed" },
-      ]
-    }
-  ];
 
   return (
     <div className={styles.container}>
@@ -227,8 +188,27 @@ export default function StudentReportsPage() {
         </div>
       </div>
 
+      {loading && (
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "40vh" }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-700"></div>
+            <p style={{ color: "#64748b", fontWeight: 600 }}>Loading Analytics Data...</p>
+          </div>
+        </div>
+      )}
+
+      {!loading && error && (
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "40vh" }}>
+          <div style={{ backgroundColor: "#fef2f2", border: "1px solid #fecaca", padding: "24px", borderRadius: "12px", maxWidth: "500px", textAlign: "center" }}>
+            <AlertCircle size={32} color="#dc2626" style={{ margin: "0 auto 12px" }} />
+            <h3 style={{ color: "#991b1b", fontSize: "1.2rem", fontWeight: 700, marginBottom: "8px" }}>Connection Error</h3>
+            <p style={{ color: "#7f1d1d", fontSize: "0.9rem" }}>{error}</p>
+          </div>
+        </div>
+      )}
+
       {/* TAB 1: ATTENDANCE TRACKER & DAILY BIOMETRIC LOGS */}
-      {activeTab === "attendance" && (
+      {!loading && !error && activeTab === "attendance" && (
         <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
           {/* Subject Attendance Breakdown Cards */}
           <div className={styles.subjectGrid}>
@@ -248,6 +228,11 @@ export default function StudentReportsPage() {
                 </div>
               </div>
             ))}
+            {attendanceData.length === 0 && (
+              <div style={{ padding: "40px", textAlign: "center", gridColumn: "1 / -1", color: "#64748b", backgroundColor: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+                No active course enrollments found for attendance tracking.
+              </div>
+            )}
           </div>
 
           {/* Daily Attendance Logs Table */}
@@ -299,6 +284,13 @@ export default function StudentReportsPage() {
                       </td>
                     </tr>
                   ))}
+                  {filteredLogs.length === 0 && (
+                    <tr>
+                      <td colSpan={5} style={{ textAlign: "center", padding: "30px", color: "#64748b" }}>
+                        No attendance logs found matching the selected filters.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -307,7 +299,7 @@ export default function StudentReportsPage() {
       )}
 
       {/* TAB 2: CONCEPT & PULSE UNDERSTANDING WITH EXPLICIT BREAKDOWN BUTTONS */}
-      {activeTab === "understanding" && (
+      {!loading && !error && activeTab === "understanding" && (
         <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
           <div className={styles.cardPanel}>
             <div className={styles.cardTitleRow}>
@@ -316,30 +308,36 @@ export default function StudentReportsPage() {
                 Real-Time Course & Topic Understanding Breakdown
               </h3>
 
-              <button
-                onClick={toggleAllSubjects}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  padding: "7px 14px",
-                  borderRadius: "8px",
-                  fontSize: "0.8rem",
-                  fontWeight: 700,
-                  backgroundColor: "#e6f4ea",
-                  color: "#00522E",
-                  border: "1px solid #c2e7da",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease"
-                }}
-              >
-                <Layers size={14} />
-                {allExpanded ? "Collapse All Topics" : "Expand All Topics"}
-              </button>
+              {subjectTopicUnderstandingData.length > 0 && (
+                <button
+                  onClick={toggleAllSubjects}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    padding: "7px 14px",
+                    borderRadius: "8px",
+                    fontSize: "0.8rem",
+                    fontWeight: 700,
+                    backgroundColor: "#e6f4ea",
+                    color: "#00522E",
+                    border: "1px solid #c2e7da",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease"
+                  }}
+                >
+                  <Layers size={14} />
+                  {allExpanded ? "Collapse All Topics" : "Expand All Topics"}
+                </button>
+              )}
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              {subjectTopicUnderstandingData.map((item) => {
+              {subjectTopicUnderstandingData.length === 0 ? (
+                <div style={{ padding: "40px", textAlign: "center", color: "#64748b", backgroundColor: "#f8fafc", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+                  No topic analytics data available for your current courses.
+                </div>
+              ) : subjectTopicUnderstandingData.map((item) => {
                 const isExpanded = expandedSubjects[item.code] ?? true;
                 return (
                   <div
@@ -422,7 +420,7 @@ export default function StudentReportsPage() {
                               </tr>
                             </thead>
                             <tbody>
-                              {item.topics.map((topic, tIdx) => (
+                              {item.topics.map((topic: any, tIdx: number) => (
                                 <tr key={tIdx}>
                                   <td style={{ fontWeight: 600, color: "#0f172a", fontSize: "0.85rem" }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -461,30 +459,38 @@ export default function StudentReportsPage() {
           </div>
 
           {/* Concept Gap Alerts */}
-          <div className={styles.cardPanel}>
-            <h3 className={styles.cardTitle}>
-              <Sparkles size={20} style={{ color: "#00522E" }} />
-              Recommended Concept Review Areas
-            </h3>
+          {subjectTopicUnderstandingData.length > 0 && (
+            <div className={styles.cardPanel}>
+              <h3 className={styles.cardTitle}>
+                <Sparkles size={20} style={{ color: "#00522E" }} />
+                Recommended Concept Review Areas
+              </h3>
 
-            <div className={styles.gapGrid}>
-              <div className={styles.gapCard}>
-                <Info size={20} style={{ color: "#00522E", flexShrink: 0, marginTop: "2px" }} />
-                <div>
-                  <h4 className={styles.gapTitle}>Operating Systems: Process Synchronization</h4>
-                  <p className={styles.gapDesc}>Topic Clarity: 76%. Recommended: Review Mutex locks, Peterson's algorithm, and Semaphore practice problems before the upcoming Mid-Term exam.</p>
-                </div>
-              </div>
-
-              <div className={styles.gapCard}>
-                <Info size={20} style={{ color: "#00522E", flexShrink: 0, marginTop: "2px" }} />
-                <div>
-                  <h4 className={styles.gapTitle}>Machine Learning: Gradient Descent Convergence</h4>
-                  <p className={styles.gapDesc}>Topic Clarity: 78%. Recommended: Practice learning rate tuning and mini-batch stochastic gradient descent numerical calculations.</p>
-                </div>
+              <div className={styles.gapGrid}>
+                {subjectTopicUnderstandingData
+                  .flatMap((item: any) => 
+                    item.topics.filter((t: any) => t.clarity < 80).map((t: any) => ({
+                      course: item.name,
+                      topic: t.name,
+                      clarity: t.clarity
+                    }))
+                  )
+                  .slice(0, 3)
+                  .map((gap: any, i: number) => (
+                    <div key={i} className={styles.gapCard}>
+                      <Info size={20} style={{ color: "#00522E", flexShrink: 0, marginTop: "2px" }} />
+                      <div>
+                        <h4 className={styles.gapTitle}>{gap.course}: {gap.topic}</h4>
+                        <p className={styles.gapDesc}>Topic Clarity: {gap.clarity}%. Recommended: Review core materials and practice problems for this topic.</p>
+                      </div>
+                    </div>
+                ))}
+                {subjectTopicUnderstandingData.flatMap((item: any) => item.topics.filter((t: any) => t.clarity < 80)).length === 0 && (
+                  <div style={{ color: "#64748b" }}>Great job! No major concept gaps detected.</div>
+                )}
               </div>
             </div>
-          </div>
+          )}
         </div>
       )}
     </div>

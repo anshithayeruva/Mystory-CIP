@@ -16,7 +16,7 @@ import {
   FileText
 } from "lucide-react";
 import styles from "./settings.module.css";
-import { STUDENT_INFO } from "../mockData";
+import { studentDashboardService } from "@/services/studentDashboard.service";
 
 type TabType = "Profile" | "Academic" | "Documents" | "Notifications" | "Security";
 
@@ -25,34 +25,37 @@ export default function StudentSettingsPage() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // Using the same mocked studentId as the dashboard for now
+  const studentId = "6a6a3135b6f279c37d3c4bd4";
 
   // 1. Personal Profile State
   const [profileForm, setProfileForm] = useState({
-    name: STUDENT_INFO.name,
-    rollNo: STUDENT_INFO.rollNo,
-    email: STUDENT_INFO.email,
-    phone: STUDENT_INFO.phone,
-    regNo: STUDENT_INFO.regNo,
-    address: STUDENT_INFO.address,
-    emergencyContact: STUDENT_INFO.emergencyContact,
+    name: "",
+    rollNo: "",
+    email: "",
+    phone: "",
+    regNo: "",
+    address: "",
+    emergencyContact: "",
   });
 
   // 2. Academic Information State
   const [academicForm, setAcademicForm] = useState({
-    program: STUDENT_INFO.program,
-    department: "Computer Science & Engineering",
-    academicYear: "2025 - 2026",
-    semester: "Semester 6 (Spring 2026)",
-    advisorName: STUDENT_INFO.advisorName,
-    cgpa: STUDENT_INFO.cgpa,
+    program: "",
+    department: "",
+    academicYear: "",
+    semester: "",
+    advisorName: "",
+    cgpa: "N/A", // From backend student info, or we can leave as N/A
     learningMode: "Hybrid / Classroom",
   });
 
-  // 3. Notifications State
+  // 3. Documents State
+  const [documents, setDocuments] = useState<any[]>([]);
+
+  // 4. Notifications State
   const [notifications, setNotifications] = useState({
     timetableReminders: true,
     attendanceAlerts: true,
@@ -60,16 +63,19 @@ export default function StudentSettingsPage() {
     weeklyDigest: false,
   });
 
-  // 4. Security State
+  // 5. Security State
   const [securityForm, setSecurityForm] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
-    enable2FA: true,
+    enable2FA: false,
   });
   const [showPassword, setShowPassword] = useState(false);
 
-  if (!mounted) return null;
+  useEffect(() => {
+    setMounted(true);
+    fetchSettings();
+  }, []);
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
@@ -78,16 +84,140 @@ export default function StudentSettingsPage() {
     }, 3500);
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const fetchSettings = async () => {
+    try {
+      setIsLoading(true);
+      const data = await studentDashboardService.getSettings(studentId);
+      
+      setProfileForm({
+        name: data.profile.name,
+        rollNo: data.profile.rollNo,
+        email: data.profile.email,
+        phone: data.profile.phone,
+        regNo: data.profile.regNo,
+        address: data.profile.address,
+        emergencyContact: data.profile.emergencyContact,
+      });
+
+      setAcademicForm({
+        program: data.academic.program,
+        department: data.academic.department,
+        academicYear: data.academic.academicYear,
+        semester: data.academic.semester,
+        advisorName: data.academic.advisorName,
+        cgpa: "8.85", // Mock or retrieve from another endpoint
+        learningMode: data.academic.learningMode,
+      });
+
+      setNotifications(data.notifications);
+
+      setSecurityForm(prev => ({
+        ...prev,
+        enable2FA: data.security.enable2FA
+      }));
+
+      // Fetch documents
+      const docs = await studentDashboardService.getDocuments(studentId);
+      setDocuments(docs);
+
+    } catch (error) {
+      console.error("Failed to load settings:", error);
+      triggerToast("Failed to load settings.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!mounted) return null;
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
-    setTimeout(() => {
+    try {
+      await studentDashboardService.updateProfile(studentId, {
+        name: profileForm.name,
+        phone: profileForm.phone,
+        address: profileForm.address,
+        emergencyContact: profileForm.emergencyContact,
+      });
+      triggerToast("Profile settings updated successfully!");
+    } catch (error) {
+      triggerToast("Failed to update profile.");
+    } finally {
       setIsSaving(false);
-      triggerToast("Student profile settings updated successfully!");
-    }, 400);
+    }
+  };
+
+  const handleSaveAcademic = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      await studentDashboardService.updateAcademic(studentId, {
+        learningMode: academicForm.learningMode,
+      });
+      triggerToast("Academic preferences updated successfully!");
+    } catch (error) {
+      triggerToast("Failed to update academic preferences.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveSecurity = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (securityForm.newPassword && securityForm.newPassword !== securityForm.confirmPassword) {
+      triggerToast("New passwords do not match!");
+      return;
+    }
+    
+    setIsSaving(true);
+    try {
+      await studentDashboardService.updateSecurity(studentId, {
+        currentPassword: securityForm.currentPassword,
+        newPassword: securityForm.newPassword,
+      });
+      setSecurityForm(prev => ({ ...prev, currentPassword: "", newPassword: "", confirmPassword: "" }));
+      triggerToast("Security settings updated successfully!");
+    } catch (error) {
+      triggerToast("Failed to update security settings.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleNotificationChange = async (key: keyof typeof notifications, value: boolean) => {
+    const updatedNotifications = { ...notifications, [key]: value };
+    setNotifications(updatedNotifications);
+    try {
+      await studentDashboardService.updateNotifications(studentId, updatedNotifications);
+      triggerToast("Alert preference saved!");
+    } catch (error) {
+      triggerToast("Failed to save alert preference.");
+      // Revert if failed
+      setNotifications(notifications);
+    }
+  };
+
+  const handle2FAChange = async (value: boolean) => {
+    setSecurityForm(prev => ({ ...prev, enable2FA: value }));
+    try {
+      await studentDashboardService.updateSecurity(studentId, { enable2FA: value });
+      triggerToast("2FA security setting updated!");
+    } catch (error) {
+      triggerToast("Failed to update 2FA setting.");
+      setSecurityForm(prev => ({ ...prev, enable2FA: !value })); // revert
+    }
   };
 
   const tabs: TabType[] = ["Profile", "Academic", "Documents", "Notifications", "Security"];
+
+  if (isLoading) {
+    return (
+      <div className={styles.container} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-700"></div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
@@ -137,7 +267,7 @@ export default function StudentSettingsPage() {
                 <div className={styles.sectionDesc}>Primary personal details and identity information for your student account.</div>
               </div>
               <div className={styles.sectionCard}>
-                <form onSubmit={handleSave}>
+                <form onSubmit={handleSaveProfile}>
                   <div className={styles.formGrid}>
                     <div className={styles.formGroup}>
                       <label className={styles.label}>Full Name</label>
@@ -205,9 +335,9 @@ export default function StudentSettingsPage() {
                   </div>
 
                   <div className={styles.btnGroup}>
-                    <button type="button" className={styles.btnCancel} onClick={() => triggerToast("Reverted to saved values.")}>Cancel</button>
+                    <button type="button" className={styles.btnCancel} onClick={() => { fetchSettings(); triggerToast("Reverted to saved values."); }}>Cancel</button>
                     <button type="submit" className={styles.btnSave} disabled={isSaving}>
-                      <Save size={14} /> Save Profile Changes
+                      <Save size={14} /> {isSaving ? "Saving..." : "Save Profile Changes"}
                     </button>
                   </div>
                 </form>
@@ -225,7 +355,7 @@ export default function StudentSettingsPage() {
                 <div className={styles.sectionDesc}>Enrolled degree program, academic advisor, and standing metrics.</div>
               </div>
               <div className={styles.sectionCard}>
-                <form onSubmit={handleSave}>
+                <form onSubmit={handleSaveAcademic}>
                   <div className={styles.formGrid}>
                     <div className={styles.formGroup}>
                       <label className={styles.label}>Degree Program</label>
@@ -284,20 +414,20 @@ export default function StudentSettingsPage() {
                     <div className={styles.formGroup} style={{ gridColumn: "span 2" }}>
                       <label className={styles.label}>Preferred Learning Mode</label>
                       <select
-                        className={styles.select}
-                        value={academicForm.learningMode}
-                        onChange={(e) => setAcademicForm({ ...academicForm, learningMode: e.target.value })}
+                         className={styles.select}
+                         value={academicForm.learningMode}
+                         onChange={(e) => setAcademicForm({ ...academicForm, learningMode: e.target.value })}
                       >
-                        <option>Hybrid / Classroom</option>
-                        <option>In-Person Campus Only</option>
-                        <option>Digital / Distance Mode</option>
+                         <option value="Hybrid / Classroom">Hybrid / Classroom</option>
+                         <option value="In-Person Campus Only">In-Person Campus Only</option>
+                         <option value="Digital / Distance Mode">Digital / Distance Mode</option>
                       </select>
                     </div>
                   </div>
 
                   <div className={styles.btnGroup}>
-                    <button type="button" className={styles.btnCancel} onClick={() => triggerToast("Discarded changes.")}>Discard Changes</button>
-                    <button type="submit" className={styles.btnSave}>Save Academic Preferences</button>
+                    <button type="button" className={styles.btnCancel} onClick={() => { fetchSettings(); triggerToast("Discarded changes."); }}>Discard Changes</button>
+                    <button type="submit" className={styles.btnSave} disabled={isSaving}>{isSaving ? "Saving..." : "Save Academic Preferences"}</button>
                   </div>
                 </form>
               </div>
@@ -325,46 +455,25 @@ export default function StudentSettingsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td style={{ fontWeight: 600, color: "#0f172a" }}>Digital Student ID Card</td>
-                        <td>Identity</td>
-                        <td><span className={styles.badgeCompleted}>VERIFIED</span></td>
-                        <td>
-                          <button className={styles.btnSecondary} onClick={() => triggerToast("Downloading Digital Student ID...")}>
-                            <Download size={14} /> Download PDF
-                          </button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style={{ fontWeight: 600, color: "#0f172a" }}>Official Academic Transcript (Sem 1-5)</td>
-                        <td>Academic Record</td>
-                        <td><span className={styles.badgeCompleted}>VERIFIED</span></td>
-                        <td>
-                          <button className={styles.btnSecondary} onClick={() => triggerToast("Downloading Academic Transcript...")}>
-                            <Download size={14} /> Download PDF
-                          </button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style={{ fontWeight: 600, color: "#0f172a" }}>Semester 6 Fee Payment Receipt</td>
-                        <td>Financial</td>
-                        <td><span className={styles.badgeCompleted}>PAID</span></td>
-                        <td>
-                          <button className={styles.btnSecondary} onClick={() => triggerToast("Downloading Fee Receipt...")}>
-                            <Download size={14} /> Download Receipt
-                          </button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style={{ fontWeight: 600, color: "#0f172a" }}>Bonafide Student Certificate</td>
-                        <td>Administrative</td>
-                        <td><span className={styles.badgeCompleted}>ISSUED</span></td>
-                        <td>
-                          <button className={styles.btnSecondary} onClick={() => triggerToast("Downloading Bonafide Certificate...")}>
-                            <Download size={14} /> Download PDF
-                          </button>
-                        </td>
-                      </tr>
+                      {documents.map((doc, idx) => (
+                        <tr key={idx}>
+                          <td style={{ fontWeight: 600, color: "#0f172a" }}>{doc.name}</td>
+                          <td>{doc.category}</td>
+                          <td>
+                            <span className={styles.badgeCompleted} style={{
+                              backgroundColor: doc.status === "VERIFIED" ? "#dcfce7" : doc.status === "PAID" ? "#e0e7ff" : "#fef3c7",
+                              color: doc.status === "VERIFIED" ? "#166534" : doc.status === "PAID" ? "#3730a3" : "#92400e"
+                            }}>
+                              {doc.status}
+                            </span>
+                          </td>
+                          <td>
+                            <button className={styles.btnSecondary} onClick={() => triggerToast(`Downloading ${doc.name}...`)}>
+                              <Download size={14} /> Download PDF
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
@@ -391,10 +500,7 @@ export default function StudentSettingsPage() {
                     <input
                       type="checkbox"
                       checked={notifications.timetableReminders}
-                      onChange={(e) => {
-                        setNotifications({ ...notifications, timetableReminders: e.target.checked });
-                        triggerToast("Alert preference saved!");
-                      }}
+                      onChange={(e) => handleNotificationChange("timetableReminders", e.target.checked)}
                     />
                     <span className={styles.slider}></span>
                   </label>
@@ -409,10 +515,7 @@ export default function StudentSettingsPage() {
                     <input
                       type="checkbox"
                       checked={notifications.attendanceAlerts}
-                      onChange={(e) => {
-                        setNotifications({ ...notifications, attendanceAlerts: e.target.checked });
-                        triggerToast("Alert preference saved!");
-                      }}
+                      onChange={(e) => handleNotificationChange("attendanceAlerts", e.target.checked)}
                     />
                     <span className={styles.slider}></span>
                   </label>
@@ -427,10 +530,7 @@ export default function StudentSettingsPage() {
                     <input
                       type="checkbox"
                       checked={notifications.resourceUploads}
-                      onChange={(e) => {
-                        setNotifications({ ...notifications, resourceUploads: e.target.checked });
-                        triggerToast("Alert preference saved!");
-                      }}
+                      onChange={(e) => handleNotificationChange("resourceUploads", e.target.checked)}
                     />
                     <span className={styles.slider}></span>
                   </label>
@@ -445,10 +545,7 @@ export default function StudentSettingsPage() {
                     <input
                       type="checkbox"
                       checked={notifications.weeklyDigest}
-                      onChange={(e) => {
-                        setNotifications({ ...notifications, weeklyDigest: e.target.checked });
-                        triggerToast("Alert preference saved!");
-                      }}
+                      onChange={(e) => handleNotificationChange("weeklyDigest", e.target.checked)}
                     />
                     <span className={styles.slider}></span>
                   </label>
@@ -467,7 +564,7 @@ export default function StudentSettingsPage() {
                 <div className={styles.sectionDesc}>Update your account password and security credentials.</div>
               </div>
               <div className={styles.sectionCard}>
-                <form onSubmit={handleSave}>
+                <form onSubmit={handleSaveSecurity}>
                   <div className={styles.formGridSingle}>
                     <div className={styles.formGroup}>
                       <label className={styles.label}>Current Password</label>
@@ -524,19 +621,16 @@ export default function StudentSettingsPage() {
                       <input
                         type="checkbox"
                         checked={securityForm.enable2FA}
-                        onChange={(e) => {
-                          setSecurityForm({ ...securityForm, enable2FA: e.target.checked });
-                          triggerToast("2FA security setting updated!");
-                        }}
+                        onChange={(e) => handle2FAChange(e.target.checked)}
                       />
                       <span className={styles.slider}></span>
                     </label>
                   </div>
 
                   <div className={styles.btnGroup}>
-                    <button type="button" className={styles.btnCancel}>Cancel</button>
-                    <button type="submit" className={styles.btnSave}>
-                      <Lock size={14} /> Update Security
+                    <button type="button" className={styles.btnCancel} onClick={() => setSecurityForm(prev => ({ ...prev, currentPassword: "", newPassword: "", confirmPassword: "" }))}>Cancel</button>
+                    <button type="submit" className={styles.btnSave} disabled={isSaving}>
+                      <Lock size={14} /> {isSaving ? "Updating..." : "Update Security"}
                     </button>
                   </div>
                 </form>

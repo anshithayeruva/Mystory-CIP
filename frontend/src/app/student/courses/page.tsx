@@ -1,19 +1,69 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { User, ArrowRight, Search } from "lucide-react";
+import { User, ArrowRight, Search, AlertCircle } from "lucide-react";
 import styles from "../student.module.css";
-import { STUDENT_COURSES } from "../mockData";
+import { studentDashboardService } from "@/services/studentDashboard.service";
 
 export default function StudentCoursesPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [courses, setCourses] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredCourses = STUDENT_COURSES.filter(c =>
+  // Using the same mocked studentId as the dashboard for now
+  const studentId = "6a6a3135b6f279c37d3c4bd4";
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        setLoading(true);
+        const data = await studentDashboardService.getCourses(studentId);
+        if (data) {
+          setCourses(data);
+        } else {
+          setError("Failed to fetch courses.");
+        }
+      } catch (err: any) {
+        setError(err.message || "An unexpected error occurred.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourses();
+  }, [studentId]);
+
+  const filteredCourses = courses.filter(c =>
     c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.faculty.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const totalCredits = courses.reduce((sum, c) => sum + (c.credits || 0), 0);
+
+  if (loading) {
+    return (
+      <div className={styles.pageContainer} style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "60vh" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-700"></div>
+          <p style={{ color: "#64748b", fontWeight: 600 }}>Loading Courses...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.pageContainer} style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "60vh" }}>
+        <div style={{ backgroundColor: "#fef2f2", border: "1px solid #fecaca", padding: "24px", borderRadius: "12px", maxWidth: "500px", textAlign: "center" }}>
+          <AlertCircle size={32} color="#dc2626" style={{ margin: "0 auto 12px" }} />
+          <h3 style={{ color: "#991b1b", fontSize: "1.2rem", fontWeight: 700, marginBottom: "8px" }}>Connection Error</h3>
+          <p style={{ color: "#7f1d1d", fontSize: "0.9rem" }}>{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.pageContainer}>
@@ -22,12 +72,12 @@ export default function StudentCoursesPage() {
         <div>
           <h1 className={styles.welcomeTitle}>Course Enrolment & Syllabus</h1>
           <p className={styles.welcomeSubtitle}>
-            Semester 6 (Spring 2026) • 6 Active Enrolled Courses • 24 Academic Credits
+            Semester 6 (Spring 2026) • {courses.length} Active Enrolled Courses • {totalCredits} Academic Credits
           </p>
         </div>
         <div className={styles.bannerMeta}>
           <div className={styles.metaPill}>
-            Total 24 Credits
+            Total {totalCredits} Credits
           </div>
         </div>
       </div>
@@ -49,7 +99,11 @@ export default function StudentCoursesPage() {
 
       {/* Course Cards Grid - Equal Card Height & Uniform Bottom Pinned Buttons */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "20px" }}>
-        {filteredCourses.map((course) => (
+        {filteredCourses.length === 0 ? (
+          <div style={{ padding: "40px", textAlign: "center", gridColumn: "1 / -1", color: "#64748b" }}>
+            No courses found matching your search.
+          </div>
+        ) : filteredCourses.map((course) => (
           <div
             key={course.id}
             className={styles.card}

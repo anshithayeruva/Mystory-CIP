@@ -17,6 +17,7 @@ model User {
   phoneNumber      String?
   lastLoginAt      DateTime?
   isActive         Boolean           @default(true)
+  twoFactorEnabled Boolean           @default(false)
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   adminProfile     AdminProfile?
@@ -103,10 +104,17 @@ model StudentProfile {
   registrationNumber  String?              @unique
   sectionId           String?              @db.ObjectId
   semesterId          String?              @db.ObjectId
+  address             String?
+  emergencyContact    String?
+  learningMode        String?              @default("Hybrid / Classroom")
   status              StudentStatus        @default(ACTIVE)
   attendance          Attendance[]
   enrollments         Enrollment[]
   pulseParticipations PulseParticipation[]
+  assignmentSubmissions AssignmentSubmission[]
+  generatedReports    GeneratedReport[]
+  notificationSettings StudentNotificationSettings?
+  documents           StudentDocument[]
   department          Department           @relation(fields: [departmentId], references: [id])
   program             Program?             @relation(fields: [programId], references: [id])
   section             Section?             @relation(fields: [sectionId], references: [id])
@@ -194,6 +202,8 @@ model FacultyCourse {
   updatedAt    DateTime       @updatedAt
   course       Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
   faculty      FacultyProfile @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  classSchedules ClassSchedule[]
+  assignments    Assignment[]
 
   @@unique([facultyId, courseId, section, academicYear, semester])
   @@index([facultyId])
@@ -689,4 +699,100 @@ model ConceptGapAnalysis {
 
   @@index([courseId])
   @@index([topicId])
+}
+
+model ClassSchedule {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  facultyCourseId String        @db.ObjectId
+  dayOfWeek       String
+  startTime       String
+  endTime         String
+  room            String
+  type            String        // Lecture, Lab, Tutorial
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  facultyCourse   FacultyCourse @relation(fields: [facultyCourseId], references: [id], onDelete: Cascade)
+  
+  @@index([facultyCourseId])
+}
+
+model Assignment {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  facultyCourseId String        @db.ObjectId
+  title           String
+  description     String?
+  dueDate         DateTime
+  dueTime         String?
+  maxMarks        Float         @default(100.0)
+  priority        String        @default("MEDIUM")
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  facultyCourse   FacultyCourse @relation(fields: [facultyCourseId], references: [id], onDelete: Cascade)
+  submissions     AssignmentSubmission[]
+  
+  @@index([facultyCourseId])
+}
+
+model AssignmentSubmission {
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
+  assignmentId   String         @db.ObjectId
+  studentId      String         @db.ObjectId
+  status         String         @default("PENDING") // PENDING, SUBMITTED, OVERDUE, GRADED
+  obtainedMarks  Float?
+  feedback       String?
+  submissionDate DateTime?
+  fileUrl        String?
+  
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  
+  assignment     Assignment     @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student        StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  @@unique([assignmentId, studentId])
+  @@index([studentId])
+}
+
+model GeneratedReport {
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  studentId   String         @db.ObjectId
+  title       String
+  type        String         // "ATTENDANCE_ANALYTICS" or "CONCEPT_UNDERSTANDING"
+  fileUrl     String
+  createdAt   DateTime       @default(now())
+  
+  student     StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+}
+
+model StudentNotificationSettings {
+  id                 String         @id @default(auto()) @map("_id") @db.ObjectId
+  studentId          String         @unique @db.ObjectId
+  timetableReminders Boolean        @default(true)
+  attendanceAlerts   Boolean        @default(true)
+  resourceUploads    Boolean        @default(true)
+  weeklyDigest       Boolean        @default(false)
+  updatedAt          DateTime       @updatedAt
+  
+  student            StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model StudentDocument {
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  studentId   String         @db.ObjectId
+  name        String
+  category    String
+  status      String         // e.g., "VERIFIED", "PAID", "ISSUED"
+  fileUrl     String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  
+  student     StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
 }
