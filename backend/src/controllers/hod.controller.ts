@@ -254,4 +254,27 @@ export class HodController {
       return sendError(res, error.statusCode || 500, error.message || 'Failed to update account password');
     }
   }
+
+  // Cross-Module Flow: Reschedule & Swap Approvals
+  static async getRescheduleRequests(req: Request, res: Response) {
+    try {
+      const userId = req.user?.id || 'dev-user';
+      const result = await HodService.getRescheduleRequests(userId);
+      return sendSuccess(res, result, 'Reschedule requests retrieved successfully');
+    } catch (error: any) {
+      return sendError(res, error.statusCode || 500, error.message || 'Failed to fetch reschedule requests');
+    }
+  }
+
+  static async approveRescheduleRequest(req: Request, res: Response) {
+    try {
+      const userId = req.user?.id || 'dev-user';
+      const { requestId, status } = req.body;
+      const result = await HodService.approveRescheduleRequest(userId, requestId, status);
+      return sendSuccess(res, result, `Reschedule request ${status?.toLowerCase()} successfully`);
+    } catch (error: any) {
+      return sendError(res, error.statusCode || 500, error.message || 'Failed to process reschedule request');
+    }
+  }
 }
+

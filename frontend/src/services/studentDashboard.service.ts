@@ -47,7 +47,7 @@ export const studentDashboardService = {
       },
       body: JSON.stringify({ title, type })
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -105,5 +105,25 @@ export const studentDashboardService = {
 
   getDocuments: async (studentId: string) => {
     return fetcher(`${API_URL}/student/${studentId}/documents`);
+  },
+
+  // Cross-Module Methods
+  getCourseResources: async () => {
+    return fetcher(`${API_URL}/student/resources`);
+  },
+
+  getActivePulseSessions: async () => {
+    return fetcher(`${API_URL}/student/pulse/active`);
+  },
+
+  submitPulseResponse: async (sessionId: string, selectedOption: string) => {
+    const response = await fetch(`${API_URL}/student/pulse/respond`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId, selectedOption })
+    });
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const data = await response.json();
+    return data;
   }
 };

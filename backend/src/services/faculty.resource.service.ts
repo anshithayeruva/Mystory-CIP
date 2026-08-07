@@ -1,6 +1,8 @@
 import { prisma } from '../prisma/client';
 import { AppError } from '../middleware/errorHandler';
 import cache from '../lib/redis';
+import path from 'path';
+import fs from 'fs';
 
 export interface ResourceItem {
   id: string;
@@ -11,6 +13,8 @@ export interface ResourceItem {
   downloads: number;
   visibleTo: string;
   category?: string;
+  fileUrl?: string;
+  filename?: string;
 }
 
 const DEFAULT_RESOURCES: ResourceItem[] = [
@@ -66,6 +70,8 @@ const DEFAULT_RESOURCES: ResourceItem[] = [
   }
 ];
 
+let inMemoryStorage: ResourceItem[] = [...DEFAULT_RESOURCES];
+
 export class FacultyResourceService {
   private static async resolveFaculty(userId?: string) {
     if (userId) {
@@ -80,6 +86,14 @@ export class FacultyResourceService {
     });
   }
 
+  private static formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  }
+
   static async getResources(userId?: string) {
     const cacheKey = `faculty:resources:${userId || 'default'}`;
 
@@ -92,40 +106,28 @@ export class FacultyResourceService {
       console.warn('Redis read skipped for resources:', err);
     }
 
-    const faculty = await this.resolveFaculty(userId);
-
-    if (!faculty) {
-      return DEFAULT_RESOURCES;
-    }
-
-    // Query pulse sessions or course syllabus units as dynamic teaching resources
-    const dbCourses = await prisma.course.findMany({
-      where: { departmentId: faculty.departmentId },
-      take: 5
-    }).catch(() => []);
-
-    if (!dbCourses || dbCourses.length === 0) {
-      return DEFAULT_RESOURCES;
-    }
-
     try {
       if (cache && typeof cache.setex === 'function') {
-        await cache.setex(cacheKey, 60, JSON.stringify(DEFAULT_RESOURCES));
+        await cache.setex(cacheKey, 60, JSON.stringify(inMemoryStorage));
       }
     } catch (err) {
       console.warn('Redis write skipped for resources:', err);
     }
 
-    return DEFAULT_RESOURCES;
+    return inMemoryStorage;
   }
 
-  static async uploadResource(userId: string | undefined, data: {
-    courseCode: string;
-    category: string;
-    title: string;
-    format?: string;
-    visibleTo?: string;
-  }) {
+  static async uploadResource(
+    userId: string | undefined, 
+    data: {
+      courseCode: string;
+      category: string;
+      title: string;
+      format?: string;
+      visibleTo?: string;
+    },
+    file?: Express.Multer.File
+  ) {
     // Invalidate cache
     try {
       if (cache && typeof cache.del === 'function') {
@@ -133,16 +135,32 @@ export class FacultyResourceService {
       }
     } catch (e) {}
 
+    let formatLabel = data.format || 'PDF (6.2 MB)';
+    let fileUrl: string | undefined = undefined;
+    let filename: string | undefined = undefined;
+
+    if (file) {
+      const ext = path.extname(file.originalname).toUpperCase().replace('.', '');
+      const sizeStr = this.formatFileSize(file.size);
+      formatLabel = `${ext} (${sizeStr})`;
+      filename = file.filename;
+      fileUrl = `/uploads/resources/${file.filename}`;
+    }
+
     const newRes: ResourceItem = {
       id: String(Date.now()),
       course: data.courseCode || 'CSE 301',
       title: data.title,
-      format: data.format || 'PDF (6.2 MB)',
+      format: formatLabel,
       uploadedAt: 'Just Now',
       downloads: 0,
       visibleTo: data.visibleTo || 'All Sections',
-      category: data.category || 'Lecture Notes'
+      category: data.category || 'Lecture Notes',
+      fileUrl,
+      filename
     };
+
+    inMemoryStorage = [newRes, ...inMemoryStorage];
 
     return newRes;
   }
@@ -154,6 +172,20 @@ export class FacultyResourceService {
         await cache.del(`faculty:resources:${userId || 'default'}`);
       }
     } catch (e) {}
+
+    const target = inMemoryStorage.find(r => r.id === resourceId);
+    if (target && target.filename) {
+      const filePath = path.join(process.cwd(), 'uploads', 'resources', target.filename);
+      if (fs.existsSync(filePath)) {
+        try {
+          fs.unlinkSync(filePath);
+        } catch (err) {
+          console.warn('Failed to delete resource file from disk:', err);
+        }
+      }
+    }
+
+    inMemoryStorage = inMemoryStorage.filter(r => r.id !== resourceId);
 
     return { id: resourceId, message: 'Resource deleted successfully' };
   }

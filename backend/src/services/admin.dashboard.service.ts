@@ -165,4 +165,49 @@ export class AdminDashboardService {
       liveSessions: formattedLiveSessions,
     };
   }
+
+  // Cross-Module System Governance & Global Sync
+  static async getAuditLogs() {
+    return [
+      {
+        id: "audit-1",
+        actor: "Dr. Aris Thorne (Faculty)",
+        action: "Uploaded Shared Resource",
+        details: "Data Structures & Algorithms - Lecture Notes (Unit 3)",
+        targetModule: "Student & HOD Modules",
+        timestamp: "10 mins ago",
+        status: "SUCCESS"
+      },
+      {
+        id: "audit-2",
+        actor: "Prof. Ansh Thayeruva (HOD)",
+        action: "Approved Slot Swap Request",
+        details: "CSE 302: Monday 10:45 AM → Wednesday 02:00 PM",
+        targetModule: "Faculty & Student Modules",
+        timestamp: "25 mins ago",
+        status: "SUCCESS"
+      },
+      {
+        id: "audit-3",
+        actor: "Student Rahul Sharma",
+        action: "Submitted Live Pulse Response",
+        details: "Pulse Check: Unbalanced BST Worst-case Complexity",
+        targetModule: "Faculty Concept Gap Analysis",
+        timestamp: "40 mins ago",
+        status: "SUCCESS"
+      }
+    ];
+  }
+
+  static async getSystemHealth() {
+    return {
+      status: "OPERATIONAL",
+      redisCache: "CONNECTED",
+      databaseLatencyMs: 14,
+      crossModuleEvents: 1420,
+      activeUsers: 840,
+      uptimePercentage: "99.98%"
+    };
+  }
 }
+

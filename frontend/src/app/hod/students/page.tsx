@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { 
-  Search, 
-  Filter, 
-  UserPlus, 
+import {
+  Search,
+  Filter,
+  UserPlus,
   GraduationCap,
   CalendarCheck,
   Award,
@@ -90,7 +90,7 @@ export default function HodStudentsPage() {
   const [studentList, setStudentList] = useState<StudentItem[]>(initialStudentData);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(1284);
@@ -227,16 +227,16 @@ export default function HodStudentsPage() {
           prev.map((s) =>
             s.id === editingId
               ? {
-                  ...s,
-                  name: formData.name.trim(),
-                  email: generatedEmail,
-                  avatar: initials,
-                  regId: generatedRegId,
-                  program: formData.program,
-                  section: formData.section,
-                  attendance: formData.attendance,
-                  status: formData.status,
-                }
+                ...s,
+                name: formData.name.trim(),
+                email: generatedEmail,
+                avatar: initials,
+                regId: generatedRegId,
+                program: formData.program,
+                section: formData.section,
+                attendance: formData.attendance,
+                status: formData.status,
+              }
               : s
           )
         );
@@ -451,7 +451,7 @@ export default function HodStudentsPage() {
             )}
           </div>
 
-          <button 
+          <button
             className={styles.addBtn}
             onClick={openAddModal}
           >
@@ -510,7 +510,7 @@ export default function HodStudentsPage() {
                     </td>
                     <td style={{ textAlign: "right", paddingRight: "20px" }}>
                       <div className={styles.actionsGroup}>
-                        <button 
+                        <button
                           className={styles.actionCellBtn}
                           title={`Edit ${item.name}`}
                           aria-label={`Edit ${item.name}`}
@@ -518,7 +518,7 @@ export default function HodStudentsPage() {
                         >
                           <Pencil size={16} />
                         </button>
-                        <button 
+                        <button
                           className={styles.actionCellBtn}
                           title={`Delete ${item.name}`}
                           aria-label={`Delete ${item.name}`}
@@ -548,14 +548,14 @@ export default function HodStudentsPage() {
             Showing <strong>{filteredStudents.length === 0 ? 0 : startIndex + 1}-{endIndex}</strong> of <strong>{totalCount}</strong> students
           </div>
           <div className={styles.paginationControls}>
-            <button 
-              className={styles.pageBtn} 
+            <button
+              className={styles.pageBtn}
               disabled={currentPage === 1}
               onClick={() => handlePageChange(currentPage - 1)}
             >
               Previous
             </button>
-            
+
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
               <button
                 key={pageNum}
@@ -566,7 +566,7 @@ export default function HodStudentsPage() {
               </button>
             ))}
 
-            <button 
+            <button
               className={styles.pageBtn}
               disabled={currentPage === totalPages || filteredStudents.length === 0}
               onClick={() => handlePageChange(currentPage + 1)}
@@ -618,7 +618,7 @@ export default function HodStudentsPage() {
       {/* Add / Edit Student Popup Modal */}
       {isModalOpen && (
         <div className={styles.modalOverlay} onClick={() => setIsModalOpen(false)}>
-          <div 
+          <div
             className={styles.modalContainer}
             onClick={(e) => e.stopPropagation()}
           >
@@ -628,12 +628,12 @@ export default function HodStudentsPage() {
                   {editingId ? "Edit Student Details" : "Add New Student"}
                 </h2>
                 <p className={styles.modalSubtitle}>
-                  {editingId 
-                    ? "Update enrollment details, section, and academic standing." 
+                  {editingId
+                    ? "Update enrollment details, section, and academic standing."
                     : "Enter student details to enroll in the department directory."}
                 </p>
               </div>
-              <button 
+              <button
                 className={styles.closeModalBtn}
                 onClick={() => setIsModalOpen(false)}
                 title="Close modal"

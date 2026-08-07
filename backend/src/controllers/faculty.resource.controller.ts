@@ -16,9 +16,19 @@ export class FacultyResourceController {
 
   static async uploadResource(req: Request, res: Response, next: NextFunction) {
     try {
-      const body = ResourceCreateSchema.parse(req.body);
+      const payload = {
+        courseCode: req.body.courseCode || 'CSE 301',
+        category: req.body.category || 'Lecture Notes',
+        title: req.body.title || (req.file ? req.file.originalname : 'Untitled Resource'),
+        format: req.body.format,
+        visibleTo: req.body.visibleTo
+      };
+
+      const body = ResourceCreateSchema.parse(payload);
       const userId = (req.user as any)?.id;
-      const result = await FacultyResourceService.uploadResource(userId, body);
+      const file = req.file;
+
+      const result = await FacultyResourceService.uploadResource(userId, body, file);
       return res.status(201).json({
         success: true,
         data: result,

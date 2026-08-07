@@ -45,4 +45,9 @@ router.get('/account', HodController.getAccountProfile);
 router.put('/account', HodController.updateAccountProfile);
 router.put('/account/password', HodController.updateAccountPassword);
 
+// Cross-Module Flow: Reschedule & Swap Approvals
+router.get('/reschedules', HodController.getRescheduleRequests);
+router.post('/reschedules/approve', HodController.approveRescheduleRequest);
+
 export default router;
+

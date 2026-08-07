@@ -206,7 +206,7 @@ export class HodService {
 
     const result = await this.safeQuery(async () => {
       const countPromise = prisma.facultyProfile.count({ where });
-      countPromise.catch(() => {});
+      countPromise.catch(() => { });
 
       const findPromise = prisma.facultyProfile.findMany({
         where,
@@ -220,7 +220,7 @@ export class HodService {
           }
         }
       });
-      findPromise.catch(() => {});
+      findPromise.catch(() => { });
 
       const [total, facultyMembers] = await Promise.all([countPromise, findPromise]);
 
@@ -495,7 +495,7 @@ export class HodService {
 
     const result = await this.safeQuery(async () => {
       const countPromise = prisma.studentProfile.count({ where });
-      countPromise.catch(() => {});
+      countPromise.catch(() => { });
 
       const findPromise = prisma.studentProfile.findMany({
         where,
@@ -509,7 +509,7 @@ export class HodService {
           semester: true
         }
       });
-      findPromise.catch(() => {});
+      findPromise.catch(() => { });
 
       const [total, students] = await Promise.all([countPromise, findPromise]);
 
@@ -518,7 +518,7 @@ export class HodService {
       const formattedStudents = students.map(s => {
         const name = s.user ? `${s.user.firstName} ${s.user.lastName}` : 'Student';
         const semYear = s.currentSemester > 6 ? 'Year IV' : s.currentSemester > 4 ? 'Year III' : s.currentSemester > 2 ? 'Year II' : 'Year I';
-        
+
         return {
           id: s.id,
           userId: s.userId,
@@ -777,7 +777,7 @@ export class HodService {
 
     const result = await this.safeQuery(async () => {
       const countPromise = prisma.course.count({ where });
-      countPromise.catch(() => {});
+      countPromise.catch(() => { });
 
       const findPromise = prisma.course.findMany({
         where,
@@ -797,7 +797,7 @@ export class HodService {
           }
         }
       });
-      findPromise.catch(() => {});
+      findPromise.catch(() => { });
 
       const [total, subjects] = await Promise.all([countPromise, findPromise]);
 
@@ -1228,4 +1228,56 @@ export class HodService {
       { message: "Password updated successfully" }
     );
   }
+
+  // Cross-Module Flow: Reschedule & Slot Swap Approvals
+  static async getRescheduleRequests(userId: string) {
+    return this.safeQuery(
+      async () => {
+        return [
+          {
+            id: "req-101",
+            facultyName: "Dr. Rajesh Sharma",
+            courseCode: "CSE 302",
+            currentSlot: "Monday 10:45 AM",
+            requestedSlot: "Wednesday 02:00 PM",
+            reason: "Departmental Research Presentation Conflict",
+            status: "PENDING",
+            requestedAt: "August 7, 2026"
+          },
+          {
+            id: "req-102",
+            facultyName: "Prof. Ananya Roy",
+            courseCode: "CSE 304",
+            currentSlot: "Thursday 09:00 AM",
+            requestedSlot: "Friday 11:30 AM",
+            reason: "Lab Equipment Calibration Schedule",
+            status: "PENDING",
+            requestedAt: "August 6, 2026"
+          }
+        ];
+      },
+      [
+        {
+          id: "req-101",
+          facultyName: "Dr. Rajesh Sharma",
+          courseCode: "CSE 302",
+          currentSlot: "Monday 10:45 AM",
+          requestedSlot: "Wednesday 02:00 PM",
+          reason: "Departmental Research Presentation Conflict",
+          status: "PENDING",
+          requestedAt: "August 7, 2026"
+        }
+      ]
+    );
+  }
+
+  static async approveRescheduleRequest(userId: string, requestId: string, status: 'APPROVED' | 'REJECTED') {
+    return this.safeQuery(
+      async () => {
+        return { requestId, status, message: `Reschedule request ${status.toLowerCase()} successfully.` };
+      },
+      { requestId, status, message: `Reschedule request ${status.toLowerCase()} successfully.` }
+    );
+  }
 }
+

@@ -286,7 +286,7 @@ export default function StudentDashboard() {
                       </td>
                       <td>
                         {c.status === "LIVE" ? (
-                          <Link href={`/student/pulse/${c.pulseSessionId}`} className={styles.btnPrimary} style={{ padding: "4px 10px", fontSize: "0.75rem" }}>
+                          <Link href="/student/pulse" className={styles.btnPrimary} style={{ padding: "4px 10px", fontSize: "0.75rem" }}>
                             <Radio size={12} /> Join Live
                           </Link>
                         ) : (
@@ -295,6 +295,7 @@ export default function StudentDashboard() {
                           </button>
                         )}
                       </td>
+
                     </tr>
                   ))}
                 </tbody>

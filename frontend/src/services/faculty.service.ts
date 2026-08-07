@@ -164,10 +164,11 @@ export class FacultyService {
   }
 
   static async uploadResource(data: any) {
+    const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
     const response = await apiClient.fetch('/api/faculty/resources', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+      headers: isFormData ? {} : { 'Content-Type': 'application/json' },
+      body: isFormData ? data : JSON.stringify(data),
     });
     if (!response.ok) throw new Error('Failed to upload resource');
     return response.json();

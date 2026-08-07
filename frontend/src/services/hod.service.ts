@@ -234,4 +234,24 @@ export class HodService {
     if (!response.ok) throw new Error('Failed to update account password');
     return response.json();
   }
+
+  /**
+   * Cross-Module Flow: Reschedule & Swap Approvals API
+   */
+  static async getRescheduleRequests() {
+    const response = await apiClient.fetch('/api/hod/reschedules');
+    if (!response.ok) throw new Error('Failed to fetch reschedule requests');
+    return response.json();
+  }
+
+  static async approveRescheduleRequest(requestId: string, status: 'APPROVED' | 'REJECTED') {
+    const response = await apiClient.fetch('/api/hod/reschedules/approve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ requestId, status }),
+    });
+    if (!response.ok) throw new Error('Failed to process reschedule request');
+    return response.json();
+  }
 }
+

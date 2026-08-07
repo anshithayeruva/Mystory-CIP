@@ -12,6 +12,10 @@ router.use(requireAdmin);
 // Dashboard routes
 router.get('/dashboard', AdminDashboardController.getDashboard);
 
+// Governance & Cross-Module Telemetry
+router.get('/audit-logs', AdminDashboardController.getAuditLogs);
+router.get('/system-health', AdminDashboardController.getSystemHealth);
+
 // Reports routes
 router.use('/reports', adminReportsRoutes);
 
@@ -19,3 +23,4 @@ router.use('/reports', adminReportsRoutes);
 router.use('/settings', adminSettingsRoutes);
 
 export default router;
+

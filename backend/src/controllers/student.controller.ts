@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
 import { studentService } from '../services/student.service';
+import { FacultyResourceService } from '../services/faculty.resource.service';
+import { FacultyPulseSessionService } from '../services/faculty.pulse-session.service';
 import { getStudentDashboardParams, exportReportBody, updateProfileBody, updateAcademicBody, updateNotificationsBody, updateSecurityBody } from '../validators/student.validator';
 
 export class StudentController {
-  
+
   public getDashboardInfo = async (req: Request, res: Response): Promise<void> => {
     try {
       const { studentId } = getStudentDashboardParams.parse(req.params);
@@ -86,6 +88,7 @@ export class StudentController {
       res.status(400).json({ success: false, error: error.message });
     }
   };
+
   public getSettings = async (req: Request, res: Response): Promise<void> => {
     try {
       const { studentId } = getStudentDashboardParams.parse(req.params);
@@ -145,6 +148,37 @@ export class StudentController {
       const { studentId } = getStudentDashboardParams.parse(req.params);
       const data = await studentService.getDocuments(studentId);
       res.json({ success: true, data });
+    } catch (error: any) {
+      res.status(400).json({ success: false, error: error.message });
+    }
+  };
+
+  // Cross-Module Flow: Faculty Resources -> Student View
+  public getCourseResources = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const resources = await FacultyResourceService.getResources();
+      res.json({ success: true, data: resources });
+    } catch (error: any) {
+      res.status(400).json({ success: false, error: error.message });
+    }
+  };
+
+  // Cross-Module Flow: Faculty Active Pulse Sessions -> Student View
+  public getActivePulseSessions = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const sessions = await FacultyPulseSessionService.getAllSessions();
+      res.json({ success: true, data: sessions });
+    } catch (error: any) {
+      res.status(400).json({ success: false, error: error.message });
+    }
+  };
+
+  // Cross-Module Flow: Student submits Pulse response -> updates Faculty Analytics
+  public submitPulseResponse = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { sessionId, selectedOption } = req.body;
+      const result = await FacultyPulseSessionService.recordResponse(sessionId, selectedOption);
+      res.json({ success: true, data: result, message: 'Response recorded successfully!' });
     } catch (error: any) {
       res.status(400).json({ success: false, error: error.message });
     }

@@ -110,6 +110,8 @@ const TIME_SLOTS = [
   "03:15 PM - 04:45 PM"
 ];
 
+import { HodService } from "@/services/hod.service";
+
 export default function HODTimetablePage() {
   const [activeTab, setActiveTab] = useState<TabMode>("master");
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
@@ -117,6 +119,9 @@ export default function HODTimetablePage() {
   const [selectedDayFilter, setSelectedDayFilter] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Cross-Module State: Reschedule Requests from Faculty
+  const [rescheduleRequests, setRescheduleRequests] = useState<any[]>([]);
 
   // AI Generator States
   const [isGenerating, setIsGenerating] = useState(false);
@@ -146,6 +151,31 @@ export default function HODTimetablePage() {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
   };
+
+  React.useEffect(() => {
+    async function loadRescheduleRequests() {
+      try {
+        const res = await HodService.getRescheduleRequests();
+        if (res && res.data && Array.isArray(res.data)) {
+          setRescheduleRequests(res.data);
+        }
+      } catch (err) {
+        console.warn("Reschedule requests API warning:", err);
+      }
+    }
+    loadRescheduleRequests();
+  }, []);
+
+  const handleApproveReschedule = async (requestId: string, status: "APPROVED" | "REJECTED") => {
+    try {
+      await HodService.approveRescheduleRequest(requestId, status);
+    } catch (err) {
+      console.warn("Approve reschedule warning:", err);
+    }
+    setRescheduleRequests(prev => prev.filter(r => r.id !== requestId));
+    showToast(`Faculty slot reschedule request ${status.toLowerCase()}!`);
+  };
+
 
   const handleRunAi = () => {
     setIsGenerating(true);
@@ -371,6 +401,98 @@ export default function HODTimetablePage() {
           </div>
         </div>
       </div>
+
+      {/* Pending Reschedule Requests Banner (Cross-Module Flow) */}
+      {rescheduleRequests.length > 0 && (
+        <div style={{
+          backgroundColor: "#fffbe6",
+          border: "1px solid #ffe58f",
+          borderRadius: "10px",
+          padding: "16px 20px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "12px"
+        }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#d48806", fontWeight: 700, fontSize: "0.9rem" }}>
+              <AlertCircle size={18} />
+              <span>Pending Faculty Reschedule & Slot Swap Requests ({rescheduleRequests.length})</span>
+            </div>
+            <span style={{ fontSize: "0.78rem", color: "#8c6b00" }}>HOD Action Required</span>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "12px" }}>
+            {rescheduleRequests.map(req => (
+              <div key={req.id} style={{
+                backgroundColor: "#ffffff",
+                border: "1px solid #ffd591",
+                borderRadius: "8px",
+                padding: "14px",
+                display: "flex",
+                flexDirection: "column",
+                justify: "space-between",
+                gap: "8px"
+              }}>
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+                    <span style={{ fontWeight: 700, fontSize: "0.88rem", color: "#0f172a" }}>{req.facultyName}</span>
+                    <span style={{ fontSize: "0.75rem", fontWeight: 700, backgroundColor: "#fff0f6", color: "#c41d7f", padding: "2px 6px", borderRadius: "4px" }}>{req.courseCode}</span>
+                  </div>
+                  <div style={{ fontSize: "0.8rem", color: "#595959", margin: "2px 0" }}>
+                    Slot: <strong>{req.currentSlot}</strong> → <strong>{req.requestedSlot}</strong>
+                  </div>
+                  <div style={{ fontSize: "0.78rem", color: "#8c8c8c", fontStyle: "italic" }}>
+                    Reason: "{req.reason}"
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", gap: "8px", marginTop: "6px" }}>
+                  <button
+                    onClick={() => handleApproveReschedule(req.id, "APPROVED")}
+                    style={{
+                      flex: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "4px",
+                      padding: "6px 12px",
+                      backgroundColor: "#047857",
+                      color: "#ffffff",
+                      border: "none",
+                      borderRadius: "6px",
+                      fontWeight: 600,
+                      fontSize: "0.78rem",
+                      cursor: "pointer"
+                    }}
+                  >
+                    <Check size={14} /> Approve Swap
+                  </button>
+                  <button
+                    onClick={() => handleApproveReschedule(req.id, "REJECTED")}
+                    style={{
+                      flex: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "4px",
+                      padding: "6px 12px",
+                      backgroundColor: "#ffffff",
+                      color: "#dc2626",
+                      border: "1px solid #fecaca",
+                      borderRadius: "6px",
+                      fontWeight: 600,
+                      fontSize: "0.78rem",
+                      cursor: "pointer"
+                    }}
+                  >
+                    <X size={14} /> Decline
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Main Tab Navigation */}
       <div style={{

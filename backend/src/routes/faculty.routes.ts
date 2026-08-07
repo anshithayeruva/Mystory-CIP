@@ -9,6 +9,7 @@ import { FacultyLiveClassroomController } from '../controllers/faculty.live-clas
 import { FacultyTimetableController } from '../controllers/faculty.timetable.controller';
 import { FacultyResourceController } from '../controllers/faculty.resource.controller';
 import { FacultyStudentsController } from '../controllers/faculty.students.controller';
+import { resourceUpload } from '../middleware/upload.middleware';
 
 const router = Router();
 
@@ -36,7 +37,7 @@ router.post('/timetable/:id/reschedule', FacultyTimetableController.requestSwap)
 
 // Resources
 router.get('/resources', FacultyResourceController.getResources);
-router.post('/resources', FacultyResourceController.uploadResource);
+router.post('/resources', resourceUpload.single('file'), FacultyResourceController.uploadResource);
 router.delete('/resources/:id', FacultyResourceController.deleteResource);
 
 // Subjects

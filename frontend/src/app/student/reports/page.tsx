@@ -27,10 +27,10 @@ export default function StudentReportsPage() {
   const [selectedSemester, setSelectedSemester] = useState("Semester 6 (Spring 2026)");
   const [statusFilter, setStatusFilter] = useState("all");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   const [attendanceData, setAttendanceData] = useState<any[]>([]);
   const [dailyLogs, setDailyLogs] = useState<any[]>([]);
   const [subjectTopicUnderstandingData, setSubjectTopicUnderstandingData] = useState<any[]>([]);
@@ -74,7 +74,7 @@ export default function StudentReportsPage() {
         setLoading(false);
       }
     };
-    
+
     if (mounted) {
       fetchData();
     }
@@ -110,7 +110,7 @@ export default function StudentReportsPage() {
       triggerToast("Generating & Downloading Official Student Analytics PDF Report...");
       const type = activeTab === "attendance" ? "ATTENDANCE_ANALYTICS" : "CONCEPT_UNDERSTANDING";
       const title = `${activeTab === "attendance" ? "Attendance" : "Understanding"} Report - ${selectedSemester}`;
-      
+
       const response = await studentDashboardService.exportReport(studentId, title, type);
       if (response && response.fileUrl) {
         triggerToast("Report saved to database successfully! Download starting...");
@@ -468,7 +468,7 @@ export default function StudentReportsPage() {
 
               <div className={styles.gapGrid}>
                 {subjectTopicUnderstandingData
-                  .flatMap((item: any) => 
+                  .flatMap((item: any) =>
                     item.topics.filter((t: any) => t.clarity < 80).map((t: any) => ({
                       course: item.name,
                       topic: t.name,
@@ -484,7 +484,7 @@ export default function StudentReportsPage() {
                         <p className={styles.gapDesc}>Topic Clarity: {gap.clarity}%. Recommended: Review core materials and practice problems for this topic.</p>
                       </div>
                     </div>
-                ))}
+                  ))}
                 {subjectTopicUnderstandingData.flatMap((item: any) => item.topics.filter((t: any) => t.clarity < 80)).length === 0 && (
                   <div style={{ color: "#64748b" }}>Great job! No major concept gaps detected.</div>
                 )}

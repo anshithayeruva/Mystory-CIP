@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { 
   Search, 
   UploadCloud, 
@@ -10,7 +10,8 @@ import {
   Bookmark,
   FileText,
   Filter,
-  CheckCircle2
+  CheckCircle2,
+  Download
 } from "lucide-react";
 import styles from "./resources.module.css";
 import { FacultyService } from "@/services/faculty.service";
@@ -24,6 +25,7 @@ interface ResourceItem {
   downloads: number;
   visibleTo: string;
   category?: string;
+  fileUrl?: string;
 }
 
 const MOCK_RESOURCES: ResourceItem[] = [
@@ -83,6 +85,9 @@ export default function FacultyResourcesPage() {
   const [formCourse, setFormCourse] = useState("CSE 301");
   const [formCategory, setFormCategory] = useState("Lecture Notes");
   const [formTitle, setFormTitle] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
@@ -103,6 +108,16 @@ export default function FacultyResourcesPage() {
     loadResources();
   }, []);
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      if (!formTitle) {
+        setFormTitle(file.name.replace(/\.[^/.]+$/, ""));
+      }
+    }
+  };
+
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formTitle.trim()) {
@@ -110,11 +125,19 @@ export default function FacultyResourcesPage() {
       return;
     }
 
+    const formData = new FormData();
+    formData.append("courseCode", formCourse);
+    formData.append("category", formCategory);
+    formData.append("title", formTitle);
+    if (selectedFile) {
+      formData.append("file", selectedFile);
+    }
+
     let newRes: ResourceItem = {
       id: String(Date.now()),
       course: formCourse,
       title: formTitle,
-      format: "PDF (6.5 MB)",
+      format: selectedFile ? `${selectedFile.name.split('.').pop()?.toUpperCase()} (${(selectedFile.size / (1024 * 1024)).toFixed(1)} MB)` : "PDF (6.5 MB)",
       uploadedAt: "Just Now",
       downloads: 0,
       visibleTo: "All Sections",
@@ -122,11 +145,7 @@ export default function FacultyResourcesPage() {
     };
 
     try {
-      const res = await FacultyService.uploadResource({
-        courseCode: formCourse,
-        category: formCategory,
-        title: formTitle
-      });
+      const res = await FacultyService.uploadResource(formData);
       if (res && res.data) {
         newRes = res.data;
       }
@@ -136,6 +155,8 @@ export default function FacultyResourcesPage() {
 
     setResources([newRes, ...resources]);
     setFormTitle("");
+    setSelectedFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
     triggerToast(`Resource "${newRes.title}" uploaded successfully!`);
   };
 
@@ -147,6 +168,14 @@ export default function FacultyResourcesPage() {
     }
     setResources(prev => prev.filter(r => r.id !== id));
     triggerToast("Resource deleted successfully.");
+  };
+
+  const handlePreview = (resource: ResourceItem) => {
+    if (resource.fileUrl) {
+      window.open(`http://localhost:5000${resource.fileUrl}`, '_blank');
+    } else {
+      triggerToast(`Opening preview for "${resource.title}"`);
+    }
   };
 
   return (
@@ -221,10 +250,26 @@ export default function FacultyResourcesPage() {
             </div>
           </div>
 
-          <div className={styles.dragDropZone}>
-            <FileText size={32} color="#94a3b8" />
-            <p className={styles.dragDropText}>Drag and drop your file here, or click to browse</p>
-            <p className={styles.dragDropSubtext}>Supported formats: PDF, PPTX, DOCX (Max 50MB)</p>
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            style={{ display: "none" }} 
+            onChange={handleFileChange}
+            accept=".pdf,.pptx,.ppt,.docx,.doc,.png,.jpg,.jpeg,.zip"
+          />
+
+          <div 
+            className={styles.dragDropZone} 
+            onClick={() => fileInputRef.current?.click()}
+            style={{ cursor: "pointer", border: selectedFile ? "2px dashed #00522E" : undefined, backgroundColor: selectedFile ? "#f0fdf4" : undefined }}
+          >
+            <FileText size={32} color={selectedFile ? "#00522E" : "#94a3b8"} />
+            <p className={styles.dragDropText}>
+              {selectedFile ? `Selected: ${selectedFile.name}` : "Drag and drop your file here, or click to browse"}
+            </p>
+            <p className={styles.dragDropSubtext}>
+              {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB` : "Supported formats: PDF, PPTX, DOCX (Max 50MB)"}
+            </p>
           </div>
 
           <button type="submit" className={styles.submitButton}>
@@ -274,8 +319,11 @@ export default function FacultyResourcesPage() {
               </div>
 
               <div className={styles.cardActions}>
-                <button className={`${styles.actionBtn} ${styles.previewBtn}`}>
-                  <Eye size={14} /> Preview
+                <button 
+                  onClick={() => handlePreview(resource)}
+                  className={`${styles.actionBtn} ${styles.previewBtn}`}
+                >
+                  {resource.fileUrl ? <Download size={14} /> : <Eye size={14} />} {resource.fileUrl ? "Download" : "Preview"}
                 </button>
                 <button className={`${styles.actionBtn} ${styles.editBtn}`}>
                   <Edit2 size={14} /> Edit

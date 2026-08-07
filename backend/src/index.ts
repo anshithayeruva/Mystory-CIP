@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { prisma } from './prisma/client';
+import path from 'path';
 import adminRoutes from './routes/admin.routes';
 import academicRoutes from './routes/academic.routes';
 import userRoutes from './routes/user.routes';
@@ -20,6 +21,9 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+
+// Serve static uploads
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // API Routes
 app.use('/api/admin', adminRoutes);
