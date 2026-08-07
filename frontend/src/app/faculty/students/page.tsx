@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { 
   Search, 
   Filter
 } from "lucide-react";
 import styles from "@/modules/faculty/styles/faculty-students.module.css";
+import { FacultyService } from "@/services/faculty.service";
 
 export interface StudentItem {
   id: string;
@@ -52,6 +53,7 @@ const MOCK_STUDENTS: StudentItem[] = [
 ];
 
 export default function FacultyStudentsPage() {
+  const [studentsList, setStudentsList] = useState<StudentItem[]>(MOCK_STUDENTS);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("All");
   const [selectedClass, setSelectedClass] = useState("All");
@@ -59,9 +61,24 @@ export default function FacultyStudentsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
+  const fetchStudents = useCallback(async () => {
+    try {
+      const res = await FacultyService.getStudents();
+      if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+        setStudentsList(res.data);
+      }
+    } catch (err) {
+      console.warn("Student directory API warning, using local state:", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchStudents();
+  }, [fetchStudents]);
+
   // Filtered list
   const filteredStudents = useMemo(() => {
-    return MOCK_STUDENTS.filter((item) => {
+    return studentsList.filter((item) => {
       const matchesSearch = 
         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.rollNo.toLowerCase().includes(searchTerm.toLowerCase());
@@ -69,7 +86,7 @@ export default function FacultyStudentsPage() {
       const matchesClass = selectedClass === "All" || item.section === selectedClass;
       return matchesSearch && matchesSubject && matchesClass;
     });
-  }, [searchTerm, selectedSubject, selectedClass]);
+  }, [studentsList, searchTerm, selectedSubject, selectedClass]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredStudents.length / itemsPerPage) || 1;

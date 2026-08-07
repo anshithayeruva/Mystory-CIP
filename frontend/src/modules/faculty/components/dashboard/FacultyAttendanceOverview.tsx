@@ -17,7 +17,13 @@ const mockAttendanceData: SubjectAttendance[] = [
   { id: "4", subjectName: "Computer Networks", subjectCode: "CS-402", percentage: 84 },
 ];
 
-export default function FacultyAttendanceOverview() {
+interface FacultyAttendanceOverviewProps {
+  data?: SubjectAttendance[];
+}
+
+export default function FacultyAttendanceOverview({ data }: FacultyAttendanceOverviewProps) {
+  const displayData = data && data.length > 0 ? data : mockAttendanceData;
+
   return (
     <div className={styles.sectionCard}>
       <div className={styles.sectionHeader}>
@@ -25,7 +31,7 @@ export default function FacultyAttendanceOverview() {
       </div>
 
       <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "18px" }}>
-        {mockAttendanceData.map((item) => (
+        {displayData.map((item) => (
           <div key={item.id} style={{ display: "grid", gridTemplateColumns: "160px 1fr 50px", alignItems: "center", gap: "16px" }}>
             <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
               <span style={{ fontSize: "0.875rem", fontWeight: 700, color: "var(--text-main)" }}>

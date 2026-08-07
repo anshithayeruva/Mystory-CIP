@@ -42,7 +42,13 @@ const scheduleActivities: TimelineItemData[] = [
   },
 ];
 
-export default function FacultyTodaysSchedule() {
+interface FacultyTodaysScheduleProps {
+  schedule?: TimelineItemData[];
+}
+
+export default function FacultyTodaysSchedule({ schedule }: FacultyTodaysScheduleProps) {
+  const displaySchedule = schedule && schedule.length > 0 ? schedule : scheduleActivities;
+
   return (
     <div className={styles.sectionCard}>
       <div className={styles.sectionHeader}>
@@ -50,7 +56,7 @@ export default function FacultyTodaysSchedule() {
       </div>
 
       <div className={styles.timelineList}>
-        {scheduleActivities.map((item, index) => {
+        {displaySchedule.map((item, index) => {
           const isLast = index === scheduleActivities.length - 1;
           const dotClass =
             item.type === "green"

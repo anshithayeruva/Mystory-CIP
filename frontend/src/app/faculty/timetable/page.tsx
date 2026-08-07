@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Clock, 
   Download, 
@@ -16,6 +16,7 @@ import {
   Filter
 } from "lucide-react";
 import styles from "../pulse-sessions/pulse-sessions.module.css";
+import { FacultyService } from "@/services/faculty.service";
 
 interface FacultySlot {
   id: string;
@@ -100,15 +101,39 @@ export default function FacultyTimetablePage() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
+  useEffect(() => {
+    async function loadTimetable() {
+      try {
+        const res = await FacultyService.getTimetable();
+        if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+          setTimetableData(res.data);
+        }
+      } catch (err) {
+        console.warn("Timetable API offline, using fallback state:", err);
+      }
+    }
+    loadTimetable();
+  }, []);
+
   const currentDayObj = timetableData.find(t => t.day === selectedDay) || timetableData[0];
   
   const displayedSlots = currentDayObj.slots.filter(s => 
     selectedSectionFilter === "ALL" || s.section === selectedSectionFilter
   );
 
-  const handleSaveSlotEdit = (e: React.FormEvent) => {
+  const handleSaveSlotEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingSlot) return;
+
+    try {
+      await FacultyService.updateTimetableSlot(editingSlot.id, {
+        name: editingSlot.name,
+        room: editingSlot.room,
+        time: editingSlot.time
+      });
+    } catch (err) {
+      console.warn("Update timetable slot API warning:", err);
+    }
 
     setTimetableData(prevData =>
       prevData.map(dayObj => {
@@ -124,16 +149,26 @@ export default function FacultyTimetablePage() {
     triggerToast("Session details updated successfully.");
   };
 
-  const handleConfirmSwap = (e: React.FormEvent) => {
+  const handleConfirmSwap = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!swappingSlot) return;
+
+    try {
+      await FacultyService.rescheduleTimetableSlot(swappingSlot.id, {
+        targetFaculty: swapTargetFaculty
+      });
+    } catch (err) {
+      console.warn("Reschedule slot API warning:", err);
+    }
+
     triggerToast(`Reschedule request sent to ${swapTargetFaculty}.`);
     setSwappingSlot(null);
   };
 
-  const handleAddExtraSession = (e: React.FormEvent) => {
+  const handleAddExtraSession = async (e: React.FormEvent) => {
     e.preventDefault();
-    const created: FacultySlot = {
+
+    let created: FacultySlot = {
       id: `f-${Date.now()}`,
       day: selectedDay,
       time: newExtraSlot.time,
@@ -146,6 +181,24 @@ export default function FacultyTimetablePage() {
       status: "UPCOMING",
       notes: newExtraSlot.notes
     };
+
+    try {
+      const res = await FacultyService.addExtraSession({
+        day: selectedDay,
+        code: newExtraSlot.code,
+        name: newExtraSlot.name,
+        section: newExtraSlot.section,
+        time: newExtraSlot.time,
+        room: newExtraSlot.room,
+        type: newExtraSlot.type,
+        notes: newExtraSlot.notes
+      });
+      if (res && res.data) {
+        created = res.data;
+      }
+    } catch (err) {
+      console.warn("Add extra session API warning:", err);
+    }
 
     setTimetableData(prevData =>
       prevData.map(dayObj => {

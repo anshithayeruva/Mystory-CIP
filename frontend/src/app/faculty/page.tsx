@@ -40,11 +40,11 @@ export default function FacultyDashboard() {
       <div className={styles.mainGrid}>
         <div className={styles.leftColumn}>
           <FacultyRecentSessions sessions={dashboardData?.recentSessions} />
-          <FacultyAttendanceOverview />
+          <FacultyAttendanceOverview data={dashboardData?.attendanceOverview} />
         </div>
         <div className={styles.rightColumn}>
-          <FacultyTodaysSchedule />
-          <FacultyUpcomingEvents />
+          <FacultyTodaysSchedule schedule={dashboardData?.todaysSchedule} />
+          <FacultyUpcomingEvents events={dashboardData?.upcomingEvents} />
         </div>
       </div>
     </div>

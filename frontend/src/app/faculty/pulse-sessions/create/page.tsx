@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Sparkles, Settings2, Check, Edit2, Trash2, RefreshCw, Save, Send } from "lucide-react";
 import styles from "../pulse-sessions.module.css";
+import { FacultyService } from "@/services/faculty.service";
 
 interface GeneratedQuestion {
   id: string;
@@ -75,8 +76,25 @@ export default function CreatePulseSessionPage() {
     }, 2000);
   };
 
-  const handlePublish = () => {
-    router.push(`/faculty/pulse-sessions/new-session-id/live`);
+  const handlePublish = async () => {
+    try {
+      const res = await FacultyService.createPulseSession({
+        title: topic || "AI Assessment",
+        questionCount: parseInt(numQuestions) || 5,
+        durationMinutes: parseInt(duration) || 10,
+        difficultyLevel: difficulty.toUpperCase(),
+        questionType: questionTypes[0] || "MCQ",
+        section: section || "A",
+        date: new Date().toISOString()
+      });
+      if (res && res.data && res.data.id) {
+        router.push(`/faculty/pulse-sessions/${res.data.id}/live`);
+        return;
+      }
+    } catch (err) {
+      console.warn("Pulse session creation warning, redirecting to list:", err);
+    }
+    router.push(`/faculty/pulse-sessions`);
   };
 
   return (

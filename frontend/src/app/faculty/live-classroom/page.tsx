@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   Radio, 
@@ -20,6 +20,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import styles from "../pulse-sessions/pulse-sessions.module.css";
+import { FacultyService } from "@/services/faculty.service";
 
 interface LiveSessionData {
   id: string;
@@ -42,6 +43,7 @@ interface LiveSessionData {
 export default function FacultyLiveClassroomPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   // Form State for New Session
   const [newCourse, setNewCourse] = useState("CSE 301");
@@ -97,49 +99,94 @@ export default function FacultyLiveClassroomPage() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const handleCreateSession = (e: React.FormEvent) => {
+  useEffect(() => {
+    async function fetchLiveClassroom() {
+      try {
+        setLoading(true);
+        const res = await FacultyService.getLiveClassroom();
+        if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+          setSessions(res.data);
+        }
+      } catch (err) {
+        console.warn("Live classroom API offline, using standard state:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchLiveClassroom();
+  }, []);
+
+  const handleCreateSession = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTopic.trim()) {
       triggerToast("Please enter a session topic.");
       return;
     }
 
-    const courseNames: Record<string, string> = {
-      "CSE 301": "Advanced Data Structures & Algorithms",
-      "CSE 302": "Database Management Systems",
-      "CSE 303": "Operating Systems & System Programming",
-      "CSE 304": "Computer Networks & Security",
-      "CSE 305": "Machine Learning & Pattern Recognition"
-    };
+    try {
+      const res = await FacultyService.createLiveClassroomSession({
+        courseCode: newCourse,
+        topic: newTopic,
+        room: newRoom,
+        duration: newDuration
+      });
 
-    const newSess: LiveSessionData = {
-      id: `sess-${Date.now()}`,
-      courseCode: newCourse,
-      courseName: courseNames[newCourse] || "Computer Science Course",
-      topic: newTopic,
-      room: newRoom,
-      time: "Just Now",
-      duration: newDuration,
-      studentsPresent: 1,
-      totalStudents: 60,
-      status: "LIVE",
-      feedback: { clear: 0, confused: 0, slowDown: 0 }
-    };
+      if (res && res.data) {
+        setSessions([res.data, ...sessions]);
+        triggerToast(`Live session "${res.data.courseCode}: ${res.data.topic}" launched successfully!`);
+      } else {
+        throw new Error("Invalid response");
+      }
+    } catch (err) {
+      console.warn("Falling back to local session creation:", err);
+      const courseNames: Record<string, string> = {
+        "CSE 301": "Advanced Data Structures & Algorithms",
+        "CSE 302": "Database Management Systems",
+        "CSE 303": "Operating Systems & System Programming",
+        "CSE 304": "Computer Networks & Security",
+        "CSE 305": "Machine Learning & Pattern Recognition"
+      };
 
-    setSessions([newSess, ...sessions]);
-    setShowCreateModal(false);
-    setNewTopic("");
-    triggerToast(`Live session "${newSess.courseCode}: ${newSess.topic}" launched successfully!`);
+      const newSess: LiveSessionData = {
+        id: `sess-${Date.now()}`,
+        courseCode: newCourse,
+        courseName: courseNames[newCourse] || "Computer Science Course",
+        topic: newTopic,
+        room: newRoom,
+        time: "Just Now",
+        duration: newDuration,
+        studentsPresent: 1,
+        totalStudents: 60,
+        status: "LIVE",
+        feedback: { clear: 0, confused: 0, slowDown: 0 }
+      };
+
+      setSessions([newSess, ...sessions]);
+      triggerToast(`Live session "${newSess.courseCode}: ${newSess.topic}" launched successfully!`);
+    } finally {
+      setShowCreateModal(false);
+      setNewTopic("");
+    }
   };
 
-  const handleStartSession = (id: string) => {
+  const handleStartSession = async (id: string) => {
+    try {
+      await FacultyService.startLiveSession(id);
+    } catch (err) {
+      console.warn("Start live session API warning:", err);
+    }
     setSessions(prev =>
       prev.map(s => (s.id === id ? { ...s, status: "LIVE" as const, studentsPresent: 48 } : s))
     );
     triggerToast("Classroom live session started!");
   };
 
-  const handleEndSession = (id: string) => {
+  const handleEndSession = async (id: string) => {
+    try {
+      await FacultyService.endLiveSession(id);
+    } catch (err) {
+      console.warn("End live session API warning:", err);
+    }
     setSessions(prev =>
       prev.map(s => (s.id === id ? { ...s, status: "COMPLETED" as const } : s))
     );

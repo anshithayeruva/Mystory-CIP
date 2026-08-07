@@ -5,6 +5,10 @@ import { FacultySubjectController } from '../controllers/faculty.subject.control
 import { FacultyPulseSessionController } from '../controllers/faculty.pulse-session.controller';
 import { FacultyReportController } from '../controllers/faculty.report.controller';
 import { FacultySettingsController } from '../controllers/faculty.settings.controller';
+import { FacultyLiveClassroomController } from '../controllers/faculty.live-classroom.controller';
+import { FacultyTimetableController } from '../controllers/faculty.timetable.controller';
+import { FacultyResourceController } from '../controllers/faculty.resource.controller';
+import { FacultyStudentsController } from '../controllers/faculty.students.controller';
 
 const router = Router();
 
@@ -18,12 +22,32 @@ try {
 // Dashboard
 router.get('/dashboard', FacultyDashboardController.getDashboard);
 
+// Live Classroom
+router.get('/live-classroom', FacultyLiveClassroomController.getLiveClassroom);
+router.post('/live-classroom', FacultyLiveClassroomController.createLiveClassroom);
+router.post('/live-classroom/:id/start', FacultyLiveClassroomController.startLiveSession);
+router.post('/live-classroom/:id/end', FacultyLiveClassroomController.endLiveSession);
+
+// Timetable
+router.get('/timetable', FacultyTimetableController.getTimetable);
+router.post('/timetable/extra-session', FacultyTimetableController.addExtraSession);
+router.put('/timetable/:id', FacultyTimetableController.updateSlot);
+router.post('/timetable/:id/reschedule', FacultyTimetableController.requestSwap);
+
+// Resources
+router.get('/resources', FacultyResourceController.getResources);
+router.post('/resources', FacultyResourceController.uploadResource);
+router.delete('/resources/:id', FacultyResourceController.deleteResource);
+
 // Subjects
 router.get('/subjects', FacultySubjectController.getSubjects);
 router.get('/subjects/:id', FacultySubjectController.getSubjectById);
 router.post('/subjects', FacultySubjectController.createSubject);
 router.put('/subjects/:id', FacultySubjectController.updateSubject);
 router.delete('/subjects/:id', FacultySubjectController.deleteSubject);
+
+// Students
+router.get('/students', FacultyStudentsController.getStudents);
 
 // Pulse Sessions
 router.get('/pulse-sessions', FacultyPulseSessionController.getPulseSessions);

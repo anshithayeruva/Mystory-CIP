@@ -3,10 +3,13 @@
 import React from "react";
 import styles from "../../styles/faculty-dashboard.module.css";
 import { mockKPIs } from "../../constants/mockData";
+import { Presentation, Users, BrainCircuit } from 'lucide-react';
 
 interface FacultyMetricsRowProps {
   data?: any;
 }
+
+const defaultIcons = [Presentation, Users, BrainCircuit];
 
 export default function FacultyMetricsRow({ data }: FacultyMetricsRowProps) {
   const displayKpis = data?.metrics || mockKPIs;
@@ -14,7 +17,7 @@ export default function FacultyMetricsRow({ data }: FacultyMetricsRowProps) {
   return (
     <div className={styles.metricsGrid}>
       {displayKpis.map((kpi: any, index: number) => {
-        const Icon = kpi.icon;
+        const Icon = kpi.icon || defaultIcons[index % defaultIcons.length];
         return (
           <div 
             key={index} 

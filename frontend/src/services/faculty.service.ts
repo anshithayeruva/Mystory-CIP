@@ -97,6 +97,100 @@ export class FacultyService {
   }
 
   /**
+   * Live Classroom API
+   */
+  static async getLiveClassroom() {
+    const response = await apiClient.fetch('/api/faculty/live-classroom');
+    if (!response.ok) throw new Error('Failed to fetch live classroom sessions');
+    return response.json();
+  }
+
+  static async createLiveClassroomSession(data: any) {
+    const response = await apiClient.fetch('/api/faculty/live-classroom', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Failed to create live classroom session');
+    return response.json();
+  }
+
+  /**
+   * Timetable API
+   */
+  static async getTimetable() {
+    const response = await apiClient.fetch('/api/faculty/timetable');
+    if (!response.ok) throw new Error('Failed to fetch timetable');
+    return response.json();
+  }
+
+  static async addExtraSession(data: any) {
+    const response = await apiClient.fetch('/api/faculty/timetable/extra-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Failed to add extra session');
+    return response.json();
+  }
+
+  static async updateTimetableSlot(id: string, data: any) {
+    const response = await apiClient.fetch(`/api/faculty/timetable/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Failed to update timetable slot');
+    return response.json();
+  }
+
+  static async rescheduleTimetableSlot(id: string, data: any) {
+    const response = await apiClient.fetch(`/api/faculty/timetable/${id}/reschedule`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Failed to request slot swap');
+    return response.json();
+  }
+
+  /**
+   * Resources API
+   */
+  static async getResources() {
+    const response = await apiClient.fetch('/api/faculty/resources');
+    if (!response.ok) throw new Error('Failed to fetch resources');
+    return response.json();
+  }
+
+  static async uploadResource(data: any) {
+    const response = await apiClient.fetch('/api/faculty/resources', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Failed to upload resource');
+    return response.json();
+  }
+
+  static async deleteResource(id: string) {
+    const response = await apiClient.fetch(`/api/faculty/resources/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to delete resource');
+    return response.json();
+  }
+
+  /**
+   * Students Directory API
+   */
+  static async getStudents() {
+    const response = await apiClient.fetch('/api/faculty/students');
+    if (!response.ok) throw new Error('Failed to fetch student directory');
+    return response.json();
+  }
+
+  /**
    * Live Session Controls API
    */
   static async startLiveSession(id: string) {

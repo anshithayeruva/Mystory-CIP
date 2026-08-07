@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Search, 
   UploadCloud, 
@@ -9,11 +9,24 @@ import {
   Trash2, 
   Bookmark,
   FileText,
-  Filter
+  Filter,
+  CheckCircle2
 } from "lucide-react";
 import styles from "./resources.module.css";
+import { FacultyService } from "@/services/faculty.service";
 
-const MOCK_RESOURCES = [
+interface ResourceItem {
+  id: string | number;
+  course: string;
+  title: string;
+  format: string;
+  uploadedAt: string;
+  downloads: number;
+  visibleTo: string;
+  category?: string;
+}
+
+const MOCK_RESOURCES: ResourceItem[] = [
   {
     id: 1,
     course: "CSE 301",
@@ -63,9 +76,103 @@ const MOCK_RESOURCES = [
 
 export default function FacultyResourcesPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  
+  const [resources, setResources] = useState<ResourceItem[]>(MOCK_RESOURCES);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Form State
+  const [formCourse, setFormCourse] = useState("CSE 301");
+  const [formCategory, setFormCategory] = useState("Lecture Notes");
+  const [formTitle, setFormTitle] = useState("");
+
+  const triggerToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  useEffect(() => {
+    async function loadResources() {
+      try {
+        const res = await FacultyService.getResources();
+        if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+          setResources(res.data);
+        }
+      } catch (err) {
+        console.warn("Resources API warning, using local state:", err);
+      }
+    }
+    loadResources();
+  }, []);
+
+  const handleUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formTitle.trim()) {
+      triggerToast("Please enter a resource title.");
+      return;
+    }
+
+    let newRes: ResourceItem = {
+      id: String(Date.now()),
+      course: formCourse,
+      title: formTitle,
+      format: "PDF (6.5 MB)",
+      uploadedAt: "Just Now",
+      downloads: 0,
+      visibleTo: "All Sections",
+      category: formCategory
+    };
+
+    try {
+      const res = await FacultyService.uploadResource({
+        courseCode: formCourse,
+        category: formCategory,
+        title: formTitle
+      });
+      if (res && res.data) {
+        newRes = res.data;
+      }
+    } catch (err) {
+      console.warn("Upload resource API warning:", err);
+    }
+
+    setResources([newRes, ...resources]);
+    setFormTitle("");
+    triggerToast(`Resource "${newRes.title}" uploaded successfully!`);
+  };
+
+  const handleDelete = async (id: string | number) => {
+    try {
+      await FacultyService.deleteResource(String(id));
+    } catch (err) {
+      console.warn("Delete resource API warning:", err);
+    }
+    setResources(prev => prev.filter(r => r.id !== id));
+    triggerToast("Resource deleted successfully.");
+  };
+
   return (
     <div className={styles.pageContainer}>
+      {/* Toast Alert */}
+      {toastMessage && (
+        <div style={{
+          position: "fixed",
+          bottom: "24px",
+          right: "24px",
+          backgroundColor: "#00522E",
+          color: "#ffffff",
+          padding: "12px 20px",
+          borderRadius: "10px",
+          boxShadow: "0 10px 25px -5px rgba(0, 82, 46, 0.3)",
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          fontWeight: 600,
+          fontSize: "0.88rem",
+          zIndex: 1000
+        }}>
+          <CheckCircle2 size={18} />
+          <span>{toastMessage}</span>
+        </div>
+      )}
       
       {/* Upload Section */}
       <div className={styles.uploadCard}>
@@ -74,12 +181,15 @@ export default function FacultyResourcesPage() {
           <h2 className={styles.uploadTitle}>Upload New Material</h2>
         </div>
         
-        <div className={styles.uploadBody}>
+        <form onSubmit={handleUpload} className={styles.uploadBody}>
           <div className={styles.uploadFormGrid}>
             <div className={styles.formGroup}>
               <label className={styles.formLabel}>Course Code</label>
-              <select className={styles.formSelect}>
-                <option value="">Select Course</option>
+              <select 
+                className={styles.formSelect}
+                value={formCourse}
+                onChange={(e) => setFormCourse(e.target.value)}
+              >
                 <option value="CSE 301">CSE 301 - Data Structures</option>
                 <option value="CSE 302">CSE 302 - Database Management</option>
                 <option value="CSE 303">CSE 303 - Operating Systems</option>
@@ -87,7 +197,11 @@ export default function FacultyResourcesPage() {
             </div>
             <div className={styles.formGroup}>
               <label className={styles.formLabel}>Category</label>
-              <select className={styles.formSelect}>
+              <select 
+                className={styles.formSelect}
+                value={formCategory}
+                onChange={(e) => setFormCategory(e.target.value)}
+              >
                 <option value="Lecture Notes">Lecture Notes</option>
                 <option value="Presentation Deck">Presentation Deck</option>
                 <option value="Lab Manual">Lab Manual</option>
@@ -97,7 +211,13 @@ export default function FacultyResourcesPage() {
             </div>
             <div className={styles.formGroup} style={{ gridColumn: "1 / -1" }}>
               <label className={styles.formLabel}>Resource Title</label>
-              <input type="text" className={styles.formInput} placeholder="e.g. Graph Algorithms Complete Lecture Notes..." />
+              <input 
+                type="text" 
+                className={styles.formInput} 
+                placeholder="e.g. Graph Algorithms Complete Lecture Notes..." 
+                value={formTitle}
+                onChange={(e) => setFormTitle(e.target.value)}
+              />
             </div>
           </div>
 
@@ -107,11 +227,11 @@ export default function FacultyResourcesPage() {
             <p className={styles.dragDropSubtext}>Supported formats: PDF, PPTX, DOCX (Max 50MB)</p>
           </div>
 
-          <button className={styles.submitButton}>
+          <button type="submit" className={styles.submitButton}>
             <UploadCloud size={16} />
             Upload Resource
           </button>
-        </div>
+        </form>
       </div>
 
       {/* Library Section */}
@@ -136,7 +256,7 @@ export default function FacultyResourcesPage() {
         </div>
 
         <div className={styles.resourcesGrid}>
-          {MOCK_RESOURCES.filter(r => r.title.toLowerCase().includes(searchQuery.toLowerCase()) || r.course.toLowerCase().includes(searchQuery.toLowerCase())).map(resource => (
+          {resources.filter(r => r.title.toLowerCase().includes(searchQuery.toLowerCase()) || r.course.toLowerCase().includes(searchQuery.toLowerCase())).map(resource => (
             <div key={resource.id} className={styles.resourceCard}>
               <div className={styles.cardTop}>
                 <span className={styles.courseTag}>{resource.course}</span>
@@ -160,7 +280,10 @@ export default function FacultyResourcesPage() {
                 <button className={`${styles.actionBtn} ${styles.editBtn}`}>
                   <Edit2 size={14} /> Edit
                 </button>
-                <button className={`${styles.actionBtn} ${styles.deleteBtn}`}>
+                <button 
+                  onClick={() => handleDelete(resource.id)}
+                  className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                >
                   <Trash2 size={14} /> Delete
                 </button>
               </div>

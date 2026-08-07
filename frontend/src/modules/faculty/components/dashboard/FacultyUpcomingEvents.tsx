@@ -5,7 +5,13 @@ import Link from "next/link";
 import styles from "../../styles/faculty-dashboard.module.css";
 import { mockUpcomingEvents } from "../../constants/mockData";
 
-export default function FacultyUpcomingEvents() {
+interface FacultyUpcomingEventsProps {
+  events?: any[];
+}
+
+export default function FacultyUpcomingEvents({ events }: FacultyUpcomingEventsProps) {
+  const displayEvents = events && events.length > 0 ? events : mockUpcomingEvents;
+
   return (
     <div className={styles.sectionCard}>
       <div className={styles.sectionHeader}>
@@ -16,7 +22,7 @@ export default function FacultyUpcomingEvents() {
       </div>
       
       <div className={styles.eventsList}>
-        {mockUpcomingEvents.map((event) => (
+        {displayEvents.map((event) => (
           <div key={event.id} className={styles.eventItem}>
             <div className={event.theme === 'dark' ? styles.dateBoxDark : styles.dateBoxLight}>
               <span className={styles.dateNum}>{event.day}</span>
