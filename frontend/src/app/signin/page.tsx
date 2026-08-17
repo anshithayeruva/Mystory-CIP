@@ -21,74 +21,17 @@ import styles from './signin.module.css';
 import { login } from '@/services/auth.client';
 
 
-type RoleType = 'ADMIN' | 'STUDENT' | 'HOD' | 'FACULTY';
-
-interface RoleOption {
-  id: RoleType;
-  title: string;
-  badge: string;
-  description: string;
-  icon: React.ElementType;
-  defaultEmail: string;
-  targetPath: string;
-}
-
-const ROLE_OPTIONS: RoleOption[] = [
-  {
-    id: 'ADMIN',
-    title: 'Admin',
-    badge: 'System Admin',
-    description: 'Full portal access, user management, and system setup',
-    icon: Shield,
-    defaultEmail: 'admin@mystory.edu',
-    targetPath: '/admin',
-  },
-  {
-    id: 'STUDENT',
-    title: 'Student',
-    badge: 'Student Portal',
-    description: 'Track academic progress, attendance, and live pulse feedback',
-    icon: GraduationCap,
-    defaultEmail: 'student@mystory.edu',
-    targetPath: '/student',
-  },
-  {
-    id: 'HOD',
-    title: 'HOD',
-    badge: 'Dept Head',
-    description: 'Department analytics, staff performance, and reporting',
-    icon: Building2,
-    defaultEmail: 'hod.cs@mystory.edu',
-    targetPath: '/hod',
-  },
-  {
-    id: 'FACULTY',
-    title: 'Faculty',
-    badge: 'Faculty Portal',
-    description: 'Manage subjects, monitor pulse sessions, and analyze concept gaps',
-    icon: BookOpen,
-    defaultEmail: 'faculty@mystory.edu',
-    targetPath: '/faculty',
-  },
-];
+// Removed demo role configurations
 
 export default function SignInPage() {
   const router = useRouter();
-  const [selectedRole, setSelectedRole] = useState<RoleType>('ADMIN');
-  const [email, setEmail] = useState<string>(ROLE_OPTIONS[0].defaultEmail);
-  const [password, setPassword] = useState<string>('demo123456');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [rememberMe, setRememberMe] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const activeRoleOption = ROLE_OPTIONS.find((r) => r.id === selectedRole) || ROLE_OPTIONS[0];
-
-  const handleRoleSelect = (role: RoleOption) => {
-    setSelectedRole(role.id);
-    setEmail(role.defaultEmail);
-  };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,24 +55,55 @@ export default function SignInPage() {
         );
       }
 
+      // Artificial delay to let the spinner spin before showing success
+      await new Promise(resolve => setTimeout(resolve, 800));
+
       setIsSuccess(true);
 
+      // Wait 1.5 seconds so the checkmark animation finishes before redirect
       setTimeout(() => {
         if (result.mustChangePassword) {
           router.push('/change-password');
         } else {
           router.push(`/${result.user.role.toLowerCase()}`);
         }
-      }, 600);
+      }, 1500);
     } catch (err: any) {
       setErrorMessage(err.message || 'Sign in failed. Please try again.');
-    } finally {
       setIsLoading(false);
     }
   };
 
   return (
     <div className={styles.container}>
+      {/* Full Page Lazy Loading Overlay */}
+      {(isLoading || isSuccess) && (
+        <div className={styles.fullPageLoader}>
+          <div className={styles.loaderContent}>
+            
+            {!isSuccess ? (
+              <svg className={styles.professionalSpinner} viewBox="0 0 50 50">
+                <circle className={styles.spinnerPath} cx="25" cy="25" r="20" fill="none" strokeWidth="4"></circle>
+              </svg>
+            ) : (
+              <svg className={styles.successCheckmark} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                <circle className={styles.checkmarkCircle} cx="26" cy="26" r="25" fill="none" />
+                <path className={styles.checkmarkCheck} fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" strokeWidth="4" stroke="#115e59" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+
+            <div className={styles.loaderTextGroup}>
+              <div className={styles.loaderText}>
+                {isSuccess ? 'Authentication Successful' : 'Authenticating...'}
+              </div>
+              <div className={styles.loaderSubtext}>
+                {isSuccess ? 'Redirecting to your dashboard' : 'Establishing secure connection'}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Navbar */}
       <header className={styles.navbar}>
         <div className={styles.brand}>
@@ -141,11 +115,6 @@ export default function SignInPage() {
             <span className={styles.brandSubtitle}>Mystory CIP Portal</span>
           </div>
         </div>
-
-        <div className={styles.demoBadge}>
-          <div className={styles.demoDot} />
-          <span>Interactive Role Sign In</span>
-        </div>
       </header>
 
       {/* Main Content */}
@@ -155,48 +124,14 @@ export default function SignInPage() {
           <div className={styles.headerSection}>
             <h1 className={styles.title}>Welcome Back</h1>
             <p className={styles.subtitle}>
-              Select your role to explore the Academic Analytics Portal workflow
+              Sign in to access your Academic Analytics Portal
             </p>
-          </div>
-
-          {/* 4 Role Options */}
-          <div className={styles.rolesGrid}>
-            {ROLE_OPTIONS.map((role) => {
-              const IconComp = role.icon;
-              const isSelected = selectedRole === role.id;
-
-              return (
-                <div
-                  key={role.id}
-                  className={`${styles.roleCard} ${isSelected ? styles.roleCardActive : ''}`}
-                  onClick={() => handleRoleSelect(role)}
-                >
-                  {isSelected && (
-                    <div className={styles.checkIndicator}>
-                      <CheckCircle2 size={18} />
-                    </div>
-                  )}
-
-                  <div className={styles.roleIconWrapper}>
-                    <IconComp size={24} />
-                  </div>
-
-                  <h3 className={styles.roleTitle}>{role.title}</h3>
-                  <span className={styles.roleBadge}>{role.badge}</span>
-                  <p className={styles.roleDescription}>{role.description}</p>
-                </div>
-              );
-            })}
           </div>
 
           {/* Sign In Form */}
           <div className={styles.formCard}>
             <div className={styles.formHeader}>
               <span className={styles.formHeaderTitle}>Sign In Credentials</span>
-              <div className={styles.selectedRolePill}>
-                <Sparkles size={14} />
-                <span>{activeRoleOption.title} Mode</span>
-              </div>
             </div>
 
             {isSuccess && (
@@ -300,19 +235,13 @@ export default function SignInPage() {
                   <span>Authenticating...</span>
                 ) : (
                   <>
-                    <span>Sign In as {activeRoleOption.title}</span>
+                    <span>Sign In</span>
                     <ArrowRight size={18} />
                   </>
                 )}
               </button>
             </form>
 
-            <div className={styles.quickFillBox}>
-              <span className={styles.quickFillNotice}>
-                <Check size={14} /> Demo credentials pre-filled automatically
-              </span>
-              <span>Role: {activeRoleOption.id}</span>
-            </div>
           </div>
         </div>
       </main>

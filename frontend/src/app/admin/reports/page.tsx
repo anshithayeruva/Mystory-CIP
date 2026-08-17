@@ -118,8 +118,17 @@ export default function ReportsAnalyticsPage() {
       </div>
 
       {loading ? (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '40px', color: 'var(--text-muted)' }}>
-          <Loader2 className="animate-spin" style={{ marginRight: '8px' }} /> Loading...
+        <div className={styles.skeletonContainer}>
+          <div className={styles.skeletonGrid}>
+            <div className={styles.skeletonCard}></div>
+            <div className={styles.skeletonCard}></div>
+            <div className={styles.skeletonCard}></div>
+            <div className={styles.skeletonCard}></div>
+          </div>
+          <div className={styles.skeletonGrid}>
+            <div className={styles.skeletonChart}></div>
+            <div className={styles.skeletonChart}></div>
+          </div>
         </div>
       ) : activeTab === "overview" ? (
         <div className={styles.overviewContainer}>

@@ -37,8 +37,36 @@ export default function HodAccountPage() {
   });
   const [showPassword, setShowPassword] = useState(false);
 
+  const [initials, setInitials] = useState("HD");
+
   useEffect(() => {
     setMounted(true);
+    
+    // Load local storage basic info first to avoid flashing "Anshitha Yeruva"
+    let localName = "Anshitha Yeruva";
+    let localEmail = "anshitha_yeruva@srmap.edu.in";
+    if (typeof window !== "undefined") {
+      const userStr = localStorage.getItem("currentUser");
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        if (user.name) localName = user.name;
+        if (user.email) localEmail = user.email;
+        
+        if (user.name) {
+          const parts = user.name.split(' ');
+          const f = parts[0]?.[0] || '';
+          const l = parts[1]?.[0] || '';
+          setInitials((f + l).toUpperCase() || "HD");
+        }
+      }
+    }
+    
+    setProfile(prev => ({
+      ...prev,
+      fullName: localName,
+      email: localEmail,
+    }));
+
     async function loadAccountData() {
       try {
         const response = await HodService.getAccountProfile();
@@ -131,7 +159,7 @@ export default function HodAccountPage() {
         <form onSubmit={handleSaveProfile}>
           <div className={styles.profileLayout}>
             <div className={styles.avatarSection}>
-              <div className={styles.avatarCircle}>AY</div>
+              <div className={styles.avatarCircle}>{initials}</div>
               <button 
                 type="button" 
                 className={styles.editAvatarBtn}
