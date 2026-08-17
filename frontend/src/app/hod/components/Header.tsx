@@ -23,6 +23,10 @@ export default function Header() {
     return "Dashboard";
   };
 
+  const [initials, setInitials] = useState("HD");
+  const [userName, setUserName] = useState("HOD Name");
+  const [userEmail, setUserEmail] = useState("hod@srmap.edu.in");
+
   // Close popover when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -31,12 +35,35 @@ export default function Header() {
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
+    
+    if (typeof window !== "undefined") {
+      const userStr = localStorage.getItem("currentUser");
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        if (user.name) {
+          setUserName(user.name);
+          const parts = user.name.split(' ');
+          const f = parts[0]?.[0] || '';
+          const l = parts[1]?.[0] || '';
+          setInitials((f + l).toUpperCase() || "HD");
+        }
+        if (user.email) {
+          setUserEmail(user.email);
+        }
+      }
+    }
+    
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleLogout = () => {
     setIsProfileOpen(false);
-    router.push("/login");
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    document.cookie = "user_role=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("currentUser");
+    }
+    router.push("/signin");
   };
 
   return (
@@ -52,17 +79,17 @@ export default function Header() {
             onClick={() => setIsProfileOpen(!isProfileOpen)}
             title="User Profile Options"
           >
-            AY
+            {initials}
           </button>
 
           {/* Profile Popover Menu */}
           {isProfileOpen && (
             <div className={styles.profilePopover}>
               <div className={styles.popoverHeader}>
-                <div className={styles.popoverAvatar}>AY</div>
+                <div className={styles.popoverAvatar}>{initials}</div>
                 <div className={styles.popoverMeta}>
-                  <span className={styles.popoverName}>Anshitha Yeruva</span>
-                  <span className={styles.popoverEmail}>anshitha_yeruva@srmap.edu.in</span>
+                  <span className={styles.popoverName}>{userName}</span>
+                  <span className={styles.popoverEmail}>{userEmail}</span>
                 </div>
               </div>
 
