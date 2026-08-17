@@ -24,6 +24,10 @@ export default function Header() {
     return "Dashboard";
   };
 
+  const [initials, setInitials] = useState("ST");
+  const [userName, setUserName] = useState(STUDENT_INFO.name);
+  const [userEmail, setUserEmail] = useState(STUDENT_INFO.email);
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
@@ -31,6 +35,24 @@ export default function Header() {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
+    
+    if (typeof window !== "undefined") {
+      const userStr = localStorage.getItem("currentUser");
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        if (user.name) {
+          setUserName(user.name);
+          const parts = user.name.split(' ');
+          const f = parts[0]?.[0] || '';
+          const l = parts[1]?.[0] || '';
+          setInitials((f + l).toUpperCase() || "ST");
+        }
+        if (user.email) {
+          setUserEmail(user.email);
+        }
+      }
+    }
+    
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
@@ -69,7 +91,7 @@ export default function Header() {
             }}
             title="User Account Options"
           >
-            NN
+            {initials}
           </button>
 
           {isProfileOpen && (
@@ -88,11 +110,11 @@ export default function Header() {
             }}>
               <div style={{ padding: "14px 16px", display: "flex", alignItems: "center", gap: "12px", borderBottom: "1px solid #e2e8f0" }}>
                 <div style={{ width: "36px", height: "36px", borderRadius: "50%", backgroundColor: "#e9f2ee", color: "#00522E", fontWeight: 700, fontSize: "0.85rem", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  NN
+                  {initials}
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
-                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{STUDENT_INFO.name}</span>
-                  <span style={{ fontSize: "12px", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{STUDENT_INFO.email}</span>
+                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{userName}</span>
+                  <span style={{ fontSize: "12px", color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{userEmail}</span>
                 </div>
               </div>
               

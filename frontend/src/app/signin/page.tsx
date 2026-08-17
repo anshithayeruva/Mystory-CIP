@@ -15,8 +15,11 @@ import {
   Check,
   CheckCircle2,
   Sparkles,
+  AlertCircle,
 } from 'lucide-react';
 import styles from './signin.module.css';
+import { login } from '@/services/auth.client';
+
 
 type RoleType = 'ADMIN' | 'STUDENT' | 'HOD' | 'FACULTY';
 
@@ -78,6 +81,7 @@ export default function SignInPage() {
   const [rememberMe, setRememberMe] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const activeRoleOption = ROLE_OPTIONS.find((r) => r.id === selectedRole) || ROLE_OPTIONS[0];
 
@@ -86,34 +90,42 @@ export default function SignInPage() {
     setEmail(role.defaultEmail);
   };
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage(null);
 
-    // Set dummy cookies and local storage state
-    document.cookie = `token=dummy-jwt-demo-token; path=/; max-age=86400`;
-    document.cookie = `user_role=${selectedRole}; path=/; max-age=86400`;
+    try {
+      const result = await login(email, password);
 
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(
-        'currentUser',
-        JSON.stringify({
-          email,
-          role: selectedRole,
-          name: `${activeRoleOption.title} User`,
-          loginTime: new Date().toISOString(),
-        })
-      );
-    }
+      // Store minimal user info for UI (role display, etc.)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(
+          'currentUser',
+          JSON.stringify({
+            id: result.user.id,
+            email: result.user.email,
+            role: result.user.role,
+            name: `${result.user.firstName} ${result.user.lastName}`,
+            loginTime: new Date().toISOString(),
+          })
+        );
+      }
 
-    setTimeout(() => {
-      setIsLoading(false);
       setIsSuccess(true);
 
       setTimeout(() => {
-        router.push(activeRoleOption.targetPath);
+        if (result.mustChangePassword) {
+          router.push('/change-password');
+        } else {
+          router.push(`/${result.user.role.toLowerCase()}`);
+        }
       }, 600);
-    }, 500);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Sign in failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -191,8 +203,21 @@ export default function SignInPage() {
               <div className={styles.successBanner}>
                 <CheckCircle2 size={20} />
                 <span>
-                  Authenticated successfully! Redirecting to {activeRoleOption.title} Dashboard...
+                  Authenticated successfully! Redirecting...
                 </span>
+              </div>
+            )}
+
+            {errorMessage && !isSuccess && (
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: '10px',
+                padding: '12px 16px', borderRadius: '8px',
+                background: '#fef2f2', border: '1px solid #fecaca',
+                color: '#dc2626', fontSize: '13px', fontWeight: 500,
+                marginBottom: '8px',
+              }}>
+                <AlertCircle size={16} style={{ flexShrink: 0 }} />
+                <span>{errorMessage}</span>
               </div>
             )}
 

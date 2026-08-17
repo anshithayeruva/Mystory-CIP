@@ -46,14 +46,23 @@ export default function StudentDashboard() {
   const [studentAssignments, setStudentAssignments] = useState<any[]>([]);
   const [insights, setInsights] = useState<any>(null);
 
-  // Note: For now, hardcoding a mock studentId for demonstration purposes 
-  // since Authentication is out of scope. Replace with actual logged-in user ID later.
-  const studentId = "6a6a3135b6f279c37d3c4bd4"; // 24-char hex string as required by Zod
-
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
+        let studentId = "";
+        if (typeof window !== "undefined") {
+          const userStr = localStorage.getItem("currentUser");
+          if (userStr) {
+            studentId = JSON.parse(userStr).id;
+          }
+        }
+
+        if (!studentId) {
+          setError("User not authenticated.");
+          return;
+        }
+
         const [info, classes, courses, assignments, insightData] = await Promise.all([
           studentDashboardService.getStudentInfo(studentId).catch(() => null),
           studentDashboardService.getTodayClasses(studentId).catch(() => []),
@@ -81,7 +90,7 @@ export default function StudentDashboard() {
     };
 
     fetchDashboardData();
-  }, [studentId]);
+  }, []);
 
   if (loading) {
     return (

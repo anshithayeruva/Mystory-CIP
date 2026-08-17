@@ -8,7 +8,10 @@ export class StudentController {
 
   public getDashboardInfo = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { studentId } = getStudentDashboardParams.parse(req.params);
+      const params = getStudentDashboardParams.parse(req.params);
+      const studentProfile = await import('../prisma/client').then(m => m.prisma.studentProfile.findUnique({ where: { userId: params.studentId } }));
+      if (!studentProfile) throw new Error('Student profile not found for user');
+      const studentId = studentProfile.id;
       const data = await studentService.getStudentInfo(studentId);
       res.json({ success: true, data });
     } catch (error: any) {
@@ -18,7 +21,10 @@ export class StudentController {
 
   public getTodayClasses = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { studentId } = getStudentDashboardParams.parse(req.params);
+      const params = getStudentDashboardParams.parse(req.params);
+      const studentProfile = await import('../prisma/client').then(m => m.prisma.studentProfile.findUnique({ where: { userId: params.studentId } }));
+      if (!studentProfile) throw new Error('Student profile not found for user');
+      const studentId = studentProfile.id;
       const data = await studentService.getTodayClasses(studentId);
       res.json({ success: true, data });
     } catch (error: any) {
@@ -28,7 +34,10 @@ export class StudentController {
 
   public getCourses = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { studentId } = getStudentDashboardParams.parse(req.params);
+      const params = getStudentDashboardParams.parse(req.params);
+      const studentProfile = await import('../prisma/client').then(m => m.prisma.studentProfile.findUnique({ where: { userId: params.studentId } }));
+      if (!studentProfile) throw new Error('Student profile not found for user');
+      const studentId = studentProfile.id;
       const data = await studentService.getStudentCourses(studentId);
       res.json({ success: true, data });
     } catch (error: any) {
@@ -38,7 +47,10 @@ export class StudentController {
 
   public getAssignments = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { studentId } = getStudentDashboardParams.parse(req.params);
+      const params = getStudentDashboardParams.parse(req.params);
+      const studentProfile = await import('../prisma/client').then(m => m.prisma.studentProfile.findUnique({ where: { userId: params.studentId } }));
+      if (!studentProfile) throw new Error('Student profile not found for user');
+      const studentId = studentProfile.id;
       const data = await studentService.getStudentAssignments(studentId);
       res.json({ success: true, data });
     } catch (error: any) {
@@ -48,7 +60,10 @@ export class StudentController {
 
   public getInsights = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { studentId } = getStudentDashboardParams.parse(req.params);
+      const params = getStudentDashboardParams.parse(req.params);
+      const studentProfile = await import('../prisma/client').then(m => m.prisma.studentProfile.findUnique({ where: { userId: params.studentId } }));
+      if (!studentProfile) throw new Error('Student profile not found for user');
+      const studentId = studentProfile.id;
       const data = await studentService.getLearningInsights(studentId);
       res.json({ success: true, data });
     } catch (error: any) {
@@ -58,7 +73,10 @@ export class StudentController {
 
   public getAttendanceReport = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { studentId } = getStudentDashboardParams.parse(req.params);
+      const params = getStudentDashboardParams.parse(req.params);
+      const studentProfile = await import('../prisma/client').then(m => m.prisma.studentProfile.findUnique({ where: { userId: params.studentId } }));
+      if (!studentProfile) throw new Error('Student profile not found for user');
+      const studentId = studentProfile.id;
       const semester = req.query.semester as string || 'all';
       const data = await studentService.getAttendanceAnalytics(studentId, semester);
       res.json({ success: true, data });
@@ -69,7 +87,10 @@ export class StudentController {
 
   public getUnderstandingReport = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { studentId } = getStudentDashboardParams.parse(req.params);
+      const params = getStudentDashboardParams.parse(req.params);
+      const studentProfile = await import('../prisma/client').then(m => m.prisma.studentProfile.findUnique({ where: { userId: params.studentId } }));
+      if (!studentProfile) throw new Error('Student profile not found for user');
+      const studentId = studentProfile.id;
       const semester = req.query.semester as string || 'all';
       const data = await studentService.getConceptUnderstanding(studentId, semester);
       res.json({ success: true, data });
@@ -80,7 +101,10 @@ export class StudentController {
 
   public exportReport = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { studentId } = getStudentDashboardParams.parse(req.params);
+      const params = getStudentDashboardParams.parse(req.params);
+      const studentProfile = await import('../prisma/client').then(m => m.prisma.studentProfile.findUnique({ where: { userId: params.studentId } }));
+      if (!studentProfile) throw new Error('Student profile not found for user');
+      const studentId = studentProfile.id;
       const { title, type } = exportReportBody.parse(req.body);
       const data = await studentService.generateAndSaveReport(studentId, title, type);
       res.json({ success: true, data });
@@ -91,7 +115,10 @@ export class StudentController {
 
   public getSettings = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { studentId } = getStudentDashboardParams.parse(req.params);
+      const params = getStudentDashboardParams.parse(req.params);
+      const studentProfile = await import('../prisma/client').then(m => m.prisma.studentProfile.findUnique({ where: { userId: params.studentId } }));
+      if (!studentProfile) throw new Error('Student profile not found for user');
+      const studentId = studentProfile.id;
       const data = await studentService.getSettings(studentId);
       res.json({ success: true, data });
     } catch (error: any) {
@@ -101,7 +128,10 @@ export class StudentController {
 
   public updateProfileSettings = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { studentId } = getStudentDashboardParams.parse(req.params);
+      const params = getStudentDashboardParams.parse(req.params);
+      const studentProfile = await import('../prisma/client').then(m => m.prisma.studentProfile.findUnique({ where: { userId: params.studentId } }));
+      if (!studentProfile) throw new Error('Student profile not found for user');
+      const studentId = studentProfile.id;
       const data = updateProfileBody.parse(req.body);
       const result = await studentService.updateProfile(studentId, data);
       res.json(result);
@@ -112,7 +142,10 @@ export class StudentController {
 
   public updateAcademicSettings = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { studentId } = getStudentDashboardParams.parse(req.params);
+      const params = getStudentDashboardParams.parse(req.params);
+      const studentProfile = await import('../prisma/client').then(m => m.prisma.studentProfile.findUnique({ where: { userId: params.studentId } }));
+      if (!studentProfile) throw new Error('Student profile not found for user');
+      const studentId = studentProfile.id;
       const data = updateAcademicBody.parse(req.body);
       const result = await studentService.updateAcademic(studentId, data);
       res.json(result);
@@ -123,7 +156,10 @@ export class StudentController {
 
   public updateNotificationSettings = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { studentId } = getStudentDashboardParams.parse(req.params);
+      const params = getStudentDashboardParams.parse(req.params);
+      const studentProfile = await import('../prisma/client').then(m => m.prisma.studentProfile.findUnique({ where: { userId: params.studentId } }));
+      if (!studentProfile) throw new Error('Student profile not found for user');
+      const studentId = studentProfile.id;
       const data = updateNotificationsBody.parse(req.body);
       const result = await studentService.updateNotifications(studentId, data);
       res.json(result);
@@ -134,7 +170,10 @@ export class StudentController {
 
   public updateSecuritySettings = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { studentId } = getStudentDashboardParams.parse(req.params);
+      const params = getStudentDashboardParams.parse(req.params);
+      const studentProfile = await import('../prisma/client').then(m => m.prisma.studentProfile.findUnique({ where: { userId: params.studentId } }));
+      if (!studentProfile) throw new Error('Student profile not found for user');
+      const studentId = studentProfile.id;
       const data = updateSecurityBody.parse(req.body);
       const result = await studentService.updateSecurity(studentId, data);
       res.json(result);
@@ -145,7 +184,10 @@ export class StudentController {
 
   public getDocuments = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { studentId } = getStudentDashboardParams.parse(req.params);
+      const params = getStudentDashboardParams.parse(req.params);
+      const studentProfile = await import('../prisma/client').then(m => m.prisma.studentProfile.findUnique({ where: { userId: params.studentId } }));
+      if (!studentProfile) throw new Error('Student profile not found for user');
+      const studentId = studentProfile.id;
       const data = await studentService.getDocuments(studentId);
       res.json({ success: true, data });
     } catch (error: any) {

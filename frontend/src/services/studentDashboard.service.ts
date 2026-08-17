@@ -1,8 +1,8 @@
 // Ensure it points to the Express backend
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 const fetcher = async (url: string) => {
-  const response = await fetch(url);
+  const response = await fetch(url, { credentials: 'include' });
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
@@ -12,35 +12,35 @@ const fetcher = async (url: string) => {
 
 export const studentDashboardService = {
   getStudentInfo: async (studentId: string) => {
-    return fetcher(`${API_URL}/student/${studentId}/dashboard/info`);
+    return fetcher(`${API_URL}/api/student/${studentId}/dashboard/info`);
   },
 
   getTodayClasses: async (studentId: string) => {
-    return fetcher(`${API_URL}/student/${studentId}/dashboard/today-classes`);
+    return fetcher(`${API_URL}/api/student/${studentId}/dashboard/today-classes`);
   },
 
   getCourses: async (studentId: string) => {
-    return fetcher(`${API_URL}/student/${studentId}/dashboard/courses`);
+    return fetcher(`${API_URL}/api/student/${studentId}/dashboard/courses`);
   },
 
   getAssignments: async (studentId: string) => {
-    return fetcher(`${API_URL}/student/${studentId}/dashboard/assignments`);
+    return fetcher(`${API_URL}/api/student/${studentId}/dashboard/assignments`);
   },
 
   getInsights: async (studentId: string) => {
-    return fetcher(`${API_URL}/student/${studentId}/dashboard/insights`);
+    return fetcher(`${API_URL}/api/student/${studentId}/dashboard/insights`);
   },
 
   getAttendanceAnalytics: async (studentId: string, semester: string) => {
-    return fetcher(`${API_URL}/student/${studentId}/reports/attendance?semester=${encodeURIComponent(semester)}`);
+    return fetcher(`${API_URL}/api/student/${studentId}/reports/attendance?semester=${encodeURIComponent(semester)}`);
   },
 
   getUnderstandingAnalytics: async (studentId: string, semester: string) => {
-    return fetcher(`${API_URL}/student/${studentId}/reports/understanding?semester=${encodeURIComponent(semester)}`);
+    return fetcher(`${API_URL}/api/student/${studentId}/reports/understanding?semester=${encodeURIComponent(semester)}`);
   },
 
   exportReport: async (studentId: string, title: string, type: string) => {
-    const response = await fetch(`${API_URL}/student/${studentId}/reports/export`, {
+    const response = await fetch(`${API_URL}/api/student/${studentId}/reports/export`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -56,11 +56,11 @@ export const studentDashboardService = {
   },
 
   getSettings: async (studentId: string) => {
-    return fetcher(`${API_URL}/student/${studentId}/settings`);
+    return fetcher(`${API_URL}/api/student/${studentId}/settings`);
   },
 
   updateProfile: async (studentId: string, payload: any) => {
-    const response = await fetch(`${API_URL}/student/${studentId}/settings/profile`, {
+    const response = await fetch(`${API_URL}/api/student/${studentId}/settings/profile`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -71,7 +71,7 @@ export const studentDashboardService = {
   },
 
   updateAcademic: async (studentId: string, payload: any) => {
-    const response = await fetch(`${API_URL}/student/${studentId}/settings/academic`, {
+    const response = await fetch(`${API_URL}/api/student/${studentId}/settings/academic`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -82,7 +82,7 @@ export const studentDashboardService = {
   },
 
   updateNotifications: async (studentId: string, payload: any) => {
-    const response = await fetch(`${API_URL}/student/${studentId}/settings/notifications`, {
+    const response = await fetch(`${API_URL}/api/student/${studentId}/settings/notifications`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -93,7 +93,7 @@ export const studentDashboardService = {
   },
 
   updateSecurity: async (studentId: string, payload: any) => {
-    const response = await fetch(`${API_URL}/student/${studentId}/settings/security`, {
+    const response = await fetch(`${API_URL}/api/student/${studentId}/settings/security`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -104,20 +104,20 @@ export const studentDashboardService = {
   },
 
   getDocuments: async (studentId: string) => {
-    return fetcher(`${API_URL}/student/${studentId}/documents`);
+    return fetcher(`${API_URL}/api/student/${studentId}/documents`);
   },
 
   // Cross-Module Methods
   getCourseResources: async () => {
-    return fetcher(`${API_URL}/student/resources`);
+    return fetcher(`${API_URL}/api/student/resources`);
   },
 
   getActivePulseSessions: async () => {
-    return fetcher(`${API_URL}/student/pulse/active`);
+    return fetcher(`${API_URL}/api/student/pulse/active`);
   },
 
   submitPulseResponse: async (sessionId: string, selectedOption: string) => {
-    const response = await fetch(`${API_URL}/student/pulse/respond`, {
+    const response = await fetch(`${API_URL}/api/student/pulse/respond`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sessionId, selectedOption })
