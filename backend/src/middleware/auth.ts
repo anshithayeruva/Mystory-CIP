@@ -5,45 +5,64 @@ import { Role } from '@prisma/client';
 declare global {
   namespace Express {
     interface Request {
-      user?: any;
+      user?: {
+        id: string;
+        role: Role;
+        mustChangePassword: boolean;
+      };
     }
   }
 }
 
-export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
-  try {
-    // Check Authorization header first
+/**
+ * Requires a valid JWT in the `token` httpOnly cookie.
+ * Populates req.user with { id, role, mustChangePassword }.
+ * Returns 401 if missing or invalid — no dev bypass.
+ */
+export const requireAuth = (req: Request, res: Response, next: NextFunction): void => {
+  // 1. Read from httpOnly cookie first (primary), then Bearer header (fallback)
+  let token = req.cookies?.token as string | undefined;
+
+  if (!token) {
     const authHeader = req.headers.authorization;
-    let token = '';
-    
     if (authHeader && authHeader.startsWith('Bearer ')) {
-      token = authHeader.split(' ')[1] || '';
-    } else if (req.cookies && req.cookies.session) {
-      // Fallback to cookie if present
-      token = req.cookies.session;
+      token = authHeader.split(' ')[1];
     }
-
-    if (token) {
-      const payload = verifyToken(token);
-      if (payload) {
-        req.user = payload;
-        return next();
-      }
-    }
-
-    // Default development fallback user (no token required)
-    req.user = { id: 'dev-user-id', role: 'HOD' };
-    next();
-  } catch (error) {
-    req.user = { id: 'dev-user-id', role: 'HOD' };
-    next();
   }
+
+  if (!token) {
+    res.status(401).json({ success: false, message: 'Unauthorized: No token provided' });
+    return;
+  }
+
+  const payload = verifyToken(token);
+  if (!payload || !payload.sub) {
+    res.status(401).json({ success: false, message: 'Unauthorized: Invalid or expired token' });
+    return;
+  }
+
+  req.user = {
+    id: payload.sub,
+    role: payload.role,
+    mustChangePassword: payload.mustChangePassword ?? false,
+  };
+
+  next();
 };
 
+/**
+ * Middleware to restrict routes to specific roles.
+ */
 export const requireRole = (allowedRoles: Role[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    if (!req.user) {
+      res.status(401).json({ success: false, message: 'Unauthorized' });
+      return;
+    }
+    if (!allowedRoles.includes(req.user.role)) {
+      res.status(403).json({ success: false, message: `Forbidden: requires one of [${allowedRoles.join(', ')}]` });
+      return;
+    }
     next();
   };
 };
-
-

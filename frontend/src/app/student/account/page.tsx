@@ -9,8 +9,28 @@ export default function StudentAccountPage() {
   const [mounted, setMounted] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  const [initials, setInitials] = useState("ST");
+
   useEffect(() => {
     setMounted(true);
+    if (typeof window !== "undefined") {
+      const userStr = localStorage.getItem("currentUser");
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        setProfile(prev => ({
+          ...prev,
+          fullName: user.name || prev.fullName,
+          email: user.email || prev.email,
+        }));
+        
+        if (user.name) {
+          const parts = user.name.split(' ');
+          const f = parts[0]?.[0] || '';
+          const l = parts[1]?.[0] || '';
+          setInitials((f + l).toUpperCase() || "ST");
+        }
+      }
+    }
   }, []);
 
   // Form State
@@ -86,7 +106,7 @@ export default function StudentAccountPage() {
         <form onSubmit={handleSaveProfile}>
           <div className={styles.profileLayout}>
             <div className={styles.avatarSection}>
-              <div className={styles.avatarCircle}>NN</div>
+              <div className={styles.avatarCircle}>{initials}</div>
               <button 
                 type="button" 
                 className={styles.editAvatarBtn}

@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 import { prisma } from './prisma/client';
 import path from 'path';
 import adminRoutes from './routes/admin.routes';
@@ -17,10 +18,11 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-  origin: 'http://localhost:3000', // Allow the frontend to access the API
+  origin: 'http://localhost:3000',
   credentials: true,
 }));
 app.use(express.json());
+app.use(cookieParser()); // Required for req.cookies (JWT auth cookie)
 
 // Serve static uploads
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));

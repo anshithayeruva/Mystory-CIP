@@ -24,18 +24,27 @@ export default function CreateUserPage() {
     setLoading(true);
     try {
       const payload = { ...formData, userType };
-      const res = await fetch("http://localhost:5000/api/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) {
-        const data = await res.json();
-        localStorage.setItem('createdUser', JSON.stringify(data.data));
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/admin/users`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(payload),
+        }
+      );
+      const data = await res.json();
+      if (res.ok && data.success) {
+        // Store the result WITHOUT any credentials — they go to the user's email only.
+        localStorage.setItem("lastCreatedUser", JSON.stringify({
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email || data.data?.email,
+          role: data.data?.role,
+          message: data.message,
+        }));
         router.push("/admin/user-management/success");
       } else {
-        const data = await res.json();
-        setError(data.error || "Failed to create user");
+        setError(data.message || "Failed to create user");
       }
     } catch (err: any) {
       setError(err.message);

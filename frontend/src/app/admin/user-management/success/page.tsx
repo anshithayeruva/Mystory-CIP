@@ -2,32 +2,24 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, CheckCircle, ShieldCheck, Copy, Send, FileText, Printer, AlertTriangle } from "lucide-react";
+import { CheckCircle2, CheckCircle, ShieldCheck, Mail, AlertTriangle } from "lucide-react";
 import styles from "./success.module.css";
 
 export default function UserSuccessPage() {
   const [createdUser, setCreatedUser] = useState<any>(null);
 
   useEffect(() => {
-    const data = localStorage.getItem('createdUser');
+    const data = localStorage.getItem('lastCreatedUser');
     if (data) {
       setCreatedUser(JSON.parse(data));
     }
   }, []);
 
-  const copyPassword = () => {
-    if (createdUser?.generatedCredentials?.password) {
-      navigator.clipboard.writeText(createdUser.generatedCredentials.password);
-      alert("Password copied to clipboard!");
-    }
-  };
-
   if (!createdUser) {
     return <div style={{ padding: "2rem" }}>Loading... (or no user data found)</div>;
   }
 
-  const { user, generatedCredentials } = createdUser;
-  const roleName = user.role === 'HOD' ? 'HoD' : user.role === 'FACULTY' ? 'Faculty' : 'Student';
+  const roleName = createdUser.role === 'HOD' ? 'HoD' : createdUser.role === 'FACULTY' ? 'Faculty' : 'Student';
 
   return (
     <div className={styles.pageContainer}>
@@ -61,7 +53,7 @@ export default function UserSuccessPage() {
         <div className={styles.summaryGrid}>
           <div className={styles.infoGroup}>
             <span className={styles.infoLabel}>FULL NAME</span>
-            <span className={styles.infoValue}>{user.firstName} {user.lastName}</span>
+            <span className={styles.infoValue}>{createdUser.name}</span>
           </div>
           <div className={styles.infoGroup}>
             <span className={styles.infoLabel}>USER TYPE</span>
@@ -69,64 +61,39 @@ export default function UserSuccessPage() {
           </div>
           <div className={styles.infoGroup}>
             <span className={styles.infoLabel}>INSTITUTION EMAIL</span>
-            <span className={styles.infoValue}>{user.email}</span>
+            <span className={styles.infoValue}>{createdUser.email}</span>
           </div>
           <div className={styles.infoGroup}>
             <span className={styles.infoLabel}>ACCOUNT STATUS</span>
             <div>
-              {user.isActive ? (
-                <span className={styles.statusActive}>
-                  <span className={styles.statusDot}></span> ACTIVE
-                </span>
-              ) : (
-                <span style={{ color: 'orange', fontSize: '0.8125rem', fontWeight: 600 }}>INACTIVE</span>
-              )}
+              <span className={styles.statusActive}>
+                <span className={styles.statusDot}></span> ACTIVE
+              </span>
             </div>
-          </div>
-        </div>
-
-        <div className={styles.tagsRow}>
-          <div className={styles.tagBlue}>
-            <Send size={14} /> Invitation Sent
-          </div>
-          <div className={styles.tagOrange}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg> 
-            Password Reset Required
           </div>
         </div>
       </div>
 
-      {/* Temporary Password Card */}
+      {/* Credential Delivery Notice */}
       <div className={styles.passwordCard}>
         <div className={styles.passwordLeft}>
           <div className={styles.passwordHeader}>
             <ShieldCheck size={20} color="#0f172a" />
-            Temporary Password
+            Secure Credentials Dispatched
           </div>
           
-          <div className={styles.passwordBox}>
-            <span className={styles.passwordText}>{generatedCredentials?.password}</span>
-            <button className={styles.copyBtn} aria-label="Copy Password" onClick={copyPassword}>
-              <Copy size={18} />
-            </button>
+          <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '12px', padding: '16px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+            <Mail size={24} color="#00522E" />
+            <div>
+              <div style={{ fontWeight: 600, color: '#0f172a', fontSize: '14px' }}>Credentials sent to {createdUser.email}</div>
+              <div style={{ color: '#64748b', fontSize: '13px', marginTop: '4px' }}>A secure temporary password has been emailed directly to the user.</div>
+            </div>
           </div>
 
-          <div className={styles.warning}>
+          <div className={styles.warning} style={{ marginTop: '16px' }}>
             <AlertTriangle size={14} className={styles.warningIcon} />
-            <span>This temporary password is shown <strong>only once</strong>. Please copy or download the credentials before leaving this page for institutional security compliance.</span>
+            <span>For security reasons, temporary passwords are <strong>never displayed on screen</strong>. The user will be required to set a permanent password upon first login.</span>
           </div>
-        </div>
-        
-        <div className={styles.passwordActions}>
-          <button className={styles.actionBtn}>
-            <Send size={14} /> Send Welcome Email
-          </button>
-          <button className={styles.actionBtn}>
-            <FileText size={14} /> Download PDF
-          </button>
-          <button className={styles.actionBtn}>
-            <Printer size={14} /> Print
-          </button>
         </div>
       </div>
 

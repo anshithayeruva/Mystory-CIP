@@ -78,12 +78,16 @@ export default function FormFields({ userType, setUserType, formData, setFormDat
             <label className={styles.label}>LAST NAME <span className={styles.required}>*</span></label>
             <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} className={styles.input} placeholder="e.g. Doe" />
           </div>
-        </div>
-        <div className={styles.inputGroup} style={{ width: "50%" }}>
-          <label className={styles.label}>PHONE NUMBER (OPTIONAL)</label>
-          <div style={{ display: "flex" }}>
-            <span style={{ padding: "10px", border: "1px solid var(--surface-border)", borderRight: "none", borderRadius: "var(--radius-sm) 0 0 var(--radius-sm)", backgroundColor: "#f8fafc", color: "var(--text-muted)", fontSize: "0.875rem" }}>+1</span>
-            <input type="text" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} className={styles.input} placeholder="555-0123" style={{ flex: 1, borderRadius: "0 var(--radius-sm) var(--radius-sm) 0" }} />
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>EMAIL <span className={styles.required}>*</span></label>
+            <input type="email" name="email" value={formData.email || ""} onChange={handleChange} className={styles.input} placeholder="e.g. jdoe@mystory.edu" />
+          </div>
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>PHONE NUMBER (OPTIONAL)</label>
+            <div style={{ display: "flex" }}>
+              <span style={{ padding: "10px", border: "1px solid var(--surface-border)", borderRight: "none", borderRadius: "var(--radius-sm) 0 0 var(--radius-sm)", backgroundColor: "#f8fafc", color: "var(--text-muted)", fontSize: "0.875rem" }}>+1</span>
+              <input type="text" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} className={styles.input} placeholder="555-0123" style={{ flex: 1, borderRadius: "0 var(--radius-sm) var(--radius-sm) 0" }} />
+            </div>
           </div>
         </div>
       </div>

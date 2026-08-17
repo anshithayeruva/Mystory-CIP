@@ -17,9 +17,11 @@ model User {
   phoneNumber      String?
   lastLoginAt      DateTime?
   isActive         Boolean           @default(true)
-  twoFactorEnabled Boolean           @default(false)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  twoFactorEnabled     Boolean           @default(false)
+  mustChangePassword   Boolean           @default(true)
+  createdBy            String?           @db.ObjectId
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
   adminProfile     AdminProfile?
   facultyProfile   FacultyProfile?
   hodProfile       HodProfile?
